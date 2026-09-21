@@ -3693,11 +3693,16 @@ body {
   display: block;
   width: 100%;
   height: auto;
-  max-height: 380px;
-  object-fit: contain;
+  aspect-ratio: 2 / 1;
+  object-fit: cover;
+  object-position: center 52%;
   border-radius: 18px;
-  background: #f5f1e6;
   margin: 1rem 0 1.5rem;
+}
+@media (max-width: 650px) {
+  .morgan-master-art {
+    aspect-ratio: 3 / 2;
+  }
 }
 .closing-diagram {
   padding: 1.25rem;
