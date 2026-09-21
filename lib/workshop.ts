@@ -347,9 +347,7 @@ export function selectionStamp(s: Session) {
 }
 export function selectionConfirmed(s: Session) {
   return (
-    activeCases(s).length > 0 &&
-    s.selectionSignature === selectionStamp(s) &&
-    !!s.selectionBy.trim()
+    activeCases(s).length > 0 && s.selectionSignature === selectionStamp(s)
   );
 }
 export function signature(lab: Lab, a: Audience) {
@@ -726,7 +724,7 @@ export function readout(s: Session): string {
       ? " (outside current working set)"
       : "");
   return [
-    `# Workshop readout\n${s.title}\n\nWorking set: ${selectionConfirmed(s) ? `Confirmed by ${s.selectionBy}` : "Proposed / needs confirmation"}`,
+    `# Workshop readout\n${s.title}\n\nWorking set: ${selectionConfirmed(s) ? "Confirmed live with the room" : "Proposed / needs confirmation"}`,
     "## Priority use cases",
     ...activeCases(s).map(
       (u) =>

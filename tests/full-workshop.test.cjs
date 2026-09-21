@@ -1435,3 +1435,15 @@ test("Morgan navigation anchors the day heading and all seven scenes have illust
     global.requestAnimationFrame = saved.raf;
   }
 });
+
+test("live working-set confirmation needs no named approver", () => {
+  const s = w.createSession();
+  s.selected = ["s2", "s3", "s5"];
+  assert.equal(w.selectionConfirmed(s), false);
+  s.selectionSignature = w.selectionStamp(s);
+  assert.equal(s.selectionBy, "");
+  assert.equal(w.selectionConfirmed(s), true);
+  assert.match(w.readout(s), /Confirmed live with the room/);
+  s.assessments.s3.proofText = "Updated proof";
+  assert.equal(w.selectionConfirmed(s), false);
+});

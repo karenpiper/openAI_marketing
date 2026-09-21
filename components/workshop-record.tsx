@@ -87,7 +87,7 @@ export default function WorkshopRecord({
       <p className={`notice ${selectionConfirmed(session) ? "success" : ""}`}>
         Working set:{" "}
         {selectionConfirmed(session)
-          ? `confirmed by ${session.selectionBy}`
+          ? "confirmed live with the room"
           : "needs confirmation in the use-case recap"}
         .
       </p>

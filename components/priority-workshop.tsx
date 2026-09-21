@@ -125,6 +125,15 @@ export default function PriorityWorkshop({
                 A working session tool — not a finished answer
               </div>
               <h2>Meet Morgan.</h2>
+              <Image
+                className="morgan-master-art"
+                src="/images/morgan/meet-morgan.png"
+                alt="Morgan at her desk at the start of Tuesday, surrounded by audience, content, approval and measurement work."
+                width={1536}
+                height={1024}
+                sizes="(max-width: 850px) 100vw, 900px"
+                priority
+              />
               <p className="moment">
                 Growth &amp; ABM lead on OpenAI’s enterprise marketing team.
                 This is a working hypothesis of Morgan’s Tuesday today. We’ll

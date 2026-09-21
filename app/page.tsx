@@ -242,23 +242,15 @@ export default function Workshop() {
           </span>
         </label>
       ))}
-      <Field
-        label="Confirmed with / by"
-        value={session.selectionBy}
-        onChange={(v) =>
-          setSession((s) => ({ ...s, selectionBy: v, selectionSignature: "" }))
-        }
-        placeholder="Room consensus, or named decision maker"
-      />
       <div className="inline-actions">
         <button
           className="primary"
-          disabled={!activeCases(session).length || !session.selectionBy.trim()}
+          disabled={!activeCases(session).length}
           onClick={() =>
             setSession((s) => ({ ...s, selectionSignature: selectionStamp(s) }))
           }
         >
-          Confirm working set
+          Confirm the room’s working set
         </button>
         <Badge value={selectionConfirmed(session) ? "Confirmed" : "Proposed"} />
       </div>

@@ -66,7 +66,7 @@ export default function RoomView({ session }: { session: Session }) {
               <h1>Which cases do we carry forward?</h1>
               <p className="room-lede">
                 {selectionConfirmed(s)
-                  ? `Working set confirmed by ${s.selectionBy}`
+                  ? "Working set confirmed live with the room"
                   : "Candidate ranking. The room still needs to confirm the working set."}
               </p>
               {rank(s.assessments).map((c, i) => (

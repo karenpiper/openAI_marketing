@@ -3689,3 +3689,31 @@ body {
     max-height: 280px;
   }
 }
+.morgan-master-art {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 380px;
+  object-fit: contain;
+  border-radius: 18px;
+  background: #f5f1e6;
+  margin: 1rem 0 1.5rem;
+}
+.closing-diagram {
+  padding: 1.25rem;
+  background: #ffffff;
+  box-shadow: 0 8px 24px #18382c08;
+  border-color: #d6dfd2;
+}
+.closing-diagram svg text {
+  font-family:
+    Inter,
+    ui-sans-serif,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+}
+.closing-diagram svg {
+  shape-rendering: geometricPrecision;
+}
