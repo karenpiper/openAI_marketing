@@ -5,9 +5,11 @@ import { Badge } from "./workshop-fields";
 export default function ArchitectureOutput({
   session: s,
   download = true,
+  compact = false,
 }: {
   session: Session;
   download?: boolean;
+  compact?: boolean;
 }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
@@ -46,7 +48,7 @@ export default function ArchitectureOutput({
       <div className="card-heading">
         <div>
           <span className="eyebrow">Generated from this conversation</span>
-          <h2>The architecture we discussed</h2>
+          <h2>Proposed architecture</h2>
         </div>
         {download && (
           <button disabled={busy} onClick={exportPdf}>
@@ -55,14 +57,9 @@ export default function ArchitectureOutput({
         )}
       </div>
       {error && <p role="alert">{error}</p>}
-      <p>
-        Agreed, proposed and unresolved elements stay distinct. Arrows show the
-        workflow sequence, not implemented integrations.
-      </p>
       <p className="muted">
-        “Looks right” means agreement on direction. Room changes and questions
-        remain visible alongside our proposal. Changed source answers require a
-        recheck.
+        Proposed workflow order · room changes and open questions remain
+        visible. Download the PDF for the full architecture record.
       </p>
       {!model.cases.length && (
         <p>
@@ -70,77 +67,87 @@ export default function ArchitectureOutput({
           build this view.
         </p>
       )}
-      {model.cases.map((c) => (
-        <section key={c.id}>
-          <h3>
-            {c.label}
-            {!c.selected ? " · outside the working set" : ""}
-          </h3>
-          <ol className="generated-flow">
-            {c.nodes.map((n, i) => (
-              <li key={i} className="generated-node">
-                <div className="card-heading">
-                  <h4>
-                    {i + 1}. {n.title}
-                  </h4>
-                  <Badge value={n.status} />
-                </div>
-                <p>{n.approach}</p>
-                {n.annotation && (
-                  <p className="proposal-annotation">
-                    <b>Room input:</b> {n.annotation}
-                  </p>
-                )}
-                <dl>
-                  <dt>
-                    {n.systemsSuggested && n.status !== "Direction agreed"
-                      ? "Suggested systems"
-                      : "Systems and roles"}
-                  </dt>
-                  <dd className="preserve-lines">{n.systems}</dd>
-                  {n.owner !== "Not assigned" && (
-                    <>
-                      <dt>Follow-up owner</dt>
-                      <dd>{n.owner}</dd>
-                    </>
-                  )}
-                  {n.handoff !== "Not captured" && (
-                    <>
-                      <dt>Captured handoff</dt>
-                      <dd>{n.handoff}</dd>
-                    </>
-                  )}
-                  {n.controls !== "Not captured" && (
-                    <>
-                      <dt>Captured controls</dt>
-                      <dd>{n.controls}</dd>
-                    </>
-                  )}
-                </dl>
-                {n.missing.length > 0 && (
-                  <p className="muted">Still needed: {n.missing.join(", ")}</p>
-                )}
-                {n.next && (
-                  <p>
-                    <b>Next:</b> {n.next}
-                  </p>
-                )}
-                {i < 4 && (
-                  <div className="flow-arrow" aria-label="Next workflow step">
-                    ↓
+      {model.cases
+        .filter((c) => !compact || c.selected)
+        .map((c) => (
+          <section key={c.id}>
+            <h3>
+              {c.label}
+              {!c.selected ? " · outside the working set" : ""}
+            </h3>
+            <ol className={compact ? "outcome-flow" : "generated-flow"}>
+              {c.nodes.map((n, i) => (
+                <li key={i} className="generated-node">
+                  <div className="card-heading">
+                    <h4>
+                      {i + 1}. {n.title}
+                    </h4>
+                    <Badge value={n.status} />
                   </div>
-                )}
-              </li>
+                  {!compact && <p>{n.approach}</p>}
+                  {n.annotation && (
+                    <p className="proposal-annotation">
+                      <b>Room input:</b> {n.annotation}
+                    </p>
+                  )}
+                  {compact ? (
+                    <p className="outcome-systems preserve-lines">
+                      {n.systems}
+                    </p>
+                  ) : (
+                    <dl>
+                      <dt>
+                        {n.systemsSuggested && n.status !== "Direction agreed"
+                          ? "Suggested systems"
+                          : "Systems and roles"}
+                      </dt>
+                      <dd className="preserve-lines">{n.systems}</dd>
+                      {n.owner !== "Not assigned" && (
+                        <>
+                          <dt>Follow-up owner</dt>
+                          <dd>{n.owner}</dd>
+                        </>
+                      )}
+                      {n.handoff !== "Not captured" && (
+                        <>
+                          <dt>Captured handoff</dt>
+                          <dd>{n.handoff}</dd>
+                        </>
+                      )}
+                      {n.controls !== "Not captured" && (
+                        <>
+                          <dt>Captured controls</dt>
+                          <dd>{n.controls}</dd>
+                        </>
+                      )}
+                    </dl>
+                  )}
+                  {n.missing.length > 0 && (
+                    <p className="muted">
+                      Still needed: {n.missing.join(", ")}
+                    </p>
+                  )}
+                  {!compact && n.next && (
+                    <p>
+                      <b>Next:</b> {n.next}
+                    </p>
+                  )}
+                  {!compact && i < 4 && (
+                    <div className="flow-arrow" aria-label="Next workflow step">
+                      ↓
+                    </div>
+                  )}
+                </li>
+              ))}
+            </ol>
+            {c.additions.map((a) => (
+              <p className="proposal-annotation" key={a.id}>
+                <b>Room addition:</b> {a.note || "Not yet described"}
+                {a.owner && ` · Follow-up: ${a.owner}`}
+              </p>
             ))}
-          </ol>
-          {c.additions.map((a) => (
-            <p className="proposal-annotation" key={a.id}>
-              <b>Room addition:</b> {a.note || "Not yet described"}
-              {a.owner && ` · Follow-up: ${a.owner}`}
-            </p>
-          ))}
-        </section>
-      ))}
+          </section>
+        ))}
     </section>
   );
 }

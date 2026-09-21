@@ -949,7 +949,7 @@ test("data-entry sections expose save controls while read-only sections do not",
     require("../components/workshop-mapping.tsx").CurrentState,
     require("../components/workshop-mapping.tsx").Architecture,
     require("../components/content-lab.tsx").default,
-    require("../components/workshop-readout.tsx").default,
+    require("../components/workshop-record.tsx").default,
   ];
   for (const Comp of modules) {
     const html = renderToStaticMarkup(
@@ -1101,4 +1101,26 @@ test("workflow simulation adapts all 32 scenarios and persists without generatio
       .readFileSync(require.resolve("../components/content-lab.tsx"), "utf8")
       .includes("fetch("),
   );
+});
+
+test("outcome readout lands on priorities and architecture without capture forms", () => {
+  const Readout = require("../components/workshop-readout.tsx").default;
+  const s = require("../lib/demo-session.ts").createDemoSession();
+  for (const room of [false, true]) {
+    const html = renderToStaticMarkup(
+      React.createElement(Readout, { session: s, setSession: () => {}, room }),
+    );
+    assert.match(html, /Three priority use cases/);
+    assert.match(html, /Proposed architecture/);
+    assert.equal((html.match(/class="outcome-priority"/g) || []).length, 3);
+    assert.ok(!html.includes("<textarea"));
+    assert.ok(!html.includes("Current-state findings"));
+    assert.ok(!html.includes("actions without owners"));
+    assert.equal(html.includes("Open full workshop record"), !room);
+  }
+  const empty = renderToStaticMarkup(
+    React.createElement(Readout, { session: w.createSession() }),
+  );
+  assert.match(empty, /0 priority use cases/);
+  assert.ok(!empty.includes("Three priority use cases"));
 });

@@ -3216,3 +3216,108 @@ body {
     position: static;
   }
 }
+
+.outcome-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin: 1.5rem 0 2.5rem;
+}
+.outcome-nav a {
+  padding: 0.8rem 1rem;
+  border: 1px solid #9aaf9e;
+  border-radius: 10px;
+  color: #18382c;
+  background: #e8eddb;
+  text-decoration: none;
+  font-weight: 600;
+}
+.outcome-priorities {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+}
+.outcome-priority {
+  padding: 1.5rem;
+  border: 1px solid #bdcbbc;
+  border-radius: 16px;
+  background: #fffdf7;
+}
+.outcome-priority h3 {
+  font-size: 1.6rem;
+  margin: 0.7rem 0;
+}
+.outcome-priority dt {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-weight: 700;
+  color: #496450;
+  margin-top: 1.2rem;
+}
+.outcome-priority dd {
+  margin: 0.4rem 0 0;
+}
+#priority-outcomes,
+#architecture-outcome {
+  scroll-margin-top: 2rem;
+}
+#architecture-outcome {
+  margin-top: 3rem;
+}
+.outcome-flow {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 0.6rem;
+  list-style: none;
+  padding: 0;
+}
+.outcome-flow .generated-node {
+  padding: 1rem;
+  min-width: 0;
+  position: relative;
+}
+.outcome-flow .card-heading {
+  display: block;
+}
+.outcome-flow h4 {
+  font-size: 1rem;
+  margin: 0 0 0.6rem;
+}
+.outcome-flow .generated-node:not(:last-child)::after {
+  content: "→";
+  position: absolute;
+  right: -0.65rem;
+  top: 45%;
+  z-index: 1;
+  color: #365343;
+}
+.outcome-systems {
+  font-size: 0.85rem;
+  overflow-wrap: anywhere;
+}
+.outcome-flow .proposal-annotation {
+  padding: 0.6rem;
+  font-size: 0.85rem;
+}
+.outcome-record-link {
+  margin-top: 2rem;
+  padding-top: 1rem;
+  border-top: 1px solid #bdcbbc;
+}
+@media (max-width: 1000px) {
+  .outcome-flow {
+    grid-template-columns: 1fr;
+  }
+  .outcome-flow .generated-node:not(:last-child)::after {
+    content: "↓";
+    top: auto;
+    bottom: -0.85rem;
+    right: 50%;
+  }
+}
+@media (max-width: 750px) {
+  .outcome-priorities {
+    grid-template-columns: 1fr;
+  }
+}
