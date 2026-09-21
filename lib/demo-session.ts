@@ -1,3 +1,4 @@
+import { reviewWorkflow } from "./architecture-workflow";
 import { saveInterpretation } from "./live-synthesis";
 import { currentQuestions, findAnswer, editAnswer } from "./workshop-guide";
 import {
@@ -343,6 +344,23 @@ export function createDemoSession(): Session {
   demo = saveInterpretation(demo, "s3", 1, {
     coverage: "Works with gaps",
     status: "Proposed",
+  });
+  demo = reviewWorkflow(demo, "s3", 0, {
+    choice: "Keep",
+    owner: "Demo audience lead",
+    next: "Verify available audience signals before the pilot.",
+  });
+  demo = reviewWorkflow(demo, "s3", 1, {
+    choice: "Change",
+    change:
+      "Use the existing approved library first; verify whether the proposed asset system is needed.",
+    owner: "Demo content lead",
+    next: "Bring an approved source and its version record.",
+  });
+  demo = reviewWorkflow(demo, "s3", 3, {
+    choice: "Unresolved",
+    owner: "Demo operations lead",
+    next: "Decide who gives final approval and how it reaches delivery.",
   });
   return demo;
 }

@@ -545,9 +545,7 @@ test("all guided questions and readbacks render in real, demo and projected sess
             assert.ok(
               room.includes(guide.currentQuestions[c.id][step].question),
             );
-            assert.ok(
-              html.includes("Which tools are involved, and what does each do?"),
-            );
+            assert.ok(html.includes(guide.toolPrompts[c.id][step]));
           }
           assert.ok(!html.includes("Start with a capability"));
           assert.ok(!html.includes("Define the boundary"));
@@ -658,4 +656,57 @@ test("live synthesis renders in capture, projector, architecture and readout wit
   const parsed = w.parseSession(JSON.parse(JSON.stringify(bad)));
   assert.equal(parsed.capabilities[0].synthesis.coverage, "Not established");
   assert.equal(parsed.capabilities[0].synthesis.status, "Unknown");
+});
+
+test("proposed workflows cover seven cases, cite real diagram boxes and carry decisions with source freshness", () => {
+  const f = require("../lib/architecture-workflow.ts");
+  const guide = require("../lib/workshop-guide.ts");
+  let s = require("../lib/demo-session.ts").createDemoSession();
+  for (const c of useCases) {
+    assert.equal(f.workflows[c.id].length, 5);
+    assert.equal(guide.toolPrompts[c.id].length, 4);
+    for (const step of f.workflows[c.id]) {
+      assert.ok(step.boxes.every((b) => f.pdfBoxes[b]));
+      assert.ok(step.sources.every((i) => guide.currentQuestions[c.id][i]));
+    }
+  }
+  s = f.reviewWorkflow(s, "s3", 1, {
+    choice: "Change",
+    change: "Keep our existing library",
+    owner: "Content lead",
+    next: "Verify approval metadata",
+  });
+  assert.equal(f.workflowState(s, "s3", 1).stale, false);
+  assert.deepEqual(w.parseSession(JSON.parse(JSON.stringify(s))), s);
+  assert.match(w.readout(s), /Keep our existing library/);
+  s = guide.editAnswer(s, "s3", guide.currentQuestions.s3[0], {
+    system: "Corrected library",
+  });
+  assert.equal(f.workflowState(s, "s3", 1).stale, true);
+  assert.match(w.readout(s), /Evidence changed/);
+  assert.equal(f.workflowState(s, "s3", 0).stale, false);
+  s = f.reviewWorkflow(s, "s3", 1, { choice: "Keep" });
+  assert.equal(f.workflowState(s, "s3", 1).stale, false);
+  const legacy = { ...s };
+  delete legacy.workflowReviews;
+  assert.deepEqual(w.parseSession(legacy).workflowReviews, []);
+});
+
+test("walkthrough shows current evidence, PDF boxes and room decisions in capture and projection", () => {
+  const Walk = require("../components/architecture-walkthrough.tsx").default;
+  const s = require("../lib/demo-session.ts").createDemoSession();
+  s.guide.architecture = 1;
+  for (const room of [true, false]) {
+    const html = renderToStaticMarkup(
+      React.createElement(Walk, { session: s, setSession: () => {}, room }),
+    );
+    assert.match(html, /Find the right approved content/);
+    assert.match(html, /Adobe CSC/);
+    assert.match(html, /Sample approved asset library/);
+    assert.match(html, /Use the existing approved library/);
+    if (!room) {
+      assert.match(html, /Keep/);
+      assert.match(html, /Unresolved/);
+    }
+  }
 });

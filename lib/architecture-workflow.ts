@@ -1,0 +1,351 @@
+import type { Session } from "./workshop";
+import { currentQuestions, findAnswer } from "./workshop-guide";
+export const pdfBoxes = {
+  interface: "Codex Interfaces + ChatGPT work / Agent Interface(s)",
+  data: "OpenAI Data Lake / Adobe CDP (w/ ABM)",
+  assets: "Adobe CSC (Assets, etc)",
+  review: "Adobe Workfront",
+  touchpoints: "Events / CRM (Marketing) / Marketing Website",
+  journeys: "Adobe Customer Journey Analytics → OpenAI Data Lake",
+  sales: "Salesforce / CRM (Sales) / Offer Tools",
+};
+export type WorkflowStep = {
+  title: string;
+  proposal: string;
+  ask: string;
+  boxes: (keyof typeof pdfBoxes)[];
+  sources: number[];
+  output: string;
+};
+const step = (
+  title: string,
+  proposal: string,
+  ask: string,
+  boxes: WorkflowStep["boxes"],
+  sources: number[],
+  output: string,
+): WorkflowStep => ({ title, proposal, ask, boxes, sources, output });
+const learn = step(
+  "Deliver and learn",
+  "Deliver through the relevant touchpoints, compare audience journeys, and return results to the next decision.",
+  "Where should approved work go, and which results should change the next message?",
+  ["touchpoints", "journeys"],
+  [3],
+  "Engagement and progression results for the next audience decision",
+);
+export const workflows: Record<string, WorkflowStep[]> = {
+  s1: [
+    step(
+      "Identify the buying group",
+      "Bring person and account context together to identify roles and gaps.",
+      "Can the existing sources connect people to the right account?",
+      ["data", "sales"],
+      [0],
+      "Account, known roles and identity gaps",
+    ),
+    step(
+      "Understand account activity",
+      "Bring activity into the marketer’s workspace to understand what the account needs.",
+      "Which signals are useful, and which could be misleading?",
+      ["interface", "data", "journeys"],
+      [1],
+      "Account context and a proposed next action",
+    ),
+    step(
+      "Coordinate the outreach",
+      "Use shared context to coordinate marketing and sales activity.",
+      "Who decides the next contact, and how do we prevent conflicting outreach?",
+      ["interface", "sales"],
+      [2],
+      "Coordinated outreach plan and relationship owner",
+    ),
+    step(
+      "Check before acting",
+      "Ask the relationship owner to check sensitive outreach before delivery.",
+      "What must a person approve or stop?",
+      ["review", "sales"],
+      [2],
+      "Approved action or a hold with a reason",
+    ),
+    learn,
+  ],
+  s2: [
+    step(
+      "Bring signals together",
+      "Make relevant audience activity available for a marketer to inspect.",
+      "Which sources are available and trustworthy enough to use?",
+      ["data", "journeys"],
+      [0],
+      "Audience signals with their source and freshness",
+    ),
+    step(
+      "Understand audience needs",
+      "Use the marketer interface to interpret signals alongside account context.",
+      "What context is required before suggesting an action?",
+      ["interface", "data"],
+      [1],
+      "Audience need and supporting evidence",
+    ),
+    step(
+      "Recommend the next action",
+      "Present a proposed action and rationale for the marketer to review.",
+      "What would make the recommendation defensible?",
+      ["interface"],
+      [2],
+      "Recommendation, rationale and alternatives",
+    ),
+    step(
+      "Approve and route the action",
+      "A marketer accepts, changes or stops the recommendation, then passes it to the right team.",
+      "Who approves it, and where does it go next?",
+      ["review", "touchpoints", "sales"],
+      [2],
+      "Approved action and destination",
+    ),
+    learn,
+  ],
+  s3: [
+    step(
+      "Identify an audience and its needs",
+      "Combine relevant signals to define an audience and the message it needs.",
+      "Can your existing signals support this? What is missing?",
+      ["data", "journeys", "interface"],
+      [1],
+      "Audience brief with need, signals and intended response",
+    ),
+    step(
+      "Find the right approved content",
+      "Use the audience brief to find a suitable approved source and its current version.",
+      "Which existing sources should we use, and how do we know the content is approved?",
+      ["assets", "interface"],
+      [0],
+      "Approved source, version and permitted claims",
+    ),
+    step(
+      "Produce relevant message variants",
+      "Draft audience-specific variants from approved material in the marketer’s workspace.",
+      "What can the system draft, and what must stay fixed?",
+      ["interface", "assets"],
+      [2],
+      "Draft variants linked to their audience and source",
+    ),
+    step(
+      "Review and approve",
+      "Route variants for a named person to check claims, relevance and permissions.",
+      "Who approves? What must always require a person?",
+      ["review", "assets"],
+      [2],
+      "Approved variants or requested changes",
+    ),
+    learn,
+  ],
+  s4: [
+    step(
+      "Assemble the launch brief",
+      "Bring the audience, assets and intended touchpoints into one launch brief.",
+      "What must be present before review can begin?",
+      ["interface", "data", "assets"],
+      [0],
+      "Complete campaign brief and source assets",
+    ),
+    step(
+      "Check readiness",
+      "Check the brief against the launch requirements before requesting approval.",
+      "Which checks can be repeatable, and which need judgment?",
+      ["interface", "review"],
+      [0],
+      "Readiness checklist with exceptions",
+    ),
+    step(
+      "Approve the campaign",
+      "Route the campaign to the accountable reviewers.",
+      "Who must sign off, and what triggers another review?",
+      ["review"],
+      [1],
+      "Approval record tied to a campaign version",
+    ),
+    step(
+      "Launch through the right touchpoints",
+      "Hand approved content and audience instructions to the delivery process.",
+      "Which existing tools launch it, and who can pause it?",
+      ["touchpoints"],
+      [2],
+      "Scheduled delivery and launch record",
+    ),
+    step(
+      "Learn from delays and outcomes",
+      "Compare launch timing and audience results to improve the next campaign.",
+      "Which timestamps and outcomes can we actually capture?",
+      ["review", "journeys"],
+      [3],
+      "Launch delays, audience results and improvements",
+    ),
+  ],
+  s5: [
+    step(
+      "Receive the request",
+      "Give the requester a consistent place to state the task and required context.",
+      "Where should requests enter, and what information is essential?",
+      ["interface"],
+      [0],
+      "Request with required context",
+    ),
+    step(
+      "Identify routine work",
+      "Check whether the request matches an agreed repeatable process.",
+      "Which requests are safe to handle routinely?",
+      ["interface", "data"],
+      [1],
+      "Routine or exception classification with rationale",
+    ),
+    step(
+      "Complete the routine task",
+      "Use the existing tools to carry out the agreed repeatable steps.",
+      "Which tools can do this today, and what needs connecting?",
+      ["interface", "touchpoints"],
+      [2],
+      "Completed task and execution record",
+    ),
+    step(
+      "Route exceptions",
+      "Send exceptions to the specialist with the original request and context.",
+      "Who takes over, and how does the requester hear back?",
+      ["review", "interface"],
+      [3],
+      "Named specialist and exception context",
+    ),
+    step(
+      "Return the result",
+      "Show completion and use recurring exceptions to improve the process.",
+      "What proves completion and which exceptions should we learn from?",
+      ["interface", "review"],
+      [2, 3],
+      "Completion response and improvement backlog",
+    ),
+  ],
+  s6: [
+    step(
+      "Recognize a sensitive moment",
+      "Bring relationship context into the decision before an action is taken.",
+      "What signals mean a person must intervene?",
+      ["data", "sales"],
+      [0],
+      "Flagged action and reason for review",
+    ),
+    step(
+      "Give the reviewer context",
+      "Show the proposed action and supporting context to the right person.",
+      "Who needs to see it, and what information is essential?",
+      ["interface", "sales"],
+      [1],
+      "Review request with context",
+    ),
+    step(
+      "Make the human decision",
+      "Let the accountable reviewer approve, change or reject the action.",
+      "Which decisions are reserved for a person?",
+      ["review", "interface"],
+      [1],
+      "Decision and rationale",
+    ),
+    step(
+      "Apply the decision",
+      "Pass the decision to the delivery process, including a stop when needed.",
+      "Where is the stop control, and how do we know it took effect?",
+      ["touchpoints", "sales"],
+      [2],
+      "Changed or stopped action with acknowledgement",
+    ),
+    step(
+      "Keep the record",
+      "Retain the decision, context and outcome for later review.",
+      "Which system should hold the authoritative record?",
+      ["review", "data"],
+      [3],
+      "Traceable decision and outcome",
+    ),
+  ],
+  s7: [
+    step(
+      "Bring outcomes together",
+      "Connect touchpoint activity and downstream outcomes for analysis.",
+      "Which outcomes can we connect reliably today?",
+      ["touchpoints", "journeys", "data"],
+      [0],
+      "Outcomes linked to audience and activity",
+    ),
+    step(
+      "Compare audience journeys",
+      "Compare progression and drop-off across audiences and touchpoints.",
+      "Which audience differences would change a marketing decision?",
+      ["journeys", "data"],
+      [1],
+      "Journey comparison and gaps",
+    ),
+    step(
+      "Decide what to change",
+      "Bring findings to the marketer’s workspace to choose a response.",
+      "Who interprets the findings, and what makes a change justified?",
+      ["interface"],
+      [2],
+      "Recommended change with supporting evidence",
+    ),
+    step(
+      "Agree the next experiment",
+      "Review the proposed change and define a measurable next test.",
+      "Who approves the test and what must it prove?",
+      ["review", "interface"],
+      [2],
+      "Agreed experiment and success measure",
+    ),
+    step(
+      "Close the loop",
+      "Return the learning to the next brief before production begins.",
+      "Who receives it, and how soon must it arrive?",
+      ["interface", "assets"],
+      [3],
+      "Updated brief and learning cadence",
+    ),
+  ],
+};
+export function workflowSource(s: Session, caseId: string, index: number) {
+  return JSON.stringify(
+    workflows[caseId][index].sources.map(
+      (i) => findAnswer(s, caseId, currentQuestions[caseId][i]) || null,
+    ),
+  );
+}
+export function workflowState(s: Session, caseId: string, index: number) {
+  const r = s.workflowReviews.find(
+    (r) => r.useCase === caseId && r.step === index,
+  );
+  return {
+    record: r,
+    stale: !!r && r.source !== workflowSource(s, caseId, index),
+  };
+}
+export function reviewWorkflow(
+  s: Session,
+  caseId: string,
+  index: number,
+  patch: Partial<Session["workflowReviews"][number]>,
+): Session {
+  const { record: r } = workflowState(s, caseId, index);
+  const next = {
+    useCase: caseId,
+    step: index,
+    choice: "Not reviewed" as const,
+    change: "",
+    owner: "",
+    next: "",
+    ...r,
+    ...patch,
+    source: workflowSource(s, caseId, index),
+  };
+  return {
+    ...s,
+    workflowReviews: r
+      ? s.workflowReviews.map((x) => (x === r ? next : x))
+      : [...s.workflowReviews, next],
+  };
+}

@@ -1,3 +1,4 @@
+import { WorkflowSummary } from "./architecture-walkthrough";
 import LiveSynthesis from "./live-synthesis";
 import { type Dispatch, type SetStateAction } from "react";
 import {
@@ -172,6 +173,15 @@ export default function WorkshopReadout({
           <section key={u.id}>
             <h2>{caseName(u.id)}</h2>
             <LiveSynthesis session={{ ...session, focus: u.id }} architecture />
+          </section>
+        ))}
+      <h2 className="section-title">Workflow decisions from step 3</h2>
+      {useCases
+        .filter((u) => session.workflowReviews.some((r) => r.useCase === u.id))
+        .map((u) => (
+          <section key={u.id}>
+            <h3>{caseName(u.id)}</h3>
+            <WorkflowSummary session={{ ...session, focus: u.id }} />
           </section>
         ))}
       <h2 className="section-title">Architecture & operating boundaries</h2>

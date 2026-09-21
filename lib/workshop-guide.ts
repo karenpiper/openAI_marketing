@@ -447,3 +447,49 @@ export function agreementLabel(status: string) {
     )[status] || status
   );
 }
+
+// Ask for a familiar example, not a complete technology inventory.
+export const toolPrompts: Record<string, string[]> = {
+  s1: [
+    "Where did you last look up the people involved in an account?",
+    "Where did you see that account’s recent activity?",
+    "Where do you check what sales or marketing has already planned?",
+    "Which report did you last use to check account progress?",
+  ],
+  s2: [
+    "Where did the last audience signal come from?",
+    "What did you open or ask someone to understand that signal?",
+    "Where did you record or share the action you chose?",
+    "Where did you check the result of that action?",
+  ],
+  s3: [
+    "Where did you find the approved source for the last asset?",
+    "What did you look at to choose the audience’s message?",
+    "Where did you write the last variant, and where was it approved?",
+    "Which report or feedback told you how that content performed?",
+  ],
+  s4: [
+    "Where did you assemble the last campaign brief?",
+    "Where did the approver review and sign off the last campaign?",
+    "Which tool did you use to launch it?",
+    "Where could you check why that launch waited?",
+  ],
+  s5: [
+    "Where did the last routine request arrive?",
+    "What checklist or person helped you decide how to handle it?",
+    "Which tool did you open to complete that request?",
+    "Where did you send the last request that needed a specialist?",
+  ],
+  s6: [
+    "Where did you see the context that made the last action sensitive?",
+    "How did you contact the person who needed to decide?",
+    "Where would you go to pause or change that action?",
+    "Where did you record the decision?",
+  ],
+  s7: [
+    "Which report did you last open to review marketing results?",
+    "Where did you compare what different audiences did next?",
+    "Where did you record the change suggested by those results?",
+    "Where did you share that learning with the team?",
+  ],
+};

@@ -1,3 +1,4 @@
+import ArchitectureWalkthrough from "./architecture-walkthrough";
 import LiveSynthesis from "./live-synthesis";
 import { CurrentReadback, ArchitectureReadback } from "./workshop-mapping";
 import {
@@ -196,69 +197,8 @@ export default function RoomView({ session }: { session: Session }) {
       )}
       {s.stage === 2 && s.architectureTab === "map" && (
         <section className="room-stage">
-          <span className="eyebrow">
-            Proposed way of working · {focus?.label}
-          </span>
-          {s.guide.architecture === 5 ? (
-            <>
-              <h1>Read back the proposed way of working</h1>
-              <LiveSynthesis session={s} architecture />
-              <ArchitectureReadback session={s} />
-            </>
-          ) : (
-            <>
-              <h1>{architectureQuestions[s.guide.architecture].question}</h1>
-              <p className="room-lede">
-                {architectureQuestions[s.guide.architecture].hint}
-              </p>
-              {(() => {
-                const step = s.guide.architecture;
-                const q = architectureQuestions[step];
-                const b = s.boundaries.find(
-                  (b) =>
-                    b.useCase === s.focus &&
-                    b.layer ===
-                      (q.layer === "primary" ? primaryLayer(s.focus) : q.layer),
-                );
-                const h = primaryHandoff(s, s.focus);
-                return (
-                  <div className="room-return">
-                    {step < 3 ? (
-                      <>
-                        <Badge value={agreementLabel(b?.status || "Unknown")} />
-                        <p className="preserve-lines">
-                          {b?.system || "Waiting for the room’s proposal."}
-                        </p>
-                        <p>{b?.owner}</p>
-                        <p>{b?.truth}</p>
-                        <p>{b?.implementer}</p>
-                        <p>{b?.control}</p>
-                      </>
-                    ) : step === 3 ? (
-                      <>
-                        <Badge value={agreementLabel(h?.status || "Unknown")} />
-                        <p>{h?.payload || "Handoff not yet captured."}</p>
-                        <p>{h?.trigger}</p>
-                        <p>{h?.owner}</p>
-                        <p>{h?.control}</p>
-                      </>
-                    ) : (
-                      s.decisions
-                        .filter((d) => !d.useCase || d.useCase === s.focus)
-                        .map((d) => (
-                          <article key={d.id}>
-                            <h2>{d.title}</h2>
-                            <Badge value={agreementLabel(d.status)} />
-                            <p>{d.answer || "Still unknown"}</p>
-                            <p>{d.owner}</p>
-                          </article>
-                        ))
-                    )}
-                  </div>
-                );
-              })()}
-            </>
-          )}
+          <span className="eyebrow">Proposed workflow · {focus?.label}</span>
+          <ArchitectureWalkthrough session={s} room />
         </section>
       )}
       {s.stage === 2 && s.architectureTab === "lab" && (

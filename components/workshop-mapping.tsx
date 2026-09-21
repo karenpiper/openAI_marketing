@@ -1,3 +1,4 @@
+import ArchitectureWalkthrough from "./architecture-walkthrough";
 import LiveSynthesis from "./live-synthesis";
 import { useState, type Dispatch, type SetStateAction } from "react";
 import {
@@ -10,6 +11,7 @@ import {
 import { useCases } from "../lib/workshop-data";
 import {
   currentQuestions,
+  toolPrompts,
   architectureQuestions,
   findAnswer,
   editAnswer,
@@ -186,11 +188,15 @@ export function CurrentState({ session: s, setSession }: Props) {
                 setSession((p) => editAnswer(p, s.focus, q, { evidence }))
               }
             />
+            <p className="muted">
+              Think of the last time you did this. You do not need the full
+              system list—one familiar example is enough.
+            </p>
             <Field
-              label="Which tools are involved, and what does each do?"
+              label={toolPrompts[s.focus][step]}
               multiline
               placeholder={
-                "One tool per line is fine. For example:\nCRM — account and contact records\nWarehouse — activity history\nIdentity service — connects people across touchpoints"
+                "Start with one place you used recently. A document, email, person or manual process counts. ‘Not sure’ is fine. Add other tools only if you know them."
               }
               value={a?.system || ""}
               onChange={(system) =>
@@ -198,7 +204,7 @@ export function CurrentState({ session: s, setSession }: Props) {
               }
             />
             <Field
-              label="Who is involved / can verify this?"
+              label="Who helped with that example, or could fill in the gap?"
               value={a?.owner || ""}
               onChange={(owner) =>
                 setSession((p) => editAnswer(p, s.focus, q, { owner }))
@@ -322,245 +328,16 @@ export function ArchitectureReadback({ session: s }: { session: Session }) {
   );
 }
 export function Architecture({ session: s, setSession }: Props) {
-  const [details, setDetails] = useState(false);
-  const step = s.guide.architecture;
-  const q = architectureQuestions[step];
-  const layer = q?.layer === "primary" ? primaryLayer(s.focus) : q?.layer;
-  const b = s.boundaries.find(
-    (b) => b.useCase === s.focus && b.layer === layer,
-  );
-  const h = primaryHandoff(s, s.focus);
-  const edit = (patch: Partial<Boundary>) =>
-    setSession((p) => editBoundary(p, s.focus, layer!, patch));
-  const change = (architecture: number) =>
-    setSession((p) => ({ ...p, guide: { ...p.guide, architecture } }));
-  const decision = (id: string, patch: Partial<Decision>) =>
-    setSession((p) => ({
-      ...p,
-      decisions: p.decisions.map((d) =>
-        d.id === id
-          ? {
-              ...d,
-              ...patch,
-              ...(!("status" in patch) ? { status: "Proposed" as const } : {}),
-            }
-          : d,
-      ),
-    }));
   return (
     <section className="module-panel guided-panel">
       <div className="module-heading">
-        <span className="eyebrow">03 · How it should work · 45 minutes</span>
-        <h1>Design the next way of working.</h1>
-        <p>
-          Step 2 captured today. Now decide what should happen, who is
-          responsible, and what needs a decision. Work through one question at a
-          time.
-        </p>
+        <span className="eyebrow">
+          03 · Proposed way of working · 45 minutes
+        </span>
+        <h1>What should change for this use case?</h1>
       </div>
       <CaseFocus session={s} setSession={setSession} />
-      <Navigation step={step} total={5} change={change} />
-      {(step === 0 || step === 5) && (
-        <LiveSynthesis session={s} setSession={setSession} architecture />
-      )}
-      {q ? (
-        <>
-          <div className="question-banner">
-            <span className="label">Proposed way of working · {q.label}</span>
-            <h2>{q.question}</h2>
-            <p>{q.hint}</p>
-          </div>
-          <details className="starting-context">
-            <summary>Refer to the answers from step 2</summary>
-            <CurrentReadback session={s} />
-          </details>
-          {step < 3 ? (
-            <div className="capture-card">
-              <Field
-                multiline
-                label={
-                  step === 0
-                    ? "Where should the marketer start?"
-                    : step === 1
-                      ? "Which tools supply the information, and what does each provide?"
-                      : "Which tools should do the work, and what does each do?"
-                }
-                value={b?.system || ""}
-                onChange={(system) => edit({ system })}
-              />
-              {step === 1 && (
-                <Field
-                  multiline
-                  label="Which source should we trust for each type of information?"
-                  value={b?.truth || ""}
-                  onChange={(truth) => edit({ truth })}
-                />
-              )}
-              <Field
-                label={
-                  step === 1
-                    ? "Who maintains this information?"
-                    : "Who is accountable for this part?"
-                }
-                value={b?.owner || ""}
-                onChange={(owner) => edit({ owner })}
-              />
-              {step === 2 && (
-                <Field
-                  label="Who builds or connects it?"
-                  value={b?.implementer || ""}
-                  onChange={(implementer) => edit({ implementer })}
-                />
-              )}
-              <details>
-                <summary>Capture more detail (optional)</summary>
-                {step !== 1 && (
-                  <Field
-                    label="Which source should we trust?"
-                    value={b?.truth || ""}
-                    onChange={(truth) => edit({ truth })}
-                  />
-                )}
-                <Field
-                  label="Where are progress and decisions saved?"
-                  multiline
-                  value={b?.state || ""}
-                  onChange={(state) => edit({ state })}
-                />
-                <Field
-                  label="Who can approve, change or stop the work?"
-                  multiline
-                  value={b?.control || ""}
-                  onChange={(control) => edit({ control })}
-                />
-              </details>
-              <Agreement
-                value={b?.status || "Unknown"}
-                ready={!!b?.system.trim() && !!b?.owner.trim()}
-                onChange={(status) => edit({ status })}
-              />
-            </div>
-          ) : step === 3 ? (
-            <div className="capture-card">
-              {(
-                [
-                  ["payload", "What is passed on?"],
-                  ["trigger", "When is it ready?"],
-                  ["owner", "Who checks it and owns the handoff?"],
-                  ["control", "When should a person change or stop it?"],
-                ] as const
-              ).map(([key, label]) => (
-                <Field
-                  key={key}
-                  label={label}
-                  multiline
-                  value={h?.[key] || ""}
-                  onChange={(value) =>
-                    setSession((p) => editHandoff(p, s.focus, { [key]: value }))
-                  }
-                />
-              ))}
-              <Agreement
-                value={h?.status || "Unknown"}
-                ready={
-                  !!h &&
-                  [h.payload, h.trigger, h.owner, h.control].every(
-                    (v) => !!v.trim(),
-                  )
-                }
-                onChange={(status) =>
-                  setSession((p) => editHandoff(p, s.focus, { status }))
-                }
-              />
-            </div>
-          ) : (
-            <>
-              <p>
-                Open a question to capture the room’s answer. Workshop-wide
-                answers apply across use cases.
-              </p>
-              {s.decisions
-                .filter((d) => !d.useCase || d.useCase === s.focus)
-                .map((d) => (
-                  <details className="capture-card" key={d.id}>
-                    <summary>
-                      {d.title} · {agreementLabel(d.status)}
-                      {!d.useCase ? " · workshop-wide" : ""}
-                    </summary>
-                    <Field
-                      label="What did the room decide, or what is still unknown?"
-                      multiline
-                      value={d.answer}
-                      onChange={(answer) => decision(d.id, { answer })}
-                    />
-                    <Field
-                      label="Who can resolve it?"
-                      value={d.owner}
-                      onChange={(owner) => decision(d.id, { owner })}
-                    />
-                    <Field
-                      label="Needed by"
-                      value={d.due}
-                      onChange={(due) => decision(d.id, { due })}
-                    />
-                    <Agreement
-                      value={d.status}
-                      ready={!!d.answer.trim() && !!d.owner.trim()}
-                      onChange={(status) => decision(d.id, { status })}
-                    />
-                  </details>
-                ))}
-            </>
-          )}
-        </>
-      ) : (
-        <>
-          <h2>Read back the proposed way of working</h2>
-          <ArchitectureReadback session={s} />
-          <div className="guide-links">
-            <button
-              onClick={() =>
-                setSession((p) => ({ ...p, architectureTab: "lab" }))
-              }
-            >
-              Try the content exercise →
-            </button>
-            <button
-              onClick={() =>
-                setSession((p) => ({
-                  ...p,
-                  stage: 3,
-                  timer: { stage: 3, remaining: 900, runningSince: null },
-                }))
-              }
-            >
-              Continue to decisions & readout →
-            </button>
-          </div>
-        </>
-      )}
-      <details className="reference-details">
-        <summary>View the proposed architecture diagram (optional)</summary>
-        <p>
-          This reference is a starting proposal. The answers above capture what
-          the room agrees.
-        </p>
-        <a href="/workshop-architecture.pdf" target="_blank" rel="noreferrer">
-          Open original diagram
-        </a>
-        <img
-          src="/workshop-architecture.png"
-          alt="Proposed OpenAI and Adobe architecture"
-        />
-      </details>
-      <button
-        className="quiet"
-        aria-expanded={details}
-        onClick={() => setDetails(!details)}
-      >
-        {details ? "Hide" : "Open"} detailed architecture editor (optional)
-      </button>
-      {details && <ArchitectureDetails session={s} setSession={setSession} />}
+      <ArchitectureWalkthrough session={s} setSession={setSession} />
     </section>
   );
 }

@@ -1,3 +1,4 @@
+import { workflows, workflowState } from "./architecture-workflow";
 import { defaults, restore, type StateMap } from "./assessment";
 import { useCases, decisions } from "./workshop-data";
 
@@ -187,7 +188,17 @@ export type Lab = {
   result: string;
   status: Status;
 };
+export type WorkflowReview = {
+  useCase: string;
+  step: number;
+  choice: "Not reviewed" | "Keep" | "Change" | "Unresolved";
+  change: string;
+  owner: string;
+  next: string;
+  source: string;
+};
 export type Session = {
+  workflowReviews: WorkflowReview[];
   schema: 1;
   title: string;
   stage: number;
@@ -258,6 +269,7 @@ export function practiceLab(): Lab {
 export function createSession(): Session {
   return {
     schema: 1,
+    workflowReviews: [],
     title: "OpenAI × Adobe × Code and Theory",
     stage: 0,
     scene: 0,
@@ -435,6 +447,25 @@ export function parseSession(raw: unknown): Session {
     gap: str(x.gap),
     status: status(x),
   }));
+  s.workflowReviews = rows(r.workflowReviews, (x) => ({
+    useCase: uc(x.useCase),
+    step:
+      typeof x.step === "number" &&
+      Number.isInteger(x.step) &&
+      x.step >= 0 &&
+      x.step < 5
+        ? x.step
+        : 0,
+    choice: choice(
+      x.choice,
+      ["Not reviewed", "Keep", "Change", "Unresolved"],
+      "Not reviewed",
+    ) as WorkflowReview["choice"],
+    change: str(x.change),
+    owner: str(x.owner),
+    next: str(x.next),
+    source: typeof x.source === "string" ? x.source.slice(0, 500000) : "",
+  }));
   s.boundaries = rows(r.boundaries, (x) => ({
     id: id(x),
     useCase: uc(x.useCase),
@@ -579,6 +610,13 @@ export function readout(s: Session): string {
       .map(
         (c) =>
           `${name(c.useCase)} | ${c.synthesis!.name} | ${synthesisStatus(c)}\nCoverage: ${c.synthesis!.coverage}\nChange to discuss: ${c.synthesis!.change || "Not captured"}\nWho takes it forward: ${c.synthesis!.nextOwner || "Unassigned"}\nBased on: ${c.evidence}\nTools and roles: ${c.system || "Unknown"}`,
+      ),
+    "## Proposed workflow decisions",
+    ...s.workflowReviews
+      .filter((r) => workflows[r.useCase]?.[r.step])
+      .map(
+        (r) =>
+          `${name(r.useCase)} | ${workflows[r.useCase][r.step].title} | ${workflowState(s, r.useCase, r.step).stale ? "Evidence changed — recheck" : r.choice}\nProposal: ${workflows[r.useCase][r.step].proposal}\nCorrection: ${r.change || "None captured"}\nOwner: ${r.owner || "Unassigned"}\nNext decision or action: ${r.next || "Not captured"}`,
       ),
     "## Architecture boundaries",
     ...s.boundaries.map(

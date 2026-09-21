@@ -2269,3 +2269,23 @@ details p {
 .live-translation .capture-card > .agreement-badge {
   margin-bottom: 14px;
 }
+.workflow-comparison {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+.pdf-box {
+  border: 1px solid #acc0b5;
+  background: #f3f7f4;
+  padding: 12px;
+  border-radius: 8px;
+}
+.guide-links button[aria-pressed="true"] {
+  background: #183b32;
+  color: white;
+}
+@media (max-width: 760px) {
+  .workflow-comparison {
+    grid-template-columns: 1fr;
+  }
+}
