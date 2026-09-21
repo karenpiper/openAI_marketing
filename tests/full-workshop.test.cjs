@@ -740,13 +740,13 @@ test("step zero opens real and demo sessions with agenda, attendees and entry wh
       "120 minutes",
       "What we’ve heard",
       "Attendees and roles",
-      "What we want to leave with",
+      "Four conversations. Four outputs.",
     ])
       assert.ok(html.includes(text));
     const projection = renderToStaticMarkup(
       React.createElement(Room, { session: s }),
     );
-    assert.match(projection, /Before we begin/);
+    assert.match(projection, /Workshop briefing/);
     assert.ok(!projection.includes("Enter workshop"));
     assert.match(w.readout(s), /Karen — facilitator/);
   }
@@ -755,4 +755,39 @@ test("step zero opens real and demo sessions with agenda, attendees and entry wh
   delete old.attendees;
   assert.equal(w.parseSession(old).overview, true);
   assert.equal(w.parseSession(old).attendees, "");
+});
+
+test("prior context lives only on step zero and Morgan skips the retired scene without shifting saved case IDs", () => {
+  const Priority = require("../components/priority-workshop.tsx").default;
+  const Overview = require("../components/workshop-overview.tsx").default;
+  const Room = require("../components/room-view.tsx").default;
+  const s = w.createSession();
+  const front = renderToStaticMarkup(
+    React.createElement(Overview, { session: s, onEnter: () => {} }),
+  );
+  assert.match(front, /What we’ve heard/);
+  assert.match(front, /Read the original statements/);
+  for (let step = 0; step < 10; step++) {
+    const html = renderToStaticMarkup(
+      React.createElement(Priority, {
+        state: s.assessments,
+        setState: () => {},
+        step,
+        setStep: () => {},
+        selection: null,
+      }),
+    );
+    assert.ok(!html.includes("What we heard"));
+    assert.ok(!html.includes("See what we heard"));
+    if (step === 0 || step === 1) {
+      assert.match(html, /Start the day/);
+      assert.match(html, /1 \/ 9/);
+    }
+    const room = renderToStaticMarkup(
+      React.createElement(Room, {
+        session: { ...s, overview: false, scene: step },
+      }),
+    );
+    assert.ok(!room.includes("What we heard"));
+  }
 });

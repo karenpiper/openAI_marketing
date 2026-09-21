@@ -1,12 +1,6 @@
 "use client";
 import { type Dispatch, type SetStateAction, type ReactNode } from "react";
-import {
-  useCases,
-  heard,
-  decisions,
-  axes,
-  type NoRegret,
-} from "../lib/workshop-data";
+import { useCases, axes, type NoRegret } from "../lib/workshop-data";
 import {
   composite,
   rank,
@@ -17,7 +11,7 @@ import {
 export default function PriorityWorkshop({
   state,
   setState,
-  step,
+  step: storedStep,
   setStep,
   selection,
 }: {
@@ -28,6 +22,7 @@ export default function PriorityWorkshop({
   selection: ReactNode;
 }) {
   const loaded = true;
+  const step = storedStep === 1 ? 0 : storedStep;
   function go(n: number) {
     setStep(n);
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -41,7 +36,7 @@ export default function PriorityWorkshop({
     vetoed = useCases.filter((s) => state[s.id].veto);
   const labels = [
     "Meet Morgan",
-    "What we heard",
+    "",
     ...useCases.map((s) => s.label),
     "End-of-day recap",
   ];
@@ -72,34 +67,37 @@ export default function PriorityWorkshop({
             {Object.values(state).filter((a) => a.discussed).length} of 7 stops
             discussed
           </div>
-          {labels.map((label, i) => (
-            <button
-              key={label}
-              className={`rail-item ${step === i ? "active" : ""}`}
-              aria-current={step === i ? "step" : undefined}
-              onClick={() => go(i)}
-            >
-              <span className="rail-time">
-                {i < 2
-                  ? "Before the day"
-                  : i === 9
-                    ? "End of day"
-                    : useCases[i - 2].time}
-              </span>
-              <span className="rail-copy">
-                <strong>{label}</strong>
-                {i > 1 && i < 9 && (
-                  <small>
-                    {state[useCases[i - 2].id].veto
-                      ? "Ruled out"
-                      : state[useCases[i - 2].id].discussed
-                        ? "Discussed"
-                        : "Not discussed"}
-                  </small>
-                )}
-              </span>
-            </button>
-          ))}
+          {labels.map(
+            (label, i) =>
+              i !== 1 && (
+                <button
+                  key={label}
+                  className={`rail-item ${step === i ? "active" : ""}`}
+                  aria-current={step === i ? "step" : undefined}
+                  onClick={() => go(i)}
+                >
+                  <span className="rail-time">
+                    {i < 2
+                      ? "Before the day"
+                      : i === 9
+                        ? "End of day"
+                        : useCases[i - 2].time}
+                  </span>
+                  <span className="rail-copy">
+                    <strong>{label}</strong>
+                    {i > 1 && i < 9 && (
+                      <small>
+                        {state[useCases[i - 2].id].veto
+                          ? "Ruled out"
+                          : state[useCases[i - 2].id].discussed
+                            ? "Discussed"
+                            : "Not discussed"}
+                      </small>
+                    )}
+                  </span>
+                </button>
+              ),
+          )}
         </aside>
         <section className="scene-panel" aria-label={labels[step]}>
           {step === 0 && (
@@ -132,47 +130,6 @@ export default function PriorityWorkshop({
               <p>
                 Seven moments. One day. Which problems are worth solving first?
               </p>
-            </>
-          )}
-          {step === 1 && (
-            <>
-              <div className="eyebrow">Before we walk through the day</div>
-              <h2>What we heard.</h2>
-              <p className="moment">
-                This came directly from Matt, Patrick and Jeff last time — not
-                from us. Today’s day looks different because of it.
-              </p>
-              {heard.map((h) => (
-                <article className="heard-card" key={h.q}>
-                  <h3>“{h.q}”</h3>
-                  <p>→ {h.a}</p>
-                </article>
-              ))}
-              <h3 className="section-title">The four decisions still open</h3>
-              <p>
-                Every stop today asks whether it can move now, or whether it
-                depends on one of these four being settled first — named
-                specifically, so “regardless of bigger decisions” isn’t left
-                abstract.
-              </p>
-              <div className="decision-grid">
-                {decisions.map((d) => (
-                  <article className="side-card" key={d.num}>
-                    <span className="eyebrow">Decision {d.num}</span>
-                    <h3>{d.t}</h3>
-                    <p>{d.q}</p>
-                    <span className="label">Already said</span>
-                    <p>{d.known}</p>
-                    <span className="label">Still open</span>
-                    <p>{d.open}</p>
-                  </article>
-                ))}
-              </div>
-              <blockquote>
-                These decisions are context for agenda item 1. We will work
-                through architecture later in the workshop. This 30-minute
-                section is about which problems are worth solving first.
-              </blockquote>
             </>
           )}
           {current && a && (
@@ -460,26 +417,27 @@ export default function PriorityWorkshop({
             </div>
           )}
           <nav className="scene-nav" aria-label="Workshop navigation">
-            <button disabled={step === 0} onClick={() => go(step - 1)}>
+            <button
+              disabled={step === 0}
+              onClick={() => go(step === 2 ? 0 : step - 1)}
+            >
               Previous
             </button>
-            <span>{step + 1} / 10</span>
+            <span>{step === 0 ? 1 : step} / 9</span>
             {step < 9 && (
               <button
                 className="primary"
                 disabled={!loaded}
                 onClick={() => {
                   if (current) update(current.id, {});
-                  go(step + 1);
+                  go(step === 0 ? 2 : step + 1);
                 }}
               >
                 {step === 0
-                  ? "See what we heard →"
-                  : step === 1
-                    ? "Start the day →"
-                    : step === 8
-                      ? "End-of-day recap →"
-                      : "Next →"}
+                  ? "Start the day →"
+                  : step === 8
+                    ? "End-of-day recap →"
+                    : "Next →"}
               </button>
             )}
           </nav>

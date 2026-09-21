@@ -43,7 +43,7 @@ export default function RoomView({ session }: { session: Session }) {
       </header>
       {s.stage === 0 && (
         <section className="room-stage">
-          {s.scene === 0 ? (
+          {s.scene === 0 || s.scene === 1 ? (
             <>
               <span className="eyebrow">
                 Today’s problems · A working hypothesis to correct
@@ -58,28 +58,6 @@ export default function RoomView({ session }: { session: Session }) {
                   Which problems are real, and which are worth solving first?
                 </h2>
               </div>
-            </>
-          ) : s.scene === 1 ? (
-            <>
-              <h1>What we heard.</h1>
-              <div className="room-heard">
-                {heard.map((h) => (
-                  <p key={h.q}>“{h.q}”</p>
-                ))}
-              </div>
-              <h2>Four decisions in the background</h2>
-              <div className="summary-grid">
-                {decisions.map((d) => (
-                  <article className="side-card" key={d.num}>
-                    <span className="eyebrow">Decision {d.num}</span>
-                    <h3>{d.t}</h3>
-                  </article>
-                ))}
-              </div>
-              <p>
-                We’ll resolve boundaries in step 3. First, establish which
-                problems matter.
-              </p>
             </>
           ) : s.scene === 9 ? (
             <>
