@@ -39,13 +39,14 @@ export default function UseCaseScoring({
   return (
     <main className="agent-wide scoring-page">
       <span className="agent-kicker">
-        Step 2 · Score the use cases · 15 minutes
+        Step 2 · What Morgan’s day surfaced · 15 minutes
       </span>
-      <h1>Make the trade-offs visible.</h1>
+      <h1>Name the use cases, then make the trade-offs visible.</h1>
       <p className="agent-lede">
-        Score the candidates as a room. The first five dimensions describe value
-        and confidence; level of effort adjusts the signal so a promising
-        near-term test can rise above a large, uncertain program.
+        These are the repeatable needs that emerged from Morgan’s day and the
+        conversations around it. Score them as a room. The first five dimensions
+        describe value and confidence; level of effort adjusts the signal so a
+        promising near-term test can rise above a large, uncertain program.
       </p>
       <div className="scoring-legend">
         <b>1 = low / 5 = high.</b>

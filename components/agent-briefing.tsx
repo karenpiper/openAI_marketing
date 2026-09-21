@@ -1,6 +1,4 @@
 import Image from "next/image";
-import { useCases } from "../lib/workshop-data";
-import { useCaseCandidates } from "../lib/use-case-candidates";
 export const workshopAgenda = [
   {
     title: "Priority use cases and outcomes",
@@ -224,69 +222,80 @@ export function MeetMorgan({ onEnter }: { onEnter: () => void }) {
           </p>
         </div>
         <p className="morgan-human-note">
-          Follow seven moments in that queue. Each reveals a problem worth
-          testing; none is a pre-agreed priority.
+          Follow her Tuesday first. The use cases come afterwards, when we name
+          the repeatable needs that surfaced from it.
         </p>
         <div className="current-day-stops">
-          {useCases.map((scene) => (
-            <article className="current-day-stop" key={scene.id}>
+          {[
+            {
+              time: "8:15 AM",
+              title: "She opens a full queue.",
+              image: "s1",
+              body: "Morgan starts with twenty-four possible tasks: an account showing new product interest, an event follow-up waiting for a list, a campaign stalled in review, a sales request, an audience question, and yesterday’s performance results. None arrives as a clean brief. Each competes for attention.",
+              room: "What usually makes it to the top of the queue today? What sits there longer than it should?",
+            },
+            {
+              time: "9:00 AM",
+              title: "She decides where to put her attention.",
+              image: "s2",
+              body: "She pulls together what she can see about the accounts, people, activity and business priorities behind the requests. The difficult part is not finding one more signal; it is judging which signal deserves action and what a good next move would be.",
+              room: "Where does this decision come from now: a playbook, a specialist, a spreadsheet, or Morgan’s own judgment?",
+            },
+            {
+              time: "10:30 AM",
+              title: "She tries to turn a decision into work.",
+              image: "s3",
+              body: "Once Morgan has chosen a direction, she has to find the right people, source material, message and channel. Some of it exists somewhere. Some needs to be created. The work crosses the team’s tools, operating rhythms and people.",
+              room: "What has to come together before a sound decision can become something the market actually sees?",
+            },
+            {
+              time: "12:00 PM",
+              title: "She keeps the work moving.",
+              image: "s4",
+              body: "The afternoon brings routine requests alongside decisions that need real care. Morgan is coordinating marketing operations, reviewers, sales context and delivery—not because every task is complex, but because the handoffs are.",
+              room: "Which work should move without waiting for Morgan, and which moments still need a person in the loop?",
+            },
+            {
+              time: "3:30 PM",
+              title: "She steps in where judgment matters.",
+              image: "s6",
+              body: "A sensitive account, an unclear consent signal and a message for a senior contact do not belong in the same pathway as a routine follow-up. Morgan needs the important exceptions to be visible, intelligible and easy to resolve.",
+              room: "What makes a moment high-stakes enough to require human judgment?",
+            },
+            {
+              time: "6:00 PM",
+              title: "She asks what today changed.",
+              image: "s7",
+              body: "At the end of the day, Morgan can see activity: sends, event attendance, engagement, replies and work still pending. The harder question is whether those results improve tomorrow’s choices—or remain a report someone reviews later.",
+              room: "How quickly does learning from today change the next decision?",
+            },
+          ].map((moment) => (
+            <article className="current-day-stop" key={moment.time}>
               <Image
-                src={`/images/morgan/${scene.id}.png`}
+                src={`/images/morgan/${moment.image}.png`}
                 alt=""
                 width={640}
                 height={420}
               />
               <div className="current-day-copy">
                 <span className="agent-kicker">
-                  {scene.time} · {scene.label}
+                  {moment.time} · Morgan’s Tuesday
                 </span>
-                <h2>{scene.title}</h2>
-                <p className="current-day-narrative">{scene.narrative}</p>
+                <h2>{moment.title}</h2>
+                <p className="current-day-narrative">{moment.body}</p>
                 <div className="current-day-detail">
                   <div>
-                    <b>The problem we think is real</b>
-                    <p>{scene.problem}</p>
-                  </div>
-                  <div>
-                    <b>Why we think it is real</b>
-                    <p>{scene.evidence}</p>
-                  </div>
-                  <div>
                     <b>Ask the room</b>
-                    <p>{scene.question}</p>
+                    <p>{moment.room}</p>
                   </div>
-                </div>
-                <div className="current-day-outcomes">
-                  <span>
-                    <b>Growth</b>
-                    {scene.kpiGrowth}
-                  </span>
-                  <span>
-                    <b>Productivity</b>
-                    {scene.kpiProd}
-                  </span>
                 </div>
               </div>
             </article>
           ))}
         </div>
-        <section className="emerging-needs">
-          <span className="agent-kicker">
-            Additional opportunities already surfaced
-          </span>
-          <h2>Carry these into the scoring conversation too.</h2>
-          <div>
-            {useCaseCandidates.slice(7).map((candidate) => (
-              <article key={candidate.id}>
-                <h3>{candidate.title}</h3>
-                <p>{candidate.short}</p>
-              </article>
-            ))}
-          </div>
-        </section>
         <p className="opening-footnote">
-          This is a current-state conversation. The next step turns what the
-          room recognizes into a scored, explicit priority set.
+          The day gives us the context. Next, we name and score the use cases
+          that emerge across it.
         </p>
         <button className="agent-primary" onClick={onEnter}>
           Turn the day into use-case candidates →
