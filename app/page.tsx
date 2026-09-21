@@ -38,7 +38,6 @@ export default function Workshop() {
   const storageKeyRef = useRef(SESSION_KEY);
   const [storageError, setStorageError] = useState("");
   const [message, setMessage] = useState("");
-  const [clock, setClock] = useState(Date.now());
   const [toolsOpen, setToolsOpen] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
   const channelRef = useRef<BroadcastChannel | null>(null);
@@ -128,17 +127,6 @@ export default function Workshop() {
       );
     }
   }, [session, loaded, room, storageError]);
-  useEffect(() => {
-    const t = setInterval(() => setClock(Date.now()), 1000);
-    return () => clearInterval(t);
-  }, []);
-  const remaining = Math.max(
-    0,
-    session.timer.remaining -
-      (session.timer.runningSince
-        ? Math.floor((clock - session.timer.runningSince) / 1000)
-        : 0),
-  );
   function saveNow() {
     if (storageError.includes("unreadable saved copy"))
       return {
@@ -337,7 +325,7 @@ export default function Workshop() {
                     ...s,
                     overview: true,
                     briefingPanel: 0,
-                    timer: { ...s.timer, remaining, runningSince: null },
+                    timer: { ...s.timer, runningSince: null },
                   }));
                 }}
               >
@@ -418,45 +406,6 @@ export default function Workshop() {
                   ? "Working set confirmed"
                   : "Working set not confirmed"}
               </span>
-              <div className="timer" aria-label="Agenda timer">
-                <span aria-live="off">
-                  {Math.floor(remaining / 60)
-                    .toString()
-                    .padStart(2, "0")}
-                  :{(remaining % 60).toString().padStart(2, "0")}
-                </span>
-                <button
-                  onClick={() => {
-                    setClock(Date.now());
-                    setSession((s) => ({
-                      ...s,
-                      timer: {
-                        ...s.timer,
-                        remaining: s.timer.runningSince
-                          ? remaining
-                          : s.timer.remaining,
-                        runningSince: s.timer.runningSince ? null : Date.now(),
-                      },
-                    }));
-                  }}
-                >
-                  {session.timer.runningSince ? "Pause" : "Start timer"}
-                </button>
-                <button
-                  onClick={() =>
-                    setSession((s) => ({
-                      ...s,
-                      timer: {
-                        stage: s.stage,
-                        remaining: stages[s.stage].minutes * 60,
-                        runningSince: null,
-                      },
-                    }))
-                  }
-                >
-                  Reset timer
-                </button>
-              </div>
             </div>
           </>
         )}

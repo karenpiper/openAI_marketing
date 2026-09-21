@@ -1,4 +1,5 @@
 "use client";
+import Image from "next/image";
 import SaveFooter from "./save-footer";
 import { type Dispatch, type SetStateAction, type ReactNode } from "react";
 import { useCases, axes, type NoRegret } from "../lib/workshop-data";
@@ -9,6 +10,15 @@ import {
   type StateMap,
 } from "../lib/assessment";
 
+const sceneIllustrations: Record<string, string> = {
+  s1: "Morgan maps the people and signals across a complex buying group.",
+  s2: "Morgan weighs audience signals to decide the next action.",
+  s3: "Morgan searches for approved content to meet different audience needs.",
+  s4: "Morgan follows a campaign through handoffs and approvals.",
+  s5: "A routine marketing request waits in the operations queue.",
+  s6: "Morgan pauses work so a specialist can review a sensitive decision.",
+  s7: "Morgan connects campaign and customer signals to learn from the day.",
+};
 export default function PriorityWorkshop({
   state,
   setState,
@@ -26,7 +36,14 @@ export default function PriorityWorkshop({
   const step = storedStep === 1 ? 0 : storedStep;
   function go(n: number) {
     setStep(n);
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    requestAnimationFrame(() => {
+      document.getElementById("morgans-tuesday")?.scrollIntoView({
+        block: "start",
+        behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches
+          ? "auto"
+          : "smooth",
+      });
+    });
   }
   function update(id: string, patch: Partial<Assessment>) {
     setState((s) => ({ ...s, [id]: { ...s[id], ...patch, discussed: true } }));
@@ -45,6 +62,7 @@ export default function PriorityWorkshop({
     v === "yes" ? "Yes" : v === "no" ? "No" : "Not sure";
   return (
     <main
+      id="morgans-tuesday"
       className={`priority-module phase-${step < 4 ? "morning" : step < 7 ? "day" : "evening"}`}
     >
       <header className="topbar">
@@ -145,7 +163,17 @@ export default function PriorityWorkshop({
                 <span style={{ width: `${current.frac * 100}%` }} />
               </div>
               <h2>{current.title}</h2>
-              <p className="moment">{current.narrative}</p>
+              <div className="morgan-scene-intro">
+                <p className="moment">{current.narrative}</p>
+                <Image
+                  sizes="(max-width: 850px) 100vw, 440px"
+                  className="morgan-scene-art"
+                  src={`/images/morgan/${current.id}.png`}
+                  alt={sceneIllustrations[current.id]}
+                  width={1536}
+                  height={1024}
+                />
+              </div>
               {current.id === "s2" && (
                 <aside className="journey-note">
                   <span className="label">

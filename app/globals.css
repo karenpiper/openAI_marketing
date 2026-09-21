@@ -3659,3 +3659,33 @@ body {
     gap: 0.5rem;
   }
 }
+#morgans-tuesday {
+  scroll-margin-top: 1rem;
+}
+.morgan-scene-intro {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+  gap: 1.5rem;
+  align-items: center;
+  margin: 1rem 0 1.5rem;
+}
+.morgan-scene-intro .moment {
+  margin: 0;
+}
+.morgan-scene-art {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 3/2;
+  object-fit: contain;
+  border-radius: 14px;
+  background: #f5f1e6;
+}
+@media (max-width: 850px) {
+  .morgan-scene-intro {
+    grid-template-columns: 1fr;
+  }
+  .morgan-scene-art {
+    max-height: 280px;
+  }
+}

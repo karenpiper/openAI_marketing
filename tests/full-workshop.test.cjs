@@ -1358,8 +1358,80 @@ test("tools-and-handoffs rows save per case and feed architecture evidence", () 
     assert.equal(rows.length, 5);
 });
 
-test("demo row migration preserves edited and intentionally cleared answers",()=>{
- const {createDemoSession,addDemoGuideExamples}=require("../lib/demo-session.ts");
- const s=createDemoSession();s.currentWorkflows.s3={rows:{"0":"Our existing audience tool","1":""},friction:"Approval waits"};
- assert.deepEqual(addDemoGuideExamples(s).currentWorkflows.s3,s.currentWorkflows.s3);
+test("demo row migration preserves edited and intentionally cleared answers", () => {
+  const {
+    createDemoSession,
+    addDemoGuideExamples,
+  } = require("../lib/demo-session.ts");
+  const s = createDemoSession();
+  s.currentWorkflows.s3 = {
+    rows: { 0: "Our existing audience tool", 1: "" },
+    friction: "Approval waits",
+  };
+  assert.deepEqual(
+    addDemoGuideExamples(s).currentWorkflows.s3,
+    s.currentWorkflows.s3,
+  );
+});
+
+test("Morgan navigation anchors the day heading and all seven scenes have illustrations", () => {
+  const Priority = require("../components/priority-workshop.tsx").default;
+  const saved = {
+    window: global.window,
+    document: global.document,
+    raf: global.requestAnimationFrame,
+  };
+  try {
+    for (const reduced of [false, true]) {
+      let advanced, anchor, options;
+      global.window = { matchMedia: () => ({ matches: reduced }) };
+      global.document = {
+        getElementById: (id) => {
+          anchor = id;
+          return {
+            scrollIntoView: (o) => {
+              options = o;
+            },
+          };
+        },
+      };
+      global.requestAnimationFrame = (fn) => fn();
+      const tree = Priority({
+        state: w.createSession().assessments,
+        setState: () => {},
+        step: 2,
+        setStep: (n) => (advanced = n),
+        selection: null,
+      });
+      const nodes = [];
+      function walk(n) {
+        if (Array.isArray(n)) return n.forEach(walk);
+        if (n && typeof n === "object") {
+          nodes.push(n);
+          walk(n.props?.children);
+        }
+      }
+      walk(tree);
+      nodes
+        .find((n) => n.type === "button" && n.props.children === "Next →")
+        .props.onClick();
+      assert.equal(advanced, 3);
+      assert.equal(anchor, "morgans-tuesday");
+      assert.equal(options.block, "start");
+      assert.equal(options.behavior, reduced ? "auto" : "smooth");
+    }
+    for (let i = 1; i <= 7; i++)
+      assert.ok(
+        fs.statSync(
+          require("node:path").join(
+            __dirname,
+            `../public/images/morgan/s${i}.png`,
+          ),
+        ).size > 1000,
+      );
+  } finally {
+    global.window = saved.window;
+    global.document = saved.document;
+    global.requestAnimationFrame = saved.raf;
+  }
 });
