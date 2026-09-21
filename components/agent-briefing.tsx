@@ -1,3 +1,4 @@
+import Image from "next/image";
 export const workshopAgenda = [
   {
     title: "Priority use cases and outcomes",
@@ -146,6 +147,19 @@ export function MeetMorgan({ onEnter }: { onEnter: () => void }) {
           Agenda 1 · Priority use cases and outcomes · 25 minutes
         </span>
         <h1>Meet Morgan.</h1>
+        <Image
+          className="morgan-portrait"
+          src="/images/morgan/meet-morgan.png"
+          alt="Morgan at her desk, surrounded by the people and work she connects."
+          width={1536}
+          height={1024}
+          sizes="(max-width:700px) 90vw, 480px"
+        />
+        <p>
+          She knows the work is about people: the champion trying to get a pilot
+          going, the sponsor who needs a reason to invest, the colleague waiting
+          for a clear decision.
+        </p>
         <p>
           She leads growth and account-based marketing. Her goal is to turn
           enterprise interest into meaningful adoption—without making every
@@ -159,7 +173,12 @@ export function MeetMorgan({ onEnter }: { onEnter: () => void }) {
             direction, approves consequential choices and handles exceptions.
           </p>
         </div>
-        <h2>One opportunity runs through her day.</h2>
+        <p className="morgan-human-note">
+          She is not looking for more things to approve. She wants time for the
+          decisions that deserve her experience—and confidence that the routine
+          work is being handled with care.
+        </p>
+        <h2 className="morgan-clear">One opportunity runs through her day.</h2>
         <div className="opening-day">
           {[
             [

@@ -18,6 +18,7 @@ import { WorkflowWork, WorkflowRequirements } from "./workflow-work";
 import { CampaignEditor } from "./campaign-editor";
 import { processKey } from "../lib/process-state";
 import { currentWorkStep, workSignature } from "../lib/workflow-work";
+import MorganStory from "./morgan-story";
 import MorningInbox from "./morning-inbox";
 import AgentBriefing, { MeetMorgan } from "./agent-briefing";
 import ArchitectureOutput from "./architecture-output";
@@ -450,34 +451,40 @@ export default function AgentWorkspace() {
                 <span>Enterprise adoption / 12 target accounts</span>
               </div>
               {s.day.moment === 0 ? (
-                <MorganScreen>
-                  <div className="day-arrival">
-                    <span className="agent-kicker">08:45 · Morgan arrives</span>
-                    <h1>Good morning, Morgan.</h1>
-                    <p className="agent-lede">
-                      Four things need your attention this morning. I recommend
-                      starting with the adoption opportunity; the other items
-                      are ready when you are.
-                    </p>
-                    <MorningInbox
-                      onStart={() => updateInMonitor(() => setChapter(0))}
-                    />
-                    <div className="day-agenda">
-                      <h3>While you focus on this</h3>
-                      <p>
-                        I’ll prepare a content plan when you choose the
-                        direction, bring approvals back to you, and surface only
-                        the operational exceptions that need judgment.
+                <>
+                  <MorganStory moment={0} />
+                  <MorganScreen>
+                    <div className="day-arrival">
+                      <span className="agent-kicker">
+                        08:45 · Morgan arrives
+                      </span>
+                      <h1>Good morning, Morgan.</h1>
+                      <p className="agent-lede">
+                        Four things need your attention this morning. I
+                        recommend starting with the adoption opportunity; the
+                        other items are ready when you are.
+                      </p>
+                      <MorningInbox
+                        onStart={() => updateInMonitor(() => setChapter(0))}
+                      />
+                      <div className="day-agenda">
+                        <h3>While you focus on this</h3>
+                        <p>
+                          I’ll prepare a content plan when you choose the
+                          direction, bring approvals back to you, and surface
+                          only the operational exceptions that need judgment.
+                        </p>
+                      </div>
+                      <p className="agent-disclaimer">
+                        Illustrative end state · All signals, counts and actions
+                        are fictional.
                       </p>
                     </div>
-                    <p className="agent-disclaimer">
-                      Illustrative end state · All signals, counts and actions
-                      are fictional.
-                    </p>
-                  </div>
-                </MorganScreen>
+                  </MorganScreen>
+                </>
               ) : s.day.moment === 4 ? (
                 <>
+                  <MorganStory moment={4} />
                   <MorganScreen>
                     <div className="day-evening">
                       <span className="agent-kicker">
@@ -532,13 +539,7 @@ export default function AgentWorkspace() {
                 </>
               ) : (
                 <>
-                  <div className="agent-story">
-                    <span className="agent-kicker">
-                      {c.time} / {c.short}
-                    </span>
-                    <h1>{c.short}</h1>
-                    <p>{c.story}</p>
-                  </div>
+                  <MorganStory moment={s.day.moment} />
                   <MorganScreen workflow>
                     <div className="agent-product">
                       <header>

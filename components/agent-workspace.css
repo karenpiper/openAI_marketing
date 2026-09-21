@@ -2708,3 +2708,100 @@
     flex-direction: column;
   }
 }
+.morgan-narrative {
+  display: grid;
+  grid-template-columns: 220px minmax(0, 1fr);
+  gap: 30px;
+  align-items: center;
+  background: #f6f1e8;
+  border: 1px solid #e3dbce;
+  padding: 25px;
+  border-radius: 15px;
+  margin: 20px 0 30px;
+}
+.morgan-narrative > img {
+  width: 100%;
+  height: 230px;
+  object-fit: cover;
+  border-radius: 10px;
+}
+.morgan-narrative h1 {
+  font-size: 28px !important;
+  font-weight: 500;
+  margin: 12px 0;
+  color: #2a4639;
+}
+.morgan-narrative p {
+  font-size: 14px;
+  line-height: 1.8;
+  color: #6c7266;
+  margin: 0;
+}
+.morgan-narrative blockquote {
+  border: 0;
+  padding: 0;
+  margin: 16px 0 0;
+  font-family: Georgia, serif;
+  font-style: italic;
+  font-size: 18px;
+  line-height: 1.5;
+  color: #526b54;
+}
+.morgan-narrative blockquote:before {
+  content: "“";
+}
+.morgan-narrative blockquote:after {
+  content: "”";
+}
+.morgan-portrait {
+  float: right;
+  width: 42%;
+  height: auto;
+  aspect-ratio: 3/2;
+  object-fit: cover;
+  border-radius: 17px;
+  margin: 0 0 30px 40px;
+}
+.morgan-human-note {
+  font-family: Georgia, serif;
+  font-style: italic;
+  color: #607361 !important;
+}
+.morgan-clear {
+  clear: both;
+  padding-top: 30px;
+}
+.workshop-opening:has(.morgan-portrait) .morgan-story-note {
+  max-width: none;
+  overflow: hidden;
+}
+@media (max-width: 850px) {
+  .morgan-narrative {
+    grid-template-columns: 150px minmax(0, 1fr);
+    gap: 20px;
+  }
+  .morgan-narrative > img {
+    height: 210px;
+  }
+  .morgan-narrative h1 {
+    font-size: 23px !important;
+  }
+}
+@media (max-width: 700px) {
+  .morgan-narrative {
+    grid-template-columns: 1fr;
+    padding: 20px;
+  }
+  .morgan-narrative > img {
+    height: 210px;
+    object-position: center 40%;
+  }
+  .morgan-portrait {
+    float: none;
+    width: 100%;
+    margin: 0 0 25px;
+  }
+  .morgan-clear {
+    padding-top: 10px;
+  }
+}
