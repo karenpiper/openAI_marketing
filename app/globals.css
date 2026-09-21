@@ -3401,3 +3401,118 @@ body {
 .readout-card dd {
   margin: 0.4rem 0 1rem;
 }
+
+.diagram-case-selector,
+.diagram-step-selector {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0.8rem 0;
+}
+.diagram-case-selector button[aria-pressed="true"],
+.diagram-step-selector button[aria-pressed="true"] {
+  background: #18382c;
+  color: white;
+  border-color: #18382c;
+}
+.diagram-step-selector button {
+  font-size: 0.8rem;
+  padding: 0.45rem 0.6rem;
+}
+.diagram-legend {
+  font-size: 0.85rem;
+  color: #496450;
+}
+.closing-diagram svg {
+  max-height: 650px;
+}
+.closing-decision-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.8rem;
+  margin: 1rem 0 1.5rem;
+}
+.closing-decision-list article {
+  padding: 1rem;
+  border: 1px solid #c9d2c5;
+  border-radius: 10px;
+  background: #fffdf7;
+}
+.closing-decision-list h3 {
+  font-size: 1rem;
+  margin: 0.65rem 0;
+}
+.closing-decision-list article > div {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+@media (max-width: 800px) {
+  .closing-decision-list {
+    grid-template-columns: 1fr;
+  }
+}
+
+.closing-architecture {
+  display: block;
+}
+.closing-architecture > aside {
+  margin-top: 1rem;
+}
+.architecture-story-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(300px, 1fr);
+  gap: 1.5rem;
+  align-items: start;
+}
+.architecture-story-layout > div {
+  position: sticky;
+  top: 1rem;
+}
+.closing-architecture .architecture-story {
+  padding: 0;
+  border: 0;
+}
+.architecture-story ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.architecture-story li {
+  padding: 0.9rem 1rem;
+  margin-bottom: 0.7rem;
+  border-left: 3px solid #c5d1c5;
+  background: #fffdf7;
+  border-radius: 0 10px 10px 0;
+}
+.architecture-story li.story-active {
+  border-color: #a85c00;
+  background: #fff0c2;
+}
+.architecture-story li button {
+  text-align: left;
+  font-weight: 700;
+  border: 0;
+  background: transparent;
+  color: #18382c;
+  padding: 0;
+}
+.architecture-story li p {
+  font-size: 0.95rem;
+  margin: 0.5rem 0;
+}
+.architecture-story li small {
+  color: #496450;
+}
+.story-room-note {
+  border-top: 1px solid #c5d1c5;
+  padding-top: 0.5rem;
+}
+@media (max-width: 800px) {
+  .architecture-story-layout {
+    grid-template-columns: 1fr;
+  }
+  .architecture-story-layout > div {
+    position: static;
+  }
+}

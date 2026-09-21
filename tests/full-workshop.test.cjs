@@ -1192,3 +1192,58 @@ test("closing readout has one diagram, three outputs and a persistent editorial 
     colin: "",
   });
 });
+
+test("readout highlights each priority flow and exposes decisions without the full record", () => {
+  const { architectureDiagram } = require("../lib/architecture-diagram.ts");
+  const { closingItems } = require("../lib/closing-summary.ts");
+  const Readout = require("../components/workshop-readout.tsx").default;
+  let s = require("../lib/demo-session.ts").createDemoSession();
+  s.readoutFlow = { caseId: "s5", step: 3 };
+  s.decisions.push({
+    id: "visible",
+    title: "Choose the approval owner",
+    answer: "Operations lead owns review",
+    owner: "Alex",
+    due: "Monday",
+    status: "Confirmed",
+    useCase: "s5",
+  });
+  s.actions.push({
+    id: "blocked",
+    task: "Connect the request queue",
+    blockedBy: "Confirm access to the queue",
+    owner: "Sam",
+    when: "First",
+    sponsorship: "",
+    status: "Proposed",
+    useCase: "s5",
+  });
+  s = w.parseSession(JSON.parse(JSON.stringify(s)));
+  assert.deepEqual(s.readoutFlow, { caseId: "s5", step: 3 });
+  const html = renderToStaticMarkup(
+    React.createElement(Readout, { session: s, setSession: () => {} }),
+  );
+  assert.match(html, /Choose the approval owner/);
+  assert.match(html, /Operations lead owns review/);
+  assert.match(html, /Confirm access to the queue/);
+  assert.match(html, /Routine marketing operations/);
+  assert.match(html, /Route exceptions/);
+  assert.match(html, /Dashed: proposed/);
+  assert.ok(
+    closingItems(s).some(
+      (i) => i.id === "decision-visible" && i.status === "Agreed",
+    ),
+  );
+  const routine = architectureDiagram(s, "s5", 3),
+    content = architectureDiagram(s, "s3", 1);
+  assert.notEqual(routine, content);
+  assert.match(routine, /#fff0c2/);
+  assert.match(routine, /stroke-dasharray="9 6"/);
+  assert.ok(!architectureDiagram(s).includes('stroke-dasharray="9 6"'));
+  const legacy = { ...s };
+  delete legacy.readoutFlow;
+  assert.deepEqual(w.parseSession(legacy).readoutFlow, {
+    caseId: "",
+    step: -1,
+  });
+});

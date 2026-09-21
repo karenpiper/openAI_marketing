@@ -208,6 +208,7 @@ export type WorkflowReview = {
   source: string;
 };
 export type Session = {
+  readoutFlow: { caseId: string; step: number };
   closing: { ownership: string; sequence: string; open: string; colin: string };
   scenario: WorkflowScenario;
   architectureAdditions: {
@@ -292,6 +293,7 @@ export function createSession(): Session {
   return {
     schema: 1,
     overview: true,
+    readoutFlow: { caseId: "", step: -1 },
     closing: { ownership: "", sequence: "", open: "", colin: "" },
     scenario: { ...defaultScenario },
     architectureAdditions: [],
@@ -405,6 +407,17 @@ export function parseSession(raw: unknown): Session {
     throw Error("This is not a supported workshop backup.");
   const s = createSession();
   s.title = str(r.title, s.title);
+  const flow = record(r.readoutFlow);
+  s.readoutFlow = {
+    caseId: uc(flow.caseId),
+    step:
+      typeof flow.step === "number" &&
+      Number.isInteger(flow.step) &&
+      flow.step >= -1 &&
+      flow.step < 5
+        ? flow.step
+        : -1,
+  };
   const closing = record(r.closing);
   s.closing = {
     ownership: str(closing.ownership),

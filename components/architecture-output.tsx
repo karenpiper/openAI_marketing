@@ -1,20 +1,30 @@
+import { workflows } from "../lib/architecture-workflow";
 import { architectureDiagram } from "../lib/architecture-diagram";
-import { useState } from "react";
-import type { Session } from "../lib/workshop";
+import { useState, type Dispatch, type SetStateAction } from "react";
+import { activeCases, type Session } from "../lib/workshop";
 import { architectureOutput } from "../lib/architecture-output";
 import { Badge } from "./workshop-fields";
 export default function ArchitectureOutput({
   session: s,
   download = true,
   compact = false,
+  setSession,
 }: {
   session: Session;
   download?: boolean;
   compact?: boolean;
+  setSession?: Dispatch<SetStateAction<Session>>;
 }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const model = architectureOutput(s);
+  const cases = activeCases(s);
+  const caseId = cases.some((u) => u.id === s.readoutFlow.caseId)
+    ? s.readoutFlow.caseId
+    : cases[0]?.id;
+  const step = s.readoutFlow.step;
+  const flow = caseId ? workflows[caseId] : [];
+
   async function exportPdf() {
     setBusy(true);
     setError("");
@@ -66,12 +76,101 @@ export default function ArchitectureOutput({
         </p>
       )}
       {compact && (
-        <div
-          className="closing-diagram"
-          role="img"
-          aria-label="Proposed OpenAI and Adobe architecture, with component references to session notes"
-          dangerouslySetInnerHTML={{ __html: architectureDiagram(s) }}
-        />
+        <>
+          <div
+            className="diagram-case-selector"
+            aria-label="Highlight a priority use case"
+          >
+            {cases.map((u) => (
+              <button
+                key={u.id}
+                disabled={!setSession}
+                aria-pressed={caseId === u.id}
+                onClick={() =>
+                  setSession?.((p) => ({
+                    ...p,
+                    readoutFlow: { caseId: u.id, step: -1 },
+                  }))
+                }
+              >
+                {u.label}
+              </button>
+            ))}
+          </div>
+          <div className="architecture-story-layout">
+            <div>
+              <div
+                className="closing-diagram"
+                role="img"
+                aria-label={`Architecture highlighting ${cases.find((u) => u.id === caseId)?.label || "the proposal"}${step >= 0 ? ` — ${flow[step]?.title}` : ""}`}
+                dangerouslySetInnerHTML={{
+                  __html: architectureDiagram(s, caseId, step),
+                }}
+              />
+              <p className="diagram-legend">
+                Gold: relevant components and connections. Solid: original
+                diagram connections. Dashed: proposed workflow connections to
+                validate.
+              </p>
+            </div>
+            <aside className="architecture-story">
+              <div className="card-heading">
+                <h3>
+                  {cases.find((u) => u.id === caseId)?.label ||
+                    "Choose a priority use case"}
+                </h3>
+                {setSession && (
+                  <button
+                    aria-pressed={step === -1}
+                    onClick={() =>
+                      setSession((p) => ({
+                        ...p,
+                        readoutFlow: { caseId: caseId || "", step: -1 },
+                      }))
+                    }
+                  >
+                    Whole flow
+                  </button>
+                )}
+              </div>
+              <p className="muted">
+                Follow the story. Select a moment to highlight where it happens.
+              </p>
+              <ol>
+                {flow.map((f, i) => {
+                  const note = model.cases.find((c) => c.id === caseId)?.nodes[
+                    i
+                  ];
+                  return (
+                    <li key={i} className={step === i ? "story-active" : ""}>
+                      <button
+                        disabled={!setSession}
+                        aria-pressed={step === i}
+                        onClick={() =>
+                          setSession?.((p) => ({
+                            ...p,
+                            readoutFlow: { caseId: caseId || "", step: i },
+                          }))
+                        }
+                      >
+                        {i + 1}. {f.title}
+                      </button>
+                      <p>{f.proposal}</p>
+                      <small>
+                        <b>Passes forward:</b> {f.output}
+                      </small>
+                      {note?.annotation && (
+                        <p className="story-room-note">
+                          <b>Room input:</b> {note.annotation}
+                        </p>
+                      )}
+                    </li>
+                  );
+                })}
+              </ol>
+            </aside>
+          </div>
+        </>
       )}
       {!compact && !model.cases.length && (
         <p>

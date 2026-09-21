@@ -1,6 +1,6 @@
 import { useState, type Dispatch, type SetStateAction } from "react";
 import { type Session, activeCases, selectionConfirmed } from "../lib/workshop";
-import { closingSummary } from "../lib/closing-summary";
+import { closingSummary, closingItems } from "../lib/closing-summary";
 import ArchitectureOutput from "./architecture-output";
 import WorkshopRecord from "./workshop-record";
 import { Badge, Field } from "./workshop-fields";
@@ -23,6 +23,7 @@ export default function WorkshopReadout({
   const [view, setView] = useState<"outcomes" | "record" | "edit">("outcomes");
   const cases = activeCases(session),
     summary = closingSummary(session);
+  const items = closingItems(session);
   const navigate = (next: typeof view) => {
     setView(next);
     window.scrollTo({ top: 0 });
@@ -120,7 +121,12 @@ export default function WorkshopReadout({
       <section className="closing-section closing-architecture">
         <div>
           <span className="eyebrow">02 · Working architecture</span>
-          <ArchitectureOutput session={session} compact download={!room} />
+          <ArchitectureOutput
+            session={session}
+            compact
+            download={!room}
+            setSession={room ? undefined : setSession}
+          />
         </div>
         <aside>
           <h3>Ownership boundaries</h3>
@@ -133,13 +139,37 @@ export default function WorkshopReadout({
       </section>
       <section className="closing-section">
         <div className="card-heading">
-          <h2>03 · What we take to Colin</h2>
+          <h2>03 · Decisions & dependencies</h2>
           {!room && setSession && (
             <button onClick={() => navigate("edit")}>
               Edit closing summary
             </button>
           )}
         </div>
+        <div className="closing-decision-list">
+          {items.length ? (
+            items.map((item) => (
+              <article key={item.id}>
+                <div>
+                  <Badge value={item.status} />
+                  <span className="muted">{item.scope}</span>
+                </div>
+                <h3>{item.title}</h3>
+                {item.detail && <p className="preserve-lines">{item.detail}</p>}
+                <p className="muted">
+                  {item.owner ? `Owner: ${item.owner}` : "Owner to agree"}
+                  {item.due ? ` · ${item.due}` : ""}
+                </p>
+              </article>
+            ))
+          ) : (
+            <p>
+              No decisions captured yet. Capture the decisions and dependencies
+              before closing.
+            </p>
+          )}
+        </div>
+        <h3>What we take to Colin</h3>
         <div className="closing-asks">
           {(["sequence", "open", "colin"] as const).map((key) => (
             <article key={key}>

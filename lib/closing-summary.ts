@@ -77,3 +77,74 @@ export function middayReadout(s: Session) {
     `Ask for Colin:\n${summary.colin}`,
   ].join("\n\n");
 }
+
+export function closingItems(s: Session) {
+  const cases = activeCases(s),
+    selected = new Set(cases.map((u) => u.id));
+  const relevant = (id: string) => !id || selected.has(id);
+  const scope = (id: string) =>
+    cases.find((u) => u.id === id)?.label || "Workshop-wide";
+  const items: {
+    id: string;
+    title: string;
+    detail: string;
+    owner: string;
+    due: string;
+    status: string;
+    scope: string;
+  }[] = [];
+  for (const d of s.decisions.filter((d) => relevant(d.useCase)))
+    items.push({
+      id: `decision-${d.id}`,
+      title: d.title,
+      detail: d.answer,
+      owner: d.owner,
+      due: d.due,
+      status:
+        d.status === "Confirmed" && d.answer.trim()
+          ? "Agreed"
+          : "Open decision",
+      scope: scope(d.useCase),
+    });
+  for (const r of s.workflowReviews.filter((r) => relevant(r.useCase))) {
+    const stale = workflowState(s, r.useCase, r.step).stale;
+    if (r.choice !== "Change" && r.choice !== "Unresolved" && !stale) continue;
+    items.push({
+      id: `review-${r.useCase}-${r.step}`,
+      title:
+        r.choice === "Change"
+          ? "Requested architecture change"
+          : "Architecture question",
+      detail: r.change || r.next || "Room clarification needed.",
+      owner: r.owner,
+      due: "",
+      status: stale ? "Needs recheck" : "Open",
+      scope: scope(r.useCase),
+    });
+  }
+  for (const a of s.actions.filter(
+    (a) => relevant(a.useCase) && a.blockedBy.trim(),
+  ))
+    items.push({
+      id: `dependency-${a.id}`,
+      title: a.blockedBy,
+      detail: a.task ? `Needed for: ${a.task}` : "",
+      owner: a.owner,
+      due: a.when,
+      status: "Dependency",
+      scope: scope(a.useCase),
+    });
+  for (const a of s.architectureAdditions.filter(
+    (a) => relevant(a.useCase) && a.note.trim(),
+  ))
+    items.push({
+      id: `addition-${a.id}`,
+      title: "Proposed architecture addition",
+      detail: a.note,
+      owner: a.owner,
+      due: "",
+      status: "To review",
+      scope: scope(a.useCase),
+    });
+  return items;
+}
