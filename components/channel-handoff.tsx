@@ -7,6 +7,22 @@ import {
   processUpdate,
   type ProcessState,
 } from "../lib/process-state";
+
+function activationChannels(plan: string) {
+  if (plan.includes("Integrated"))
+    return [
+      "Sales enablement",
+      "Executive thought leadership",
+      "Social campaign",
+      "Event follow-up",
+      "Website",
+    ];
+  if (plan.includes("thought leadership"))
+    return ["Sales enablement", "Executive thought leadership"];
+  if (plan.includes("Social")) return ["Social campaign", "Website"];
+  if (plan.includes("event")) return ["Email", "Event follow-up"];
+  return ["Email", "Website"];
+}
 export default function ChannelHandoff({
   session,
   onChange,
@@ -44,16 +60,12 @@ export default function ChannelHandoff({
     URL.revokeObjectURL(url);
   }
   const p = processState(session, "s3", 3);
-  const second = session.channel.includes("event")
-    ? "Event follow-up"
-    : session.channel.includes("sales")
-      ? "Sales handoff"
-      : "Website";
-  const channels = ["Email", second];
+  const channels = activationChannels(session.channel);
+  const activeTab = channels.includes(tab) ? tab : channels[0];
   const approved = processReady(session, "s3", 2);
-  const staged = p.reviewers[tab] === "Staged";
+  const staged = p.reviewers[activeTab] === "Staged";
   function stage() {
-    const reviewers = { ...p.reviewers, [tab]: "Staged" };
+    const reviewers = { ...p.reviewers, [activeTab]: "Staged" };
     onChange(
       processUpdate(
         p,
@@ -63,7 +75,7 @@ export default function ChannelHandoff({
             ? "Complete"
             : "Staging",
         },
-        `${tab} bundle (${variants.length} candidate email variants across 12 accounts) accepted by the simulated connector. Routed to the configured marketing operations team. Not sent.`,
+        `${activeTab} bundle (${variants.length} candidate account packages across 12 accounts) accepted by the simulated connector. Routed to the configured team. Not sent.`,
       ),
     );
   }
@@ -82,7 +94,11 @@ export default function ChannelHandoff({
       </header>
       <nav aria-label="Channel work orders">
         {channels.map((c) => (
-          <button key={c} aria-pressed={tab === c} onClick={() => setTab(c)}>
+          <button
+            key={c}
+            aria-pressed={activeTab === c}
+            onClick={() => setTab(c)}
+          >
             {c} {p.reviewers[c] === "Staged" ? "✓" : ""}
           </button>
         ))}
@@ -93,7 +109,7 @@ export default function ChannelHandoff({
       >
         <div>
           <b>
-            {variants.length} candidate email variants · 12 accounts ·{" "}
+            {variants.length} candidate account packages · 12 accounts ·{" "}
             {accountVariants.length} audience{" "}
             {accountVariants.length === 1 ? "version" : "versions"} each
           </b>
@@ -142,8 +158,10 @@ export default function ChannelHandoff({
       </section>
       <div className="handoff-canvas">
         <div className="handoff-preview">
-          <span className="agent-kicker">{tab} · illustrative preview</span>
-          {tab === "Email" ? (
+          <span className="agent-kicker">
+            {activeTab} · illustrative preview
+          </span>
+          {activeTab === "Email" ? (
             <div className="email-preview">
               <div>
                 <b>To</b> {variant.account} · {variant.segment}
@@ -167,7 +185,7 @@ export default function ChannelHandoff({
                 service
               </footer>
             </div>
-          ) : tab === "Event follow-up" ? (
+          ) : activeTab === "Event follow-up" ? (
             <div className="event-preview">
               <h2>
                 Two paths.
@@ -194,7 +212,7 @@ export default function ChannelHandoff({
                 Suppress duplicate invitations and ineligible contacts.
               </footer>
             </div>
-          ) : tab === "Website" ? (
+          ) : activeTab === "Website" ? (
             <div className="email-preview">
               <div>Marketing website / proposed audience experience</div>
               <article>
@@ -211,12 +229,12 @@ export default function ChannelHandoff({
                 Audience rule: resolved identity + eligible account context
               </footer>
             </div>
-          ) : (
+          ) : activeTab === "Sales enablement" ? (
             <div className="event-preview">
               <h2>
-                Account-team
+                Seller-ready
                 <br />
-                handoff card.
+                account brief.
               </h2>
               <article>
                 <b>Why this account, now</b>
@@ -234,6 +252,52 @@ export default function ChannelHandoff({
               </article>
               <footer>
                 Includes role context, approved guide and campaign reference.
+              </footer>
+            </div>
+          ) : activeTab === "Executive thought leadership" ? (
+            <div className="event-preview">
+              <h2>Executive point of view.</h2>
+              <article>
+                <b>Perspective</b>
+                <p>
+                  Frame enterprise adoption as a leadership decision, using
+                  approved evidence and the account’s stated priorities.
+                </p>
+              </article>
+              <article>
+                <b>Distribution</b>
+                <p>
+                  Prepare executive social copy, a seller talking point and an
+                  account-specific invitation to continue the conversation.
+                </p>
+              </article>
+              <footer>
+                Claims remain tied to the approved source and the review packet.
+              </footer>
+            </div>
+          ) : (
+            <div className="event-preview">
+              <h2>
+                Account-relevant
+                <br />
+                social campaign.
+              </h2>
+              <article>
+                <b>Social story</b>
+                <p>
+                  Adapt the approved enterprise adoption perspective into a
+                  role-relevant social sequence.
+                </p>
+              </article>
+              <article>
+                <b>Destination</b>
+                <p>
+                  Link to the matching approved website experience and retain
+                  campaign, audience and account context.
+                </p>
+              </article>
+              <footer>
+                Prepared for review and staging; no content has been published.
               </footer>
             </div>
           )}
@@ -261,13 +325,17 @@ export default function ChannelHandoff({
           <div>
             <b>Destination</b>
             <p>
-              {tab === "Email"
+              {activeTab === "Email"
                 ? "CRM (Marketing) / proposed Marketo connector"
-                : tab === "Event follow-up"
+                : activeTab === "Event follow-up"
                   ? "Events + marketing CRM"
-                  : tab === "Website"
+                  : activeTab === "Website"
                     ? "Marketing Website"
-                    : "Sales CRM / account team"}
+                    : activeTab === "Sales enablement"
+                      ? "Sales CRM / account team"
+                      : activeTab === "Executive thought leadership"
+                        ? "Executive communications workflow + sales CRM"
+                        : "Social publishing / advocacy workflow"}
             </p>
           </div>
           <div>
@@ -277,7 +345,7 @@ export default function ChannelHandoff({
               <br />
               Audience: buying-role / lifecycle segment
               <br />
-              Channel: {tab}
+              Channel: {activeTab}
             </p>
           </div>
           <div className="handoff-gate">
@@ -295,7 +363,7 @@ export default function ChannelHandoff({
           >
             {staged
               ? "Prepared for release"
-              : `Prepare ${tab.toLowerCase()} for release`}
+              : `Prepare ${activeTab.toLowerCase()} for release`}
           </button>
           {!approved && (
             <p>
@@ -306,7 +374,12 @@ export default function ChannelHandoff({
             <div className="handoff-receipt" role="status">
               <b>✓ Prepared · not sent</b>
               <p>
-                WO-{tab === "Email" ? "EMAIL" : "SECOND"}-001
+                WO-
+                {activeTab
+                  .toUpperCase()
+                  .replace(/[^A-Z]/g, "")
+                  .slice(0, 8)}
+                -001
                 <br />
                 Status: accepted into staging
                 <br />

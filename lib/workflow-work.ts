@@ -214,7 +214,7 @@ export function workStages(s: AgentState, id: string): WorkStage[] {
         input:
           "Approved direction, review packet, eligibility rules and channel configuration.",
         output: "Staged channel work orders and a measurement plan.",
-        connection: `OpenAI orchestration → ${s.channel.includes("event") ? "Marketo / marketing CRM + event platform" : s.channel.includes("sales") ? "Marketo / marketing CRM + sales CRM" : "Marketo / marketing CRM + website activation"} → journey analytics.`,
+        connection: `OpenAI orchestration → ${s.channel.includes("event") ? "Marketo / marketing CRM + event platform" : s.channel.includes("thought leadership") ? "sales CRM + executive communications workflow" : s.channel.includes("Social") ? "social publishing workflow + marketing website" : s.channel.includes("Integrated") ? "marketing CRM + sales CRM + social publishing + event platform" : "Marketo / marketing CRM + website activation"} → journey analytics.`,
         enables:
           "Coordinates channels and returns response signals to the same campaign context.",
         control:
@@ -228,15 +228,27 @@ export function workStages(s: AgentState, id: string): WorkStage[] {
           [
             s.channel.includes("event")
               ? "Event follow-up"
-              : s.channel.includes("sales")
-                ? "Sales handoff"
-                : "Website experience",
+              : s.channel.includes("thought leadership")
+                ? "Executive thought leadership"
+                : s.channel.includes("Social")
+                  ? "Social campaign"
+                  : s.channel.includes("Integrated")
+                    ? "Sales + social activation"
+                    : s.channel.includes("sales")
+                      ? "Sales handoff"
+                      : "Website experience",
             "Staged work order",
             s.channel.includes("event")
               ? "Separate attendee and non-attendee routes"
-              : s.channel.includes("sales")
-                ? "Account brief + role context + next action"
-                : "Audience rule + approved experience reference",
+              : s.channel.includes("thought leadership")
+                ? "Executive POV + seller talking points + approved distribution plan"
+                : s.channel.includes("Social")
+                  ? "Social variants + website destination + campaign identifiers"
+                  : s.channel.includes("Integrated")
+                    ? "Coordinated seller, social, event and web activation"
+                    : s.channel.includes("sales")
+                      ? "Account brief + role context + next action"
+                      : "Audience rule + approved experience reference",
           ],
           [
             "Measurement",

@@ -152,12 +152,21 @@ export default function AgentWorkspace() {
     if (!prompt.trim()) return;
     let reply = guidedReply(chapters[chapter], prompt);
     const q = prompt.toLowerCase();
-    if (/website|sales follow.up|lifecycle|one audience|^objective:/.test(q)) {
+    if (
+      /website|sales follow.up|sales enablement|thought leadership|social|lifecycle|one audience|^objective:/.test(
+        q,
+      )
+    ) {
       setS((prev) => ({
         ...prev,
         ...(q.includes("website") ? { channel: "Email + website" } : {}),
-        ...(q.includes("sales follow")
-          ? { channel: "Email + sales follow-up" }
+        ...(q.includes("sales follow") ||
+        q.includes("sales enablement") ||
+        q.includes("thought leadership")
+          ? { channel: "Sales enablement + executive thought leadership" }
+          : {}),
+        ...(q.includes("social")
+          ? { channel: "Social campaign + website" }
           : {}),
         ...(q.includes("lifecycle") ? { audience: "Lifecycle stages" } : {}),
         ...(q.includes("one audience") ? { audience: "One audience" } : {}),
@@ -663,7 +672,9 @@ export default function AgentWorkspace() {
                                     [
                                       "Email + event follow-up",
                                       "Email + website",
-                                      "Email + sales follow-up",
+                                      "Sales enablement + executive thought leadership",
+                                      "Social campaign + website",
+                                      "Integrated account activation",
                                     ],
                                     "channel",
                                   ],

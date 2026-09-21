@@ -15,6 +15,13 @@ export const priorities = [
   "Later",
   "Not needed",
 ] as const;
+export const activationPlans = [
+  "Email + event follow-up",
+  "Email + website",
+  "Sales enablement + executive thought leadership",
+  "Social campaign + website",
+  "Integrated account activation",
+] as const;
 export const chapters = [
   {
     id: "s2",
@@ -287,20 +294,22 @@ export function restoreAgentState(raw: unknown): AgentState {
       };
     }
   }
+  const restoredChannel =
+    r.channel === "Email + sales follow-up"
+      ? "Sales enablement + executive thought leadership"
+      : r.channel;
   if (
     !["Buying roles", "Lifecycle stages", "One audience"].includes(
       r.audience,
     ) ||
-    ![
-      "Email + event follow-up",
-      "Email + website",
-      "Email + sales follow-up",
-    ].includes(r.channel) ||
+    !activationPlans.includes(
+      restoredChannel as (typeof activationPlans)[number],
+    ) ||
     !["Approved source available", "Source material missing"].includes(r.source)
   )
     throw Error("Invalid scenario");
   base.audience = r.audience;
-  base.channel = r.channel;
+  base.channel = restoredChannel;
   base.source = r.source;
   for (const c of chapters)
     if (typeof r.outcomes?.[c.id] === "string")
@@ -419,9 +428,13 @@ export function planRows(
       value: s.channel,
       detail: s.channel.includes("event")
         ? "Separate invitations, attendee follow-up and non-attendee follow-up."
-        : s.channel.includes("sales")
-          ? "Prepare a coordinated handoff with account context for sales."
-          : "Prepare channel-specific requirements and eligibility checks.",
+        : s.channel.includes("thought leadership")
+          ? "Prepare executive perspective, seller enablement and an approved distribution plan."
+          : s.channel.includes("Social")
+            ? "Prepare social campaign variations and the matching website destination."
+            : s.channel.includes("sales")
+              ? "Prepare a coordinated handoff with account context for sales."
+              : "Prepare channel-specific requirements and eligibility checks.",
     },
     {
       label: "Learning",

@@ -1737,6 +1737,22 @@
   font-size: 13px;
   line-height: 1.35;
 }
+.sub-use-case-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  padding: 0;
+  margin: 9px 0 0;
+  list-style: none;
+}
+.sub-use-case-list li {
+  padding: 3px 6px;
+  border-radius: 5px;
+  background: #edf3ed;
+  color: #3c634b;
+  font-size: 10px;
+  line-height: 1.25;
+}
 .opening-day {
   margin: 25px 0 40px;
 }

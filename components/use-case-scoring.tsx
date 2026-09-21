@@ -57,6 +57,10 @@ export default function UseCaseScoring({
         <span>
           The room—not the calculation—chooses the final priority set.
         </span>
+        <span>
+          Sub-use cases make each parent use case concrete. Score the parent,
+          not every prompt individually.
+        </span>
       </div>
       <div className="scoring-table-wrap">
         <table className="scoring-table">
@@ -83,6 +87,14 @@ export default function UseCaseScoring({
                     </small>
                     <b>{candidate.title}</b>
                     <span>{candidate.short}</span>
+                    <ul
+                      className="sub-use-case-list"
+                      aria-label={`${candidate.title} sub-use cases`}
+                    >
+                      {candidate.subUseCases.map((subUseCase) => (
+                        <li key={subUseCase}>{subUseCase}</li>
+                      ))}
+                    </ul>
                   </td>
                   {axes.map(([key]) => (
                     <td key={key}>
