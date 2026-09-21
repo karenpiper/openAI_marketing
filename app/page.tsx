@@ -36,7 +36,6 @@ export default function Workshop() {
   const [room, setRoom] = useState(false);
   const [demo, setDemo] = useState(false);
   const storageKeyRef = useRef(SESSION_KEY);
-  const [preview, setPreview] = useState(false);
   const [storageError, setStorageError] = useState("");
   const [message, setMessage] = useState("");
   const [clock, setClock] = useState(Date.now());
@@ -226,13 +225,6 @@ export default function Workshop() {
       );
     }
   }
-  function openRoom() {
-    window.open(
-      `${window.location.origin}${window.location.pathname}?view=room${demo ? "&demo=1" : ""}`,
-      "workshop-room",
-      "popup,width=1440,height=900",
-    );
-  }
   const selection = (
     <section className="selection-panel">
       <span className="eyebrow">A score is a conversation aid</span>
@@ -341,7 +333,6 @@ export default function Workshop() {
             {!session.overview && (
               <button
                 onClick={() => {
-                  setPreview(false);
                   setSession((s) => ({
                     ...s,
                     overview: true,
@@ -353,16 +344,11 @@ export default function Workshop() {
                 00 · Workshop overview
               </button>
             )}
-            <button onClick={() => setPreview((v) => !v)}>
-              {preview ? "Return to capture" : "Preview room view"}
-            </button>
-            <button onClick={openRoom}>Open projector ↗</button>
-            {!demo && <button onClick={enterDemo}>Try demo data</button>}
             <button
               aria-expanded={toolsOpen}
               onClick={() => setToolsOpen((v) => !v)}
             >
-              Session tools
+              Workshop settings
             </button>
           </div>
         </header>
@@ -387,7 +373,6 @@ export default function Workshop() {
                   ) {
                     setSession(createDemoSession());
                     setStorageError("");
-                    setPreview(false);
                   }
                 }}
               >
@@ -410,7 +395,6 @@ export default function Workshop() {
                   aria-current={session.stage === i ? "step" : undefined}
                   className={session.stage === i ? "active" : ""}
                   onClick={() => {
-                    setPreview(false);
                     navigate(i);
                   }}
                 >
@@ -492,14 +476,14 @@ export default function Workshop() {
         {toolsOpen && (
           <section className="session-tools">
             <div>
-              <h2>Keep the room moving.</h2>
+              <h2>Workshop settings</h2>
               <p>
-                Use one facilitator capture tab. Open the projector window in
-                the same browser profile and move it to the room screen. It
-                follows your current section and saved answers; it does not sync
-                across devices.
+                Share this workshop screen with the room. Notes save
+                automatically in this browser. Use these controls to back up
+                your work, restore a session or try demo data.
               </p>
               <div className="inline-actions">
+                {!demo && <button onClick={enterDemo}>Try demo data</button>}
                 <button onClick={() => download("json")}>
                   Export session backup
                 </button>
@@ -562,13 +546,9 @@ export default function Workshop() {
               </button>
             </div>
           )}
-        {!session.overview && !preview && (
-          <WorkshopChapter stage={session.stage} />
-        )}
+        {!session.overview && <WorkshopChapter stage={session.stage} />}
         <div className="capture-content">
-          {preview ? (
-            <RoomView session={session} />
-          ) : session.overview ? (
+          {session.overview ? (
             <WorkshopOverview
               session={session}
               setSession={setSession}
