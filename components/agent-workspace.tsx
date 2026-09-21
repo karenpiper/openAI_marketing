@@ -18,6 +18,7 @@ import { WorkflowWork, WorkflowRequirements } from "./workflow-work";
 import { CampaignEditor } from "./campaign-editor";
 import { processKey } from "../lib/process-state";
 import { currentWorkStep, workSignature } from "../lib/workflow-work";
+import MorningInbox from "./morning-inbox";
 import AgentBriefing, { MeetMorgan } from "./agent-briefing";
 import ArchitectureOutput from "./architecture-output";
 import { Architecture } from "./workshop-mapping";
@@ -404,6 +405,15 @@ export default function AgentWorkspace() {
               <span className="agent-kicker">
                 Tuesday · one connected workflow
               </span>
+              <button
+                className={s.day.moment === 0 ? "active" : ""}
+                onClick={() =>
+                  setS((prev) => ({ ...prev, day: { ...prev.day, moment: 0 } }))
+                }
+              >
+                <span>08:45</span>
+                <strong>Morning briefing</strong>
+              </button>
               {chapters.map((ch, i) => (
                 <button
                   key={ch.id}
@@ -445,45 +455,13 @@ export default function AgentWorkspace() {
                     <span className="agent-kicker">08:45 · Morgan arrives</span>
                     <h1>Good morning, Morgan.</h1>
                     <p className="agent-lede">
-                      I’ve pulled together what changed overnight. There’s one
-                      opportunity I think is worth your attention.
+                      Four things need your attention this morning. I recommend
+                      starting with the adoption opportunity; the other items
+                      are ready when you are.
                     </p>
-                    <div className="day-brief">
-                      <span className="agent-kicker">Recommended focus</span>
-                      <h2>
-                        Technical interest is growing.
-                        <br />
-                        Bring the rest of the buying group along.
-                      </h2>
-                      <p>
-                        12 target accounts show growing product engagement.
-                        Website visits and recent event activity add context—but
-                        business sponsors and procurement are not yet part of
-                        the conversation.
-                      </p>
-                      <div className="day-stats">
-                        <div>
-                          <b>12</b>
-                          <span>target accounts</span>
-                        </div>
-                        <div>
-                          <b>3</b>
-                          <span>buying roles to engage</span>
-                        </div>
-                        <div>
-                          <b>1</b>
-                          <span>coordinated campaign</span>
-                        </div>
-                      </div>
-                      <button
-                        className="agent-primary"
-                        onClick={() => {
-                          updateInMonitor(() => setChapter(0));
-                        }}
-                      >
-                        Show me the opportunity →
-                      </button>
-                    </div>
+                    <MorningInbox
+                      onStart={() => updateInMonitor(() => setChapter(0))}
+                    />
                     <div className="day-agenda">
                       <h3>While you focus on this</h3>
                       <p>
