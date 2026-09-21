@@ -1,3 +1,4 @@
+import DecisionHelper from "./decision-helper";
 import ChannelHandoff from "./channel-handoff";
 import { useState } from "react";
 import type { AgentState } from "../lib/agent-workspace";
@@ -76,6 +77,7 @@ export default function ProcessActions({
             : "Put this work into motion"}
         </h3>
       </header>
+      <DecisionHelper id={id} index={index} />
       {id === "s2" && index === 0 && (
         <>
           <p>

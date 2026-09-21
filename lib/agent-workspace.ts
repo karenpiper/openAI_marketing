@@ -122,6 +122,7 @@ export type Finding = {
   decision: string;
 };
 export type AgentState = {
+  learning?: { choice: string; reason: string; applied: boolean };
   process?: Record<string, ProcessState>;
   campaign?: { objective: string; instruction: string };
   artifactEdits?: Record<
@@ -303,6 +304,13 @@ export function restoreAgentState(raw: unknown): AgentState {
         base.process[key] = p;
     }
   }
+  if (
+    r.learning &&
+    ["message", "data", "scale", ""].includes(r.learning.choice) &&
+    typeof r.learning.reason === "string" &&
+    typeof r.learning.applied === "boolean"
+  )
+    base.learning = r.learning;
   base.architecture = parseSession(r.architecture);
   return base;
 }
@@ -381,7 +389,7 @@ export function agentReadout(s: AgentState) {
         return `## ${c.title} — ${f.priority}\n\nBusiness outcome: ${f.businessOutcome || "Not captured"}\n\nProcess: ${f.process}\n\n${c.inputs.map(([label]) => `- ${label}: ${f.capabilities[label] || "Unknown"}`).join("\n")}\n\nRoom finding: ${f.note || "Not captured"}\n\nProve: ${f.proof}\n\nDecision / dependency: ${f.decision || "Not captured"}\n\nOwner: ${f.owner || "Unassigned"}`;
       })
       .join("\n\n") +
-    `\n\n## Workflow activity\n${processDigest(s) || "No decisions recorded yet."}\n\n## Colin readout\n\nOwnership: ${s.architecture.closing.ownership || "Not agreed"}\n\nOpen decisions: ${s.architecture.closing.open || "Not captured"}\n\nSequence: ${s.architecture.closing.sequence || "Not captured"}\n\nColin asks: ${s.architecture.closing.colin || "Not captured"}`
+    `\n\n## Performance learning\nDecision: ${s.learning?.choice || "Not reviewed"}\nRationale: ${s.learning?.reason || "Not captured"}\nApplied to next plan: ${s.learning?.applied ? "Yes" : "No"}\nFictional reference campaign, not live results.\n\n## Workflow activity\n${processDigest(s) || "No decisions recorded yet."}\n\n## Colin readout\n\nOwnership: ${s.architecture.closing.ownership || "Not agreed"}\n\nOpen decisions: ${s.architecture.closing.open || "Not captured"}\n\nSequence: ${s.architecture.closing.sequence || "Not captured"}\n\nColin asks: ${s.architecture.closing.colin || "Not captured"}`
   );
 }
 

@@ -19,6 +19,7 @@ import { CampaignEditor } from "./campaign-editor";
 import { processKey } from "../lib/process-state";
 import { currentWorkStep, workSignature } from "../lib/workflow-work";
 import MorganStory from "./morgan-story";
+import PerformanceLoop from "./performance-loop";
 import MorningInbox from "./morning-inbox";
 import AgentBriefing, { MeetMorgan } from "./agent-briefing";
 import ArchitectureOutput from "./architecture-output";
@@ -274,6 +275,7 @@ export default function AgentWorkspace() {
               ["intro", "0 · Briefing"],
               ["meet", "Meet Morgan"],
               ["workspace", "1 · Morgan’s day"],
+              ["performance", "Results & learning"],
               ["capabilities", "2 · Capability reuse"],
               ["architecture", "3 · Architecture"],
               ["readout", "4 · Readout"],
@@ -391,6 +393,42 @@ export default function AgentWorkspace() {
               }}
             >
               Next · Target architecture →
+            </button>
+          </main>
+        ) : page === "performance" ? (
+          <main className="agent-wide">
+            <div className="agent-story">
+              <span className="agent-kicker">
+                Time jump · after the approved campaign has run
+              </span>
+              <h1>Morgan comes back to the evidence.</h1>
+              <p>
+                She wants to know what changed for the account—not just whether
+                the emails went out. This illustrative follow-up shows how the
+                next decision draws on results.
+              </p>
+            </div>
+            <MorganScreen>
+              <PerformanceLoop
+                session={s}
+                onSave={(learning) => setS((prev) => ({ ...prev, learning }))}
+                onApply={(instruction) => {
+                  setS((prev) => ({
+                    ...prev,
+                    campaign: {
+                      objective:
+                        prev.campaign?.objective ||
+                        "Grow enterprise adoption across the buying group",
+                      instruction,
+                    },
+                    day: { ...prev.day, moment: 2 },
+                  }));
+                  setPage("workspace");
+                }}
+              />
+            </MorganScreen>
+            <button onClick={() => setPage("readout")}>
+              Take the decision into the readout →
             </button>
           </main>
         ) : page === "workspace" ? (
@@ -523,6 +561,27 @@ export default function AgentWorkspace() {
                       </div>
                     </div>
                   </MorganScreen>
+                  <section className="performance-transition">
+                    <span className="agent-kicker">
+                      Close the loop · a few days later
+                    </span>
+                    <h2>What did the campaign teach us?</h2>
+                    <p>
+                      Jump to fictional results from a reviewed, released
+                      reference campaign. Inspect audience and channel outcomes,
+                      identify uncertainty and use the learning in the next
+                      plan.
+                    </p>
+                    <button
+                      className="agent-primary"
+                      onClick={() => {
+                        setPage("performance");
+                        window.scrollTo({ top: 0 });
+                      }}
+                    >
+                      Explore results and decide what changes →
+                    </button>
+                  </section>
                   <section className="agent-requirements">
                     <span className="agent-kicker">
                       Facilitator discussion · outside Morgan’s screen
