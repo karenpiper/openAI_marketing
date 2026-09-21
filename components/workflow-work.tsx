@@ -8,6 +8,7 @@ import {
   workSignature,
   workflowArtifact,
   artifactKey,
+  workflowSources,
 } from "../lib/workflow-work";
 export function WorkflowWork({
   session,
@@ -152,6 +153,22 @@ export function WorkflowWork({
             Show result now
           </button>
         )}
+      </div>
+      <div className="assembly-sources">
+        <b>
+          {phase < 3 ? "Assembling from" : "Sources carried into this package"}
+        </b>
+        <span>Illustrative data and systems · proposed connections</span>
+        <ul>
+          {workflowSources(session, id, index).map((source) => (
+            <li key={source.name}>
+              <strong>{source.name}</strong>
+              <small>{source.purpose}</small>
+              <span className="source-system">{source.system}</span>
+              <small className="source-connection">↳ {source.connection}</small>
+            </li>
+          ))}
+        </ul>
       </div>
       <ol className="execution-log">
         {actions.slice(0, Math.min(phase + 1, 3)).map((action, i) => (
@@ -313,6 +330,21 @@ export function WorkflowWork({
                     )}
                   </section>
                 ))}
+                <div className="assembly-sources">
+                  <b>Source references</b>
+                  <ul>
+                    {output.sources.map((source) => (
+                      <li key={source.name}>
+                        <strong>{source.name}</strong>
+                        <small>{source.purpose}</small>
+                        <span className="source-system">{source.system}</span>
+                        <small className="source-connection">
+                          ↳ {source.connection}
+                        </small>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
                 <footer>
                   <p>
                     No live content was generated or delivered. This is a

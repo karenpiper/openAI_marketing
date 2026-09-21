@@ -390,6 +390,169 @@ export function workflowArtifact(s: AgentState, id: string, index: number) {
       status,
       detail,
     }));
-  const text = `# ${title}\n\nILLUSTRATIVE PROTOTYPE OUTPUT — no live systems queried or actions executed.\n\nCampaign: Enterprise adoption / 12 target accounts\nObjective: ${s.campaign?.objective || "Grow enterprise adoption across the buying group"}\nMorgan’s instruction: ${s.campaign?.instruction || "None added"}\nAudience: ${s.audience}\nChannels: ${s.channel}\n\n${stage.summary}\n\n${sections.map((r) => `## ${r.name}\nStatus: ${r.status}\n${r.detail}`).join("\n\n")}\n\n## Handoff\n${stage.output}\n\n## Required control\n${stage.control}`;
-  return { title, sections, text, blocked };
+  const sources = workflowSources(s, id, index);
+  const text = `# ${title}\n\nILLUSTRATIVE PROTOTYPE OUTPUT — no live systems queried or actions executed.\n\nCampaign: Enterprise adoption / 12 target accounts\nObjective: ${s.campaign?.objective || "Grow enterprise adoption across the buying group"}\nMorgan’s instruction: ${s.campaign?.instruction || "None added"}\nAudience: ${s.audience}\nChannels: ${s.channel}\n\n${stage.summary}\n\n${sections.map((r) => `## ${r.name}\nStatus: ${r.status}\n${r.detail}`).join("\n\n")}\n\n## Illustrative sources used\n${sources.map((source) => `- ${source.name}: ${source.purpose} | System: ${source.system} | Connection: ${source.connection}`).join("\n")}\n\n## Handoff\n${stage.output}\n\n## Required control\n${stage.control}`;
+  return { title, sections, text, blocked, sources };
+}
+
+export function workflowSources(s: AgentState, id: string, index: number) {
+  const sources: Record<string, { name: string; purpose: string }[][]> = {
+    s2: [
+      [
+        {
+          name: "Product telemetry",
+          purpose: "Usage and account-level engagement",
+        },
+        {
+          name: "Website and event activity",
+          purpose: "Journey signals beyond product usage",
+        },
+        {
+          name: "CRM / account identity",
+          purpose: "Link people, accounts and buying roles",
+        },
+      ],
+      [
+        {
+          name: "Account signal brief",
+          purpose: "Carry forward the combined evidence",
+        },
+        {
+          name: "Buying-role and journey context",
+          purpose: "Identify active and missing roles",
+        },
+      ],
+      [
+        { name: "Opportunity map", purpose: "Ground the recommended action" },
+        {
+          name: "Morgan’s campaign brief",
+          purpose: "Set the objective and direction",
+        },
+      ],
+    ],
+    s3: [
+      [
+        {
+          name: "Morgan’s campaign brief",
+          purpose: "Objective, audience and instructions",
+        },
+        {
+          name: "Approved asset library",
+          purpose: "Find source versions and permitted claims",
+        },
+        { name: "Rights and brand rules", purpose: "Check allowed reuse" },
+      ],
+      [
+        {
+          name: "Morgan’s campaign brief",
+          purpose: "Keep all work aligned to the objective",
+        },
+        {
+          name: "Audience / buying-role context",
+          purpose: "Tailor each work package to a decision need",
+        },
+        {
+          name: "Enterprise adoption guide · v3",
+          purpose:
+            s.source === "Source material missing"
+              ? "Missing — adaptation is blocked"
+              : "Illustrative approved source for claims and references",
+        },
+        {
+          name: "Channel specifications",
+          purpose: `Prepare requirements for ${s.channel}`,
+        },
+      ],
+      [
+        {
+          name: "Audience work packages",
+          purpose: "Collect briefs and source references",
+        },
+        {
+          name: "Approval policy",
+          purpose: "Assign brand, legal and privacy checks",
+        },
+        {
+          name: "Asset permissions",
+          purpose: "Verify version and permitted use",
+        },
+      ],
+      [
+        {
+          name: "Review packet",
+          purpose: "Carry approval gates into delivery",
+        },
+        {
+          name: "Audience eligibility / consent",
+          purpose: "Exclude ineligible recipients",
+        },
+        {
+          name: "Channel configuration",
+          purpose: "Prepare routing and tracking requirements",
+        },
+      ],
+    ],
+    s5: [
+      [
+        {
+          name: "Campaign work orders",
+          purpose: "Inspect staged setup and destinations",
+        },
+        {
+          name: "Operational checklist",
+          purpose: "Apply agreed routine checks",
+        },
+      ],
+      [
+        {
+          name: "Consent and identity records",
+          purpose: "Inspect the conflicting permissions",
+        },
+        {
+          name: "Escalation policy",
+          purpose: "Identify the authoritative owner",
+        },
+      ],
+      [
+        {
+          name: "Morgan’s resolution",
+          purpose: "Record the authorized direction",
+        },
+        {
+          name: "Campaign state and audit record",
+          purpose: "Preserve holds, gates and open tasks",
+        },
+      ],
+    ],
+  };
+  return (sources[id]?.[index] || []).map((source) => {
+    const name = source.name.toLowerCase();
+    let system = "OpenAI agent interface / campaign state";
+    let connection = "Agent reads the shared campaign context";
+    if (/telemetry/.test(name)) {
+      system = "ChatGPT usage → OpenAI data lake";
+      connection = "Proposed read connector from the data lake to the agent";
+    } else if (/website|event activity/.test(name)) {
+      system =
+        "Marketing website / Events → Customer Journey Analytics → OpenAI data lake";
+      connection = "Proposed query of journey signals available to OpenAI";
+    } else if (/crm|identity|buying-role|eligibility|consent/.test(name)) {
+      system = "CDP ABM / identity + CRM context";
+      connection =
+        "Proposed audience and identity lookup; consent source must be confirmed";
+    } else if (/asset|adoption guide|rights/.test(name)) {
+      system = "Adobe CSC (assets) / approved content repository";
+      connection =
+        "Proposed asset-search connector returning references, versions and permissions";
+    } else if (/approval|review packet|escalation/.test(name)) {
+      system = "Adobe Workfront / existing review system";
+      connection =
+        "Proposed workflow connector for review rules, owners and status";
+    } else if (/channel|work orders|operational checklist/.test(name)) {
+      system = "CRM (Marketing), Events and Marketing Website";
+      connection =
+        "Proposed configuration / status connector; Marketo is a candidate CRM implementation";
+    }
+    return { ...source, system, connection };
+  });
 }
