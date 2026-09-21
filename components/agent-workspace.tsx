@@ -1,4 +1,5 @@
 "use client";
+import ReviewComments from "./review-comments";
 import UseCaseDiscussion from "./use-case-discussion";
 import { useEffect, useState, type ReactNode } from "react";
 import {
@@ -209,6 +210,24 @@ export default function AgentWorkspace() {
         "Saved data could not be read. Export a backup before continuing; the saved copy will not be overwritten.",
       );
     }
+    const params = new URLSearchParams(location.search);
+    const view = params.get("view");
+    if (
+      view &&
+      [
+        "intro",
+        "meet",
+        "workspace",
+        "performance",
+        "capabilities",
+        "architecture",
+        "readout",
+      ].includes(view)
+    )
+      setPage(view);
+    const day = params.get("day");
+    if (day !== null && /^[0-4]$/.test(day))
+      setS((prev) => ({ ...prev, day: { ...prev.day, moment: Number(day) } }));
     setReady(true);
   }, []);
   useEffect(() => {
@@ -220,6 +239,14 @@ export default function AgentWorkspace() {
       setError("Autosave unavailable. Export a backup before leaving.");
     }
   }, [s, ready, error, key]);
+  useEffect(() => {
+    if (!ready) return;
+    const url = new URL(location.href);
+    url.searchParams.set("view", page);
+    if (page === "workspace") url.searchParams.set("day", String(s.day.moment));
+    else url.searchParams.delete("day");
+    history.replaceState(history.state, "", url);
+  }, [ready, page, s.day.moment]);
   function save() {
     if (error) return { ok: false, message: error };
     try {
@@ -261,6 +288,7 @@ export default function AgentWorkspace() {
     <SaveContext.Provider value={{ save, revision: s, error }}>
       <div className="agent-app">
         <header className="agent-top">
+          <ReviewComments />
           <a
             href="#"
             onClick={(e) => {

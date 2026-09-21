@@ -148,3 +148,10 @@ Existing nonempty system entries are preserved. Editing or explicitly clearing a
 Each data-entry section has a **Save** button as well as autosave: attendees, use-case notes/scores, working-set selection, current-state answers, live interpretations, workflow decisions, detailed architecture, source/audience/draft content, results, actions and session notes. Save writes the latest complete session to the same real/demo browser-local key and reports success or failure. It never confirms an answer or room decision. Print and projector views do not show capture controls.
 
 A failed storage write reports an error; manual Save can retry storage and resume autosave. An unreadable existing saved session is protected from overwrite until restored or explicitly reset. The unfinished “another decision” input is also persisted. The optional private AI access code remains deliberately ephemeral and is not saved.
+
+
+## Shared review comments
+
+The Comments button enables the official Vercel Toolbar on demand (`?review=1`). Vercel stores pinned comment threads, replies and resolution state, independently of local workshop data. Reviewers must sign in and have deployment access through Vercel sharing controls. If hidden, enable Production under Project Settings → General → Vercel Toolbar. No custom comments database or account system is included.
+
+Workshop URLs preserve the visible section and day moment for review links. They do not transfer saved answers, approval state or opened artifacts. Include the artifact and step name when commenting on an interactive output. Exit review mode reloads the page to remove the toolbar. Comment delivery and reviewer access require an authenticated check on the deployed site; a successful build alone does not verify access.

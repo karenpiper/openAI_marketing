@@ -3329,3 +3329,43 @@
     padding: 18px;
   }
 }
+
+.review-comments {
+  position: relative;
+  order: 3;
+}
+.review-comments > button {
+  white-space: nowrap;
+}
+.review-help {
+  position: absolute;
+  top: calc(100% + 12px);
+  right: 0;
+  width: min(390px, 86vw);
+  z-index: 100;
+  padding: 22px;
+  border: 1px solid #cbd1cd;
+  border-radius: 14px;
+  background: white;
+  color: #26362d;
+  box-shadow: 0 12px 40px #10231926;
+}
+.review-help header,
+.review-help footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.review-help h2 {
+  font-size: 20px;
+  margin: 0;
+}
+.review-help p {
+  font-size: 14px;
+  line-height: 1.5;
+}
+.review-help a {
+  color: #245e45;
+  font-size: 13px;
+}
