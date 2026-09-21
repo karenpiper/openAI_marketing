@@ -1,3 +1,4 @@
+import { currentWorkflowText } from "../lib/current-workflow";
 import { scenarioSummary } from "../lib/workflow-simulation";
 import SaveFooter from "./save-footer";
 import ArchitectureOutput from "./architecture-output";
@@ -137,6 +138,12 @@ export default function WorkshopRecord({
         </article>
       ))}
       <h2 className="section-title">Current-state findings</h2>
+      {Object.keys(session.currentWorkflows).map((id) => (
+        <article className="readout-card" key={id}>
+          <h3>{caseName(id)}</h3>
+          <p className="preserve-lines">{currentWorkflowText(session, id)}</p>
+        </article>
+      ))}
       {Object.entries(session.currentStories).map(([id, note]) => (
         <article className="readout-card" key={id}>
           <h3>{caseName(id)}</h3>

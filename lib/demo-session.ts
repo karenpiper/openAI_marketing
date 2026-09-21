@@ -1,3 +1,4 @@
+import { currentWorkflowRows } from "./current-workflow";
 import { reviewWorkflow } from "./architecture-workflow";
 import { saveInterpretation } from "./live-synthesis";
 import { currentQuestions, findAnswer, editAnswer } from "./workshop-guide";
@@ -455,5 +456,17 @@ export function addDemoGuideExamples(session: Session): Session {
           status: i === 3 ? "Unknown" : "Proposed",
         });
     });
+  s.currentWorkflows = Object.fromEntries(
+    Object.entries(currentWorkflowRows).map(([id, rows]) => [
+      id,
+      s.currentWorkflows[id] || {
+        rows: Object.fromEntries(
+          rows.map((r, i) => [String(i), `Fictional example: ${r.example}`]),
+        ),
+        friction:
+          "Fictional example: manually transferring context between tools causes delay and rework.",
+      },
+    ]),
+  );
   return s;
 }

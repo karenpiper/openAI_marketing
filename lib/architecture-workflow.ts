@@ -323,6 +323,8 @@ export function workflowSystems(s: Session, caseId: string, index: number) {
   };
 }
 export function workflowSource(s: Session, caseId: string, index: number) {
+  if (s.currentWorkflows[caseId])
+    return JSON.stringify({ workflow: s.currentWorkflows[caseId] });
   if (Object.prototype.hasOwnProperty.call(s.currentStories, caseId))
     return JSON.stringify({ story: s.currentStories[caseId] });
   return JSON.stringify(

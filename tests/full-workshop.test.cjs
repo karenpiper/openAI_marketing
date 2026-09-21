@@ -541,12 +541,26 @@ test("all guided questions and readbacks render in real, demo and projected sess
           assert.ok(html.length > 500 && room.length > 500);
           if (stage === 1 && step < 4) {
             assert.ok(
-              html.includes(guide.currentQuestions[c.id][step].question),
+              html.includes(
+                require("../lib/current-workflow.ts").currentWorkflowRows[c.id][
+                  step
+                ].ask,
+              ),
             );
             assert.ok(
-              room.includes(guide.currentQuestions[c.id][step].question),
+              room.includes(
+                require("../lib/current-workflow.ts").currentWorkflowRows[c.id][
+                  step
+                ].ask,
+              ),
             );
-            assert.ok(html.includes(guide.toolPrompts[c.id][step]));
+            assert.ok(
+              html.includes(
+                require("../lib/current-workflow.ts").currentWorkflowRows[c.id][
+                  step
+                ].label,
+              ),
+            );
           }
           assert.ok(!html.includes("Start with a capability"));
           assert.ok(!html.includes("Define the boundary"));
@@ -663,6 +677,8 @@ test("proposed workflows cover seven cases, cite real diagram boxes and carry de
   const f = require("../lib/architecture-workflow.ts");
   const guide = require("../lib/workshop-guide.ts");
   let s = require("../lib/demo-session.ts").createDemoSession();
+  s.currentWorkflows = {};
+  s.workflowReviews = [];
   for (const c of useCases) {
     assert.equal(f.workflows[c.id].length, 5);
     assert.equal(guide.toolPrompts[c.id].length, 4);
@@ -696,6 +712,7 @@ test("proposed workflows cover seven cases, cite real diagram boxes and carry de
 test("walkthrough shows current evidence and room decisions without internal PDF references", () => {
   const Walk = require("../components/architecture-walkthrough.tsx").default;
   const s = require("../lib/demo-session.ts").createDemoSession();
+  s.currentWorkflows = {};
   s.guide.architecture = 1;
   for (const room of [true, false]) {
     const html = renderToStaticMarkup(
@@ -1286,7 +1303,7 @@ test("expanded scenario options round-trip and change their relevant workflow pa
   assert.match(html, /Enter workshop/);
 });
 
-test("current-state conversation uses one input and preserves legacy examples and architecture freshness", () => {
+test("current-state conversation uses short workflow inputs and preserves legacy examples and architecture freshness", () => {
   const { currentStory } = require("../lib/current-story.ts");
   const { CurrentState } = require("../components/workshop-mapping.tsx");
   const {
@@ -1295,12 +1312,13 @@ test("current-state conversation uses one input and preserves legacy examples an
   } = require("../lib/architecture-workflow.ts");
   for (const focus of ["s1", "s2", "s3", "s4", "s5", "s6", "s7"]) {
     let s = { ...require("../lib/demo-session.ts").createDemoSession(), focus };
+    s.currentWorkflows = {};
     const legacy = currentStory(s, focus);
     assert.ok(legacy.length > 0);
     const html = renderToStaticMarkup(
       React.createElement(CurrentState, { session: s, setSession: () => {} }),
     );
-    assert.equal((html.match(/<textarea/g) || []).length, 1);
+    assert.equal((html.match(/<textarea/g) || []).length, 6);
     assert.ok(!html.includes("Does the room agree"));
     assert.ok(!html.includes("Live interpretation"));
     assert.ok(!html.includes("Discussion questions"));
@@ -1315,4 +1333,33 @@ test("current-state conversation uses one input and preserves legacy examples an
     restored.currentStories[focus] = "";
     assert.equal(currentStory(restored, focus), "");
   }
+});
+
+test("tools-and-handoffs rows save per case and feed architecture evidence", () => {
+  const { currentStory } = require("../lib/current-story.ts");
+  const {
+    workflowState,
+    reviewWorkflow,
+  } = require("../lib/architecture-workflow.ts");
+  const { currentWorkflowRows } = require("../lib/current-workflow.ts");
+  let s = w.createSession();
+  s = reviewWorkflow(s, "s3", 0, { choice: "Keep" });
+  s.currentWorkflows.s3 = {
+    rows: { 0: "Marketo builds the list; a spreadsheet holds review.", 1: "" },
+    friction: "Manual exports lose context.",
+  };
+  s = w.parseSession(JSON.parse(JSON.stringify(s)));
+  assert.equal(workflowState(s, "s3", 0).stale, true);
+  assert.match(currentStory(s, "s3"), /Marketo builds/);
+  assert.match(w.readout(s), /Manual exports lose context/);
+  assert.equal(s.currentWorkflows.s3.rows["1"], "");
+  assert.equal(s.currentWorkflows.s2, undefined);
+  for (const rows of Object.values(currentWorkflowRows))
+    assert.equal(rows.length, 5);
+});
+
+test("demo row migration preserves edited and intentionally cleared answers",()=>{
+ const {createDemoSession,addDemoGuideExamples}=require("../lib/demo-session.ts");
+ const s=createDemoSession();s.currentWorkflows.s3={rows:{"0":"Our existing audience tool","1":""},friction:"Approval waits"};
+ assert.deepEqual(addDemoGuideExamples(s).currentWorkflows.s3,s.currentWorkflows.s3);
 });

@@ -1,3 +1,4 @@
+import { currentStory } from "../lib/current-story";
 import SaveFooter from "./save-footer";
 import { type Dispatch, type SetStateAction } from "react";
 import { type Session } from "../lib/workshop";
@@ -88,12 +89,13 @@ export default function ArchitectureWalkthrough({
               </p>
               <div className="proposal-evidence">
                 <span className="eyebrow">From today’s workflow</span>
-                {Object.prototype.hasOwnProperty.call(
+                {s.currentWorkflows[s.focus] ||
+                Object.prototype.hasOwnProperty.call(
                   s.currentStories,
                   s.focus,
                 ) ? (
                   <p className="preserve-lines">
-                    {s.currentStories[s.focus] || "Not captured yet."}
+                    {currentStory(s, s.focus) || "Not captured yet."}
                   </p>
                 ) : (
                   step.sources.map((index) => {

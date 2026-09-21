@@ -1,3 +1,4 @@
+import { currentWorkflowRows } from "../lib/current-workflow";
 import { currentStory } from "../lib/current-story";
 import SaveFooter from "./save-footer";
 import ArchitectureWalkthrough from "./architecture-walkthrough";
@@ -101,9 +102,9 @@ export function CurrentState({ session: s, setSession }: Props) {
         <span className="eyebrow">02 · What happens today · 30 minutes</span>
         <h1>Talk through one recent example.</h1>
         <p>
-          Use the prompts to guide the conversation, then capture the story in
-          one place. Include the tools, people and friction you know about;
-          leave unknowns as questions.
+          For each part of the workflow, name the tools, what they do and how
+          work moves to the next person or system. A few phrases are enough.
+          Multiple tools and “not sure” are both valid answers.
         </p>
       </div>
       <CaseFocus session={s} setSession={setSession} />
@@ -131,50 +132,91 @@ export function CurrentConversation({
   session: Session;
   setSession?: Dispatch<SetStateAction<Session>>;
 }) {
+  const capture = s.currentWorkflows[s.focus] || { rows: {}, friction: "" };
+  const patch = (update: Partial<typeof capture>) =>
+    setSession?.((p) => ({
+      ...p,
+      currentWorkflows: {
+        ...p.currentWorkflows,
+        [s.focus]: {
+          ...(p.currentWorkflows[s.focus] || { rows: {}, friction: "" }),
+          ...update,
+        },
+      },
+    }));
   return (
-    <div className="current-conversation">
-      <section className="current-prompts">
-        <span className="eyebrow">Ask the room · prompts, not a checklist</span>
-        {currentQuestions[s.focus].map((q, i) => (
-          <article key={q.id}>
-            <span className="eyebrow">
-              {i + 1} · {q.label}
-            </span>
-            <h3>{q.question}</h3>
-            <p>{q.hint}</p>
-            <p className="muted">{toolPrompts[s.focus][i]}</p>
-          </article>
+    <section className="current-workflow-capture">
+      <p className="muted">
+        Examples illustrate the level of detail; they are not assumptions about
+        your technology.
+      </p>
+      <div
+        className="current-workflow-table"
+        role="table"
+        aria-label="Current tools and handoffs"
+      >
+        <div className="current-workflow-head" role="row">
+          <span role="columnheader">Part of today’s workflow</span>
+          <span role="columnheader">Tools, roles and handoffs</span>
+        </div>
+        {currentWorkflowRows[s.focus].map((r, i) => (
+          <div className="current-workflow-row" role="row" key={r.label}>
+            <div role="cell">
+              <h3>
+                {i + 1}. {r.label}
+              </h3>
+              <p>{r.ask}</p>
+              <p className="muted">
+                <b>Example:</b> {r.example}
+              </p>
+            </div>
+            <div role="cell">
+              {setSession ? (
+                <Field
+                  label={`${r.label} · how it works today`}
+                  multiline
+                  value={capture.rows[String(i)] || ""}
+                  placeholder="Tool → what it does → where the work goes next. ‘Not sure’ is fine."
+                  onChange={(value) =>
+                    patch({ rows: { ...capture.rows, [String(i)]: value } })
+                  }
+                />
+              ) : (
+                <p className="preserve-lines">
+                  {capture.rows[String(i)] || "Not captured yet."}
+                </p>
+              )}
+            </div>
+          </div>
         ))}
-      </section>
-      <section className="capture-card current-story">
-        <h2>How it happens today</h2>
-        <p>
-          Capture the example, where work happens, who is involved and where it
-          gets stuck. Read it back as you go.
-        </p>
+      </div>
+      <div className="current-friction">
         {setSession ? (
-          <>
-            <Field
-              label="Room notes"
-              multiline
-              value={currentStory(s, s.focus)}
-              placeholder="Last time we did this… We used… The handoff was… What slowed us down was…"
-              onChange={(note) =>
-                setSession((p) => ({
-                  ...p,
-                  currentStories: { ...p.currentStories, [s.focus]: note },
-                }))
-              }
-            />
-            <SaveFooter />
-          </>
+          <Field
+            label="Which handoff causes the most friction?"
+            multiline
+            value={capture.friction}
+            placeholder="Name the delay, rework or manual transfer that matters most."
+            onChange={(friction) => patch({ friction })}
+          />
         ) : (
-          <p className="preserve-lines">
-            {currentStory(s, s.focus) || "Waiting for the room’s example."}
-          </p>
+          <>
+            <h3>Which handoff causes the most friction?</h3>
+            <p>{capture.friction || "Not captured yet."}</p>
+          </>
         )}
-      </section>
-    </div>
+      </div>
+      {setSession && <SaveFooter />}
+      {s.currentStories[s.focus] && (
+        <aside className="capture-card">
+          <h3>Earlier discussion notes</h3>
+          <p className="muted">
+            Kept as reference while you map the tools above.
+          </p>
+          <p className="preserve-lines">{s.currentStories[s.focus]}</p>
+        </aside>
+      )}
+    </section>
   );
 }
 export function ArchitectureReadback({ session: s }: { session: Session }) {

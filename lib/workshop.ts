@@ -1,3 +1,4 @@
+import { currentWorkflowText } from "./current-workflow";
 import {
   defaultScenario,
   scenarioOptions,
@@ -208,6 +209,10 @@ export type WorkflowReview = {
   source: string;
 };
 export type Session = {
+  currentWorkflows: Record<
+    string,
+    { rows: Record<string, string>; friction: string }
+  >;
   currentStories: Record<string, string>;
   readoutFlow: { caseId: string; step: number };
   closing: { ownership: string; sequence: string; open: string; colin: string };
@@ -294,6 +299,7 @@ export function createSession(): Session {
   return {
     schema: 1,
     overview: true,
+    currentWorkflows: {},
     currentStories: {},
     readoutFlow: { caseId: "", step: -1 },
     closing: { ownership: "", sequence: "", open: "", colin: "" },
@@ -409,6 +415,26 @@ export function parseSession(raw: unknown): Session {
     throw Error("This is not a supported workshop backup.");
   const s = createSession();
   s.title = str(r.title, s.title);
+  const captures = record(r.currentWorkflows);
+  s.currentWorkflows = Object.fromEntries(
+    useCases
+      .filter((u) => captures[u.id] && typeof captures[u.id] === "object")
+      .map((u) => {
+        const c = record(captures[u.id]);
+        const values = record(c.rows);
+        return [
+          u.id,
+          {
+            rows: Object.fromEntries(
+              [0, 1, 2, 3, 4]
+                .filter((i) => typeof values[String(i)] === "string")
+                .map((i) => [String(i), str(values[String(i)])]),
+            ),
+            friction: str(c.friction),
+          },
+        ];
+      }),
+  );
   const stories = record(r.currentStories);
   s.currentStories = Object.fromEntries(
     useCases
@@ -722,6 +748,10 @@ export function readout(s: Session): string {
         (c) =>
           `${name(c.useCase)} | ${c.synthesis!.name} | ${synthesisStatus(c)}\nCoverage: ${c.synthesis!.coverage}\nChange to discuss: ${c.synthesis!.change || "Not captured"}\nWho takes it forward: ${c.synthesis!.nextOwner || "Unassigned"}\nBased on: ${c.evidence}\nTools and roles: ${c.system || "Unknown"}`,
       ),
+    "## Current-state tools and handoffs",
+    ...Object.keys(s.currentWorkflows).map(
+      (id) => `${name(id)}\n${currentWorkflowText(s, id)}`,
+    ),
     "## Current-state discussion notes",
     ...Object.entries(s.currentStories).map(
       ([id, note]) => `${name(id)}\n${note || "No notes captured"}`,

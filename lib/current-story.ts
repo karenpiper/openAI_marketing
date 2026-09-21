@@ -1,6 +1,8 @@
+import { currentWorkflowText } from "./current-workflow";
 import type { Session } from "./workshop";
 import { currentQuestions, findAnswer } from "./workshop-guide";
 export function currentStory(s: Session, caseId: string): string {
+  if (s.currentWorkflows[caseId]) return currentWorkflowText(s, caseId);
   if (Object.prototype.hasOwnProperty.call(s.currentStories, caseId))
     return s.currentStories[caseId];
   return currentQuestions[caseId]
