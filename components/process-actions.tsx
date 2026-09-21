@@ -55,12 +55,24 @@ export default function ProcessActions({
     </label>
   );
   return (
-    <section className="process-actions">
+    <section
+      className={`process-actions ${id === "s3" && index === 2 ? "approval-panel" : ""}`}
+    >
       <header>
-        <span className="agent-kicker">Your decision · {p.status}</span>
+        <span className="agent-kicker">
+          {id === "s3" && index === 2
+            ? `Approval · v${p.version}`
+            : `Your decision · ${p.status}`}
+        </span>
         <h3>
           {id === "s3" && index === 2
-            ? "Review and resolve the actual packet"
+            ? p.status === "Not started"
+              ? "Ready for your review"
+              : p.status === "Approved"
+                ? "Approved for handoff"
+                : p.status === "Changes requested"
+                  ? "A revision is needed"
+                  : "Review in progress"
             : "Put this work into motion"}
         </h3>
       </header>
@@ -216,22 +228,53 @@ export default function ProcessActions({
       {id === "s3" && index === 2 && (
         <>
           <p>
-            Packet v{p.version} · Morgan approves the audience promise and
-            channel mix here. Reviewers receive the same packet through the
-            proposed Workfront connection.
+            {p.status === "Not started"
+              ? "Confirm the audience and channel mix. Then I’ll send this version to Brand and Legal."
+              : "Review decisions stay attached to this version of the packet."}
           </p>
           <div className="process-reviewers">
             {["Morgan", "Brand / asset owner", "Legal / privacy"].map(
               (role) => (
-                <article key={role}>
-                  <b>{role}</b>
-                  <span>{p.reviewers[role] || "Not submitted"}</span>
+                <article
+                  key={role}
+                  data-status={p.reviewers[role] || "waiting"}
+                >
+                  <i aria-hidden="true">
+                    {p.reviewers[role] === "Approved"
+                      ? "✓"
+                      : role === "Morgan"
+                        ? "M"
+                        : role.startsWith("Brand")
+                          ? "B"
+                          : "L"}
+                  </i>
+                  <div>
+                    <b>
+                      {role === "Morgan"
+                        ? "You"
+                        : role.startsWith("Brand")
+                          ? "Brand"
+                          : "Legal & privacy"}
+                    </b>
+                    <small>
+                      {role === "Morgan"
+                        ? "Audience & channel direction"
+                        : role.startsWith("Brand")
+                          ? "Claims & consistency"
+                          : "Claims & permissions"}
+                    </small>
+                  </div>
+                  <span>
+                    {p.reviewers[role] ||
+                      (role === "Morgan" ? "Your turn" : "Up next")}
+                  </span>
                 </article>
               ),
             )}
           </div>
           {p.status === "Not started" && (
             <button
+              className="agent-primary"
               onClick={() =>
                 update(
                   {
@@ -246,7 +289,7 @@ export default function ProcessActions({
                 )
               }
             >
-              Approve direction and route packet
+              Approve & send for review
             </button>
           )}
           {p.status === "In review" && (

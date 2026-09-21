@@ -2922,3 +2922,138 @@
     padding: 14px;
   }
 }
+.agent-app .approval-panel {
+  background: #fff;
+  border: 1px solid #e3e7e5;
+  border-radius: 12px;
+  padding: 24px !important;
+  margin: 24px 0;
+  box-shadow: 0 3px 12px #00000003;
+}
+.approval-panel > header {
+  margin: 0 0 8px;
+  padding: 0;
+}
+.approval-panel > header .agent-kicker {
+  font-size: 9px;
+  color: #929b96;
+  letter-spacing: 0.08em;
+}
+.approval-panel > header h3 {
+  font-size: 22px;
+  letter-spacing: -0.035em;
+  font-weight: 500;
+  margin: 7px 0 10px;
+}
+.approval-panel > p {
+  font-size: 13px;
+  line-height: 1.6;
+  color: #78847d;
+  max-width: 520px;
+  margin: 0 0 22px;
+}
+.approval-panel .process-reviewers {
+  margin: 0 0 20px;
+  gap: 0;
+  border-top: 1px solid #eef0ee;
+  border-bottom: 1px solid #eef0ee;
+}
+.approval-panel .process-reviewers article {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  padding: 14px 0;
+  margin: 0;
+}
+.approval-panel .process-reviewers article + article {
+  border-top: 1px solid #f1f3f1;
+}
+.approval-panel .process-reviewers i {
+  display: grid;
+  place-items: center;
+  flex: 0 0 29px;
+  height: 29px;
+  border-radius: 50%;
+  background: #f1f3f1;
+  color: #88968c;
+  font-size: 11px;
+  font-style: normal;
+}
+.approval-panel .process-reviewers article[data-status="Approved"] i {
+  background: #e9f2e9;
+  color: #4a7554;
+}
+.approval-panel .process-reviewers article > div {
+  flex: 1;
+}
+.approval-panel .process-reviewers b {
+  font-size: 12px;
+  font-weight: 500;
+}
+.approval-panel .process-reviewers small {
+  display: block;
+  font-size: 10px;
+  color: #9aa39d;
+  margin-top: 3px;
+}
+.approval-panel .process-reviewers article > span {
+  font-size: 10px;
+  color: #84918a;
+  background: #f5f6f5;
+  border-radius: 12px;
+  padding: 4px 9px;
+}
+.approval-panel .process-reviewers article[data-status="Approved"] > span {
+  background: #eff6ed;
+  color: #66825f;
+}
+.approval-panel > .agent-primary {
+  font-size: 12px;
+  padding: 10px 16px;
+  margin: 0;
+}
+.approval-panel .review-inbox {
+  background: #f6f8f7;
+  border: 0;
+  border-radius: 7px;
+  padding: 14px;
+}
+.approval-panel .review-inbox > b {
+  font-size: 12px;
+  color: #526c5c;
+}
+.approval-panel .review-inbox p {
+  font-size: 11px;
+}
+.approval-panel .review-simulator {
+  background: #f8f9fa;
+  border: 1px dashed #dce2e6;
+  padding: 16px;
+}
+.approval-panel .review-simulator > p {
+  font-size: 11px;
+}
+.approval-panel .process-receipt {
+  border: 0;
+  border-top: 1px solid #edf0ed;
+  padding: 15px 0 0;
+  margin: 20px 0 0;
+}
+.approval-panel .process-receipt ol {
+  margin-top: 8px;
+}
+.approval-panel .process-receipt li {
+  font-size: 10px;
+  color: #8c9890;
+}
+@media (max-width: 650px) {
+  .agent-app .approval-panel {
+    padding: 18px !important;
+  }
+  .approval-panel > header h3 {
+    font-size: 20px;
+  }
+}
