@@ -76,7 +76,10 @@ export function WorkflowWork({
         });
     });
   }
-  const output = opened === null ? null : workflowArtifact(session, id, opened);
+  const output =
+    opened === null || opened >= stages.length
+      ? null
+      : workflowArtifact(session, id, opened);
   function download() {
     if (!output) return;
     const url = URL.createObjectURL(

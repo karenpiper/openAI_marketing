@@ -650,6 +650,7 @@ export default function AgentWorkspace() {
                           }
                         />
                         <WorkflowWork
+                          key={`${c.id}:${workSignature(s, c.id)}`}
                           onEdit={(key, rows) =>
                             setS((prev) => ({
                               ...prev,

@@ -362,7 +362,11 @@ export function currentWorkStep(s: AgentState, id: string) {
 }
 
 export function workflowArtifact(s: AgentState, id: string, index: number) {
-  const stage = workStages(s, id)[index];
+  const stages = workStages(s, id);
+  index = Number.isInteger(index)
+    ? Math.max(0, Math.min(index, stages.length - 1))
+    : 0;
+  const stage = stages[index];
   const names: Record<string, string[]> = {
     s2: [
       "Account signal brief",
@@ -370,7 +374,7 @@ export function workflowArtifact(s: AgentState, id: string, index: number) {
       "Campaign action brief",
     ],
     s3: [
-      "Approved source manifest",
+      "Content plan",
       "Audience work packages",
       "Approval packet",
       "Channel handoff bundle",
@@ -385,11 +389,44 @@ export function workflowArtifact(s: AgentState, id: string, index: number) {
   const title = blocked ? "Source material request" : names[id][index];
   const sections =
     s.artifactEdits?.[artifactKey(s, id, index)] ??
-    stage.rows.map(([name, status, detail]) => ({
-      name,
-      status,
-      detail: deliveredDetail(s, id, index, name, detail),
-    }));
+    (id === "s3" && index === 0 && !blocked
+      ? [
+          {
+            name: "Campaign direction",
+            status: "Proposed content plan",
+            detail: `Objective: ${s.campaign?.objective || "Grow enterprise adoption across the buying group"}.\nScope: 12 illustrative target accounts.\nDirection from Morgan: ${s.campaign?.instruction || "Use one approved source to bring the wider buying group into evaluation."}`,
+          },
+          {
+            name: "Audience and deliverables",
+            status: s.audience,
+            detail:
+              s.audience === "Buying roles"
+                ? "Technical evaluators: evaluation-guide brief with a practical next step.\nBusiness sponsors: adoption-value brief tied to operating outcomes.\nProcurement: governance-readiness brief grounded in approved material."
+                : s.audience === "Lifecycle stages"
+                  ? "Exploring: introductory adoption brief.\nEvaluating: practical evaluation brief.\nReady for sales: account handoff and governance brief."
+                  : "One eligible audience: a unified adoption brief and next-action recommendation.",
+          },
+          {
+            name: "Channel plan",
+            status: s.channel,
+            detail: s.channel.includes("event")
+              ? "Email: role-specific message briefs.\nEvents: invitation and follow-up requirements, separated for attendees and non-attendees."
+              : s.channel.includes("sales")
+                ? "Email: role-specific message briefs.\nSales: account and buying-role handoff with the same objective."
+                : "Email: role-specific message briefs.\nWebsite: aligned experience brief and eligibility rules.",
+          },
+          {
+            name: "Source and release gates",
+            status: "Approved source available · release not authorized",
+            detail:
+              "Source: Enterprise adoption guide v3 (illustrative).\nPreserve approved claims and attach source references to each work package.\nNext: prepare audience packages, route required reviews and assemble staged channel handoffs.\nRelease only after required brand / legal checks and audience eligibility are resolved.",
+          },
+        ]
+      : stage.rows.map(([name, status, detail]) => ({
+          name,
+          status,
+          detail: deliveredDetail(s, id, index, name, detail),
+        })));
   const sources = workflowSources(s, id, index);
   const text = `# ${title}\n\nILLUSTRATIVE PROTOTYPE OUTPUT — no live systems queried or actions executed.\n\nCampaign: Enterprise adoption / 12 target accounts\nObjective: ${s.campaign?.objective || "Grow enterprise adoption across the buying group"}\nMorgan’s instruction: ${s.campaign?.instruction || "None added"}\nAudience: ${s.audience}\nChannels: ${s.channel}\n\n${stage.summary}\n\n${sections.map((r) => `## ${r.name}\nStatus: ${r.status}\n${r.detail}`).join("\n\n")}\n\n## Illustrative sources used\n${sources.map((source) => `- ${source.name}: ${source.purpose} | System: ${source.system} | Connection: ${source.connection}`).join("\n")}\n\n## Handoff\n${stage.output}\n\n## Required control\n${stage.control}`;
   return { title, sections, text, blocked, sources };

@@ -131,3 +131,11 @@ test('Morgan edits survive saving and are included in exported artifacts',()=>{
  const restored=m.restoreAgentState(JSON.parse(JSON.stringify(s)));const artifact=w.workflowArtifact(restored,'s3',1);assert.equal(artifact.sections.length,1);assert.match(artifact.text,/Security reviewer/);assert.match(artifact.text,/Include security review/);assert.match(artifact.text,/Improve account activation/);
  const signature=w.workSignature(s,'s3');s.campaign.objective='A different objective';assert.notEqual(w.workSignature(s,'s3'),signature);
 });
+
+test('workflow transition cannot crash on a stale artifact index and produces the promised content plan',()=>{
+ const w=require('../lib/workflow-work.ts');let s=m.createAgentState();
+ s=m.advanceDay(s,0);assert.equal(s.day.moment,2);
+ const plan=w.workflowArtifact(s,'s3',0);assert.equal(plan.title,'Content plan');assert.match(plan.text,/Audience and deliverables/);assert.match(plan.text,/Technical evaluators/);assert.match(plan.text,/Channel plan/);
+ const afterContent=w.workflowArtifact(s,'s5',3);assert.equal(afterContent.title,'Decision and audit record');
+ for(const id of ['s2','s3','s5'])for(const index of [-1,0,1,2,3,999,NaN])assert.ok(w.workflowArtifact(s,id,index).text.length>100);
+});
