@@ -34,7 +34,7 @@ export default function ChannelHandoff({
             ? "Complete"
             : "Staging",
         },
-        `${tab} work order accepted by the simulated connector. Release owner: ${p.owner}. Not sent.`,
+        `${tab} work order accepted by the simulated connector. Routed to the configured marketing operations team. Not sent.`,
       ),
     );
   }
@@ -44,10 +44,10 @@ export default function ChannelHandoff({
         <span className="agent-kicker">
           Activation workspace · simulated destination
         </span>
-        <h3>Prepare the handoff.</h3>
+        <h3>Ready for the next step.</h3>
         <p>
-          Inspect each channel, assign its owner and stage the work. A staged
-          work order is not a released campaign.
+          Review the preview, then prepare each channel for release. The agent
+          routes the work to the configured team. Nothing is sent yet.
         </p>
       </header>
       <nav aria-label="Channel work orders">
@@ -152,7 +152,7 @@ export default function ChannelHandoff({
                 <b>Suggested seller action</b>
                 <p>
                   Review the account brief and coordinate the next conversation
-                  with the campaign owner.
+                  with the account team.
                 </p>
               </article>
               <footer>
@@ -162,26 +162,6 @@ export default function ChannelHandoff({
           )}
         </div>
         <div className="handoff-settings">
-          <label>
-            Work order owner
-            <input
-              value={p.owner}
-              onChange={(e) =>
-                onChange(
-                  processUpdate(
-                    p,
-                    {
-                      owner: e.target.value,
-                      status: "Not started",
-                      reviewers: {},
-                    },
-                    "Owner updated; work orders need restaging",
-                  ),
-                )
-              }
-              placeholder="Name or responsible role"
-            />
-          </label>
           <div>
             <b>Audience</b>
             <p>{session.audience} · 12 illustrative target accounts</p>
@@ -205,7 +185,7 @@ export default function ChannelHandoff({
                   ? "Events + marketing CRM"
                   : tab === "Website"
                     ? "Marketing Website"
-                    : "Sales CRM / account-owner queue"}
+                    : "Sales CRM / account team"}
             </p>
           </div>
           <div>
@@ -228,12 +208,12 @@ export default function ChannelHandoff({
           </div>
           <button
             className="agent-primary"
-            disabled={!approved || !p.owner.trim() || staged}
+            disabled={!approved || staged}
             onClick={stage}
           >
             {staged
-              ? "Work order staged"
-              : `Stage ${tab.toLowerCase()} work order`}
+              ? "Prepared for release"
+              : `Prepare ${tab.toLowerCase()} for release`}
           </button>
           {!approved && (
             <p>
@@ -242,13 +222,13 @@ export default function ChannelHandoff({
           )}
           {staged && (
             <div className="handoff-receipt" role="status">
-              <b>✓ Simulated connector receipt</b>
+              <b>✓ Prepared · not sent</b>
               <p>
                 WO-{tab === "Email" ? "EMAIL" : "SECOND"}-001
                 <br />
                 Status: accepted into staging
                 <br />
-                Owner: {p.owner}
+                Routing: marketing operations
                 <br />
                 Release: blocked pending final checks
                 <br />
@@ -260,8 +240,7 @@ export default function ChannelHandoff({
       </div>
       <div className="handoff-progress">
         {channels.filter((c) => p.reviewers[c] === "Staged").length} of{" "}
-        {channels.length} work orders staged · both must be staged before the
-        afternoon checks.
+        {channels.length} channels prepared · then we’ll check eligibility before release.
       </div>
     </section>
   );

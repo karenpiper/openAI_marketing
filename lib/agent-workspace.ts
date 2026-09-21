@@ -423,7 +423,7 @@ export function advanceDay(s: AgentState, chapterIndex: number): AgentState {
       ? "Morgan chose the 12-account adoption opportunity. The agent will prepare an audience-specific plan."
       : chapterIndex === 1
         ? `Morgan approved the proposed plan: ${s.audience}; ${s.channel}; ${s.source}. Required reviews still precede release.`
-        : `Morgan’s containment decision: ${processState(s, "s5", 1).choice || "Not recorded"}. Owner: ${processState(s, "s5", 1).owner || "Unassigned"}. ${processState(s, "s5", 2).events.at(-1) || "Connector acknowledgement not recorded."}`;
+        : `Morgan’s containment decision: ${processState(s, "s5", 1).choice || "Not recorded"}. Routed to the configured data team. ${processState(s, "s5", 2).events.at(-1) || "Connector acknowledgement not recorded."}`;
   return {
     ...s,
     outcomes: { ...s.outcomes, [c.id]: text },

@@ -2805,3 +2805,120 @@
     padding-top: 10px;
   }
 }
+/* Handoffs focus on the preview and release state, not assignment forms. */
+.handoff-console > header > h3 {
+  font-size: 23px;
+}
+.handoff-console nav {
+  padding: 4px;
+  background: #edf0ed;
+  border-radius: 10px;
+  width: fit-content;
+}
+.handoff-console nav button {
+  border: 0;
+  margin: 0;
+  border-radius: 7px;
+  padding: 10px 18px;
+}
+.handoff-console nav button[aria-pressed="true"] {
+  background: white;
+  color: #243d30;
+  box-shadow: 0 1px 5px #0000000d;
+}
+.handoff-canvas {
+  grid-template-columns: minmax(0, 1.2fr) minmax(220px, 0.8fr);
+  gap: 24px;
+  align-items: start;
+}
+.handoff-preview {
+  background: #f0f1f2;
+  padding: 20px;
+  border-radius: 13px;
+}
+.handoff-settings {
+  background: white;
+  border: 1px solid #e1e6e1;
+  padding: 8px 18px 18px;
+  border-radius: 12px;
+}
+.handoff-settings > div {
+  border: 0;
+  padding: 12px 0;
+}
+.handoff-settings > div + div {
+  border-top: 1px solid #edf0ed;
+}
+.handoff-settings b {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.045em;
+  color: #7a887d;
+  font-weight: 500;
+}
+.handoff-settings p {
+  font-size: 12px !important;
+  line-height: 1.6;
+  color: #415647;
+}
+.handoff-settings .handoff-gate {
+  background: #f2f6ef;
+  padding: 12px;
+  border-radius: 7px;
+  margin: 12px 0;
+}
+.handoff-settings > .agent-primary {
+  width: 100%;
+  margin: 10px 0 0;
+}
+.handoff-settings .handoff-receipt {
+  background: #eef6ed;
+  box-shadow: none;
+}
+.handoff-receipt b {
+  text-transform: none;
+  font-size: 12px;
+  color: #466646;
+}
+.handoff-progress {
+  padding-top: 20px;
+  font-size: 11px;
+  color: #6b7d70;
+}
+.handoff-console .email-preview {
+  box-shadow: 0 6px 20px #00000008;
+}
+.process-actions:has(.handoff-console) {
+  border: 0;
+  padding: 0;
+  background: transparent;
+}
+.process-actions:has(.handoff-console) > header {
+  display: none;
+}
+.process-actions:has(.handoff-console) > .process-receipt {
+  background: #f9faf9;
+}
+@media (max-width: 1100px) {
+  .handoff-canvas {
+    grid-template-columns: 1fr;
+  }
+  .handoff-settings {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0 20px;
+  }
+  .handoff-settings > .agent-primary,
+  .handoff-settings > .handoff-receipt,
+  .handoff-settings > .handoff-gate {
+    grid-column: 1/-1;
+  }
+}
+@media (max-width: 650px) {
+  .handoff-settings {
+    display: block;
+  }
+  .handoff-preview {
+    padding: 14px;
+  }
+}

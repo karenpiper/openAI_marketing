@@ -136,19 +136,17 @@ export default function ProcessActions({
       {id === "s2" && index === 2 && (
         <>
           <p>
-            Review the action brief above and assign accountability for the next
-            handoff. Use “Adjust brief” if the objective needs to change.
+            Review the action brief above. The agent will carry it into content
+            planning. Use “Adjust brief” if the objective needs to change.
           </p>
-          {field("Campaign owner (name or role)", "owner")}
           <button
-            disabled={!p.owner.trim()}
             onClick={() =>
               complete(
-                `Action brief accepted; campaign owner: ${p.owner}. Content planning requested.`,
+                "Action brief accepted; content planning requested through the configured workflow.",
               )
             }
           >
-            Accept brief and assign owner
+            Use this brief
           </button>
         </>
       )}
@@ -203,16 +201,15 @@ export default function ProcessActions({
             requirements, then accept this version for review. Editing the
             artifact later invalidates this acceptance.
           </p>
-          {field("Direction for the production / review team", "note")}
+          {field("Anything you’d like to change? (optional)", "note")}
           <button
-            disabled={!p.note.trim()}
             onClick={() =>
               complete(
-                `Audience work packages accepted with instruction: ${p.note}`,
+                `Audience work packages accepted. ${p.note.trim() ? "Morgan’s changes: " + p.note : "No changes requested."}`,
               )
             }
           >
-            Accept these packages for review
+            Looks good—send for review
           </button>
         </>
       )}
@@ -296,7 +293,7 @@ export default function ProcessActions({
                     <button
                       onClick={() => {
                         setFeedback(
-                          "Please specify the release owner and the evidence they must check before activation.",
+                          "Please attach the approved source reference for the governance claims before release.",
                         );
                         onChange(applyReview(p, role, "Changes requested"));
                       }}
@@ -312,16 +309,15 @@ export default function ProcessActions({
               <h4>Changes requested · release is blocked</h4>
               <p>
                 {feedback ||
-                  "Please specify the release owner and the evidence they must check before activation."}
+                  "Please attach the approved source reference for the governance claims before release."}
               </p>
-              {field("Release owner to add to this packet", "owner")}
-              {field("Required evidence / revision to the packet", "note")}
+              {field("Source reference or correction to add", "note")}
               <button
-                disabled={!p.owner.trim() || !p.note.trim()}
+                disabled={!p.note.trim()}
                 onClick={() =>
                   update(
                     { status: "Revision prepared" },
-                    `Packet revision: release owner ${p.owner}; required evidence: ${p.note}`,
+                    `Packet revision: source evidence added — ${p.note}`,
                   )
                 }
               >
@@ -333,10 +329,7 @@ export default function ProcessActions({
             <div>
               <h4>Packet v{p.version + 1} · revision preview</h4>
               <p>
-                <b>Added owner:</b> {p.owner}
-              </p>
-              <p>
-                <b>Added release evidence:</b> {p.note}
+                <b>Added source reference:</b> {p.note}
               </p>
               <button
                 onClick={() =>
@@ -417,22 +410,24 @@ export default function ProcessActions({
         <>
           <p>
             CONSENT-001: engagement is present, but permission records conflict.
-            Decide the scope of the hold and who must reconcile it.
+            Decide the scope of the hold and the scope of the pause.
           </p>
           {select("Containment decision", [
             "Hold the affected contact only",
             "Pause the whole campaign pending reconciliation",
           ])}
-          {field("Data / consent owner", "owner")}
+          <p>
+            The agent will send the consent issue to the configured data team.
+          </p>
           <button
-            disabled={!p.choice || !p.owner.trim()}
+            disabled={!p.choice}
             onClick={() =>
               complete(
-                `CONSENT-001: ${p.choice}. Reconciliation assigned to ${p.owner}. No consent inferred from engagement.`,
+                `CONSENT-001: ${p.choice}. Reconciliation routed to the configured data team. No consent inferred from engagement.`,
               )
             }
           >
-            Create the hold and owner task
+            Apply hold and notify the data team
           </button>
         </>
       )}
@@ -457,7 +452,7 @@ export default function ProcessActions({
             <button
               onClick={() =>
                 complete(
-                  "Simulated connector acknowledged the hold and owner task; audit record attached. Campaign release remains gated.",
+                  "Simulated connector acknowledged the hold and data-team task; audit record attached. Campaign release remains gated.",
                 )
               }
             >
