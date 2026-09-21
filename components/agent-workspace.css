@@ -2332,3 +2332,20 @@
   padding: 8px 0;
   border-top: 1px solid #e2e8ed;
 }
+.execution-log {
+  padding-left: 0;
+}
+.execution-log li {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  font-size: 12px;
+  line-height: 1.7;
+  margin: 11px 0;
+  color: #68747d;
+}
+.execution-log li > span {
+  flex-shrink: 0;
+  margin-right: 0;
+  min-width: 13px;
+}

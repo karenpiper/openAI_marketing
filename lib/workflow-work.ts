@@ -556,3 +556,73 @@ export function workflowSources(s: AgentState, id: string, index: number) {
     return { ...source, system, connection };
   });
 }
+
+export function workflowActivity(
+  s: AgentState,
+  id: string,
+  index: number,
+): string[] {
+  const steps: Record<string, string[][]> = {
+    s2: [
+      [
+        "Bringing account context together from product usage in the OpenAI data lake, website and event activity through journey analytics, and account identities through a proposed CDP / CRM lookup.",
+        "Comparing those engagement signals with technical evaluator, business sponsor and procurement roles from account context to identify who is active and who is missing.",
+        "Preparing a recommendation that links the buying-group gap to an adoption objective, with supporting signals, audience scope and the proposed next action.",
+      ],
+      [
+        "Reading the account signal brief and retrieving buying-role context through the proposed identity / CDP and CRM connections.",
+        "Comparing engagement by role: technical evaluators show interest; business sponsors and procurement need different evidence before they can participate.",
+        "Preparing a buying-group opportunity map with the missing roles, the decision each needs to make and a recommended engagement path.",
+      ],
+      [
+        "Carrying the account cohort, supporting signals and buying-group gap forward from the opportunity map in the shared OpenAI workspace.",
+        "Combining that evidence with Morgan’s objective and instructions to set the audience scope and content requirements.",
+        "Preparing the campaign action brief with source references and a handoff to content planning, without authorizing a send.",
+      ],
+    ],
+    s3: [
+      [
+        "Searching the approved asset repository through a proposed Adobe CSC / content connector for material matching the campaign objective and audience needs.",
+        s.source === "Source material missing"
+          ? "Finding no approved source in this scenario; marking adaptation as blocked instead of supplying unsupported claims."
+          : "Reading the adoption guide’s version, permitted claims and usage rights from the asset metadata before reusing it.",
+        s.source === "Source material missing"
+          ? "Preparing a source request identifying the missing approved material and the review needed before adaptation can resume."
+          : "Preparing a source manifest that links the adoption guide, allowed claims and reuse restrictions to the campaign brief.",
+      ],
+      [
+        "Reading Morgan’s objective and instructions from the shared brief, together with audience and buying-role context from the proposed CDP / CRM connection.",
+        `Mapping ${s.audience.toLowerCase()} to the approved adoption guide: selecting the relevant evidence and emphasis while preserving the source claims.`,
+        `Preparing audience work packages for ${s.channel.toLowerCase()}, each carrying its decision need, source references and production instructions.`,
+      ],
+      [
+        "Collecting the audience work packages and their source versions from the shared campaign state and approved asset repository.",
+        "Applying brand, legal and privacy requirements through the proposed Workfront / review-system connection to determine owners and approval gates.",
+        "Preparing a review packet linking each work package to its required checks; Morgan’s direction approval does not bypass release review.",
+      ],
+      [
+        `Mapping the reviewed work packages to ${s.channel.toLowerCase()} through proposed marketing CRM, website or event-platform handoffs.`,
+        "Checking audience eligibility through the identity / consent source and attaching required review status from the workflow system; unresolved checks keep release gated.",
+        "Preparing staged channel work orders with asset references, audience identifiers and measurement instructions that return response signals to journey analytics.",
+      ],
+    ],
+    s5: [
+      [
+        "Reading the staged campaign work orders and destination references through proposed marketing activation connectors.",
+        "Comparing links, audience settings and asset references against the operational checklist, while checking consent consistency through the identity source.",
+        "Preparing a check report that separates routine validation from the conflicting-consent exception requiring human attention.",
+      ],
+      [
+        "Retrieving the affected contact’s identity and consent records through the proposed CDP / consent-source connection.",
+        "Comparing the conflicting permissions with escalation policy rather than inferring consent from engagement.",
+        "Preparing a contact hold and reconciliation request for the data owner, while preserving the approval gates for everyone else.",
+      ],
+      [
+        "Reading Morgan’s chosen resolution and the campaign’s current release state from the shared OpenAI workspace.",
+        "Linking the proposed hold to the affected contact and the escalation task through the activation and request-system connections.",
+        "Preparing a decision record with the owner, pending task and release conditions; external execution remains unconfirmed in this simulation.",
+      ],
+    ],
+  };
+  return steps[id]?.[index] || [];
+}

@@ -8,7 +8,7 @@ import {
   workSignature,
   workflowArtifact,
   artifactKey,
-  workflowSources,
+  workflowActivity,
 } from "../lib/workflow-work";
 export function WorkflowWork({
   session,
@@ -38,42 +38,7 @@ export function WorkflowWork({
   const [opened, setOpened] = useState<number | null>(null);
   const panel = useRef<HTMLDivElement>(null);
   const blocked = id === "s3" && session.source === "Source material missing";
-  const actions =
-    id === "s3"
-      ? index === 0
-        ? [
-            "Checking the source library",
-            "Reading version and usage permissions",
-            "Assembling the source manifest",
-          ]
-        : index === 1
-          ? [
-              "Reading the campaign brief",
-              "Mapping audience needs to approved material",
-              "Assembling audience work packages",
-            ]
-          : index === 2
-            ? [
-                "Collecting the work packages",
-                "Applying review and permission rules",
-                "Assembling the approval packet",
-              ]
-            : [
-                "Mapping packages to channels",
-                "Adding eligibility and release gates",
-                "Preparing the delivery bundle",
-              ]
-      : id === "s2"
-        ? [
-            "Bringing account context together",
-            "Comparing signals and buying roles",
-            "Preparing the recommendation",
-          ]
-        : [
-            "Checking the campaign work orders",
-            "Applying routine rules and isolating exceptions",
-            "Preparing the action record",
-          ];
+  const actions = workflowActivity(session, id, index);
   useEffect(() => {
     setRun({ key: runKey, phase: 0 });
     setOpened(null);
@@ -137,7 +102,11 @@ export function WorkflowWork({
         <div>
           <b>
             {phase < 3
-              ? actions[phase]
+              ? [
+                  "Gathering the inputs…",
+                  "Checking the context…",
+                  "Preparing the output…",
+                ][phase]
               : blocked
                 ? "Source gap found"
                 : "Work package ready"}
@@ -153,22 +122,6 @@ export function WorkflowWork({
             Show result now
           </button>
         )}
-      </div>
-      <div className="assembly-sources">
-        <b>
-          {phase < 3 ? "Assembling from" : "Sources carried into this package"}
-        </b>
-        <span>Illustrative data and systems · proposed connections</span>
-        <ul>
-          {workflowSources(session, id, index).map((source) => (
-            <li key={source.name}>
-              <strong>{source.name}</strong>
-              <small>{source.purpose}</small>
-              <span className="source-system">{source.system}</span>
-              <small className="source-connection">↳ {source.connection}</small>
-            </li>
-          ))}
-        </ul>
       </div>
       <ol className="execution-log">
         {actions.slice(0, Math.min(phase + 1, 3)).map((action, i) => (
