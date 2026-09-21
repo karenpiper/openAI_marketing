@@ -277,7 +277,7 @@ export function Architecture({ session: s, setSession }: Props) {
     <section className="module-panel guided-panel">
       <div className="module-heading">
         <span className="eyebrow">
-          03 · Proposed way of working · 45 minutes
+          Proposed way of working · Adapt with the room
         </span>
         <h1>What should change for this use case?</h1>
       </div>

@@ -2,7 +2,7 @@
 
 ## Preserve the original
 
-The discovery workshop is preserved at commit `8a1785b` on `archive/workshop-discovery-2026-09-21`. Main remains unchanged. Adaptation work belongs on `feature/agent-led-workshop` in the separate `openai-agent-workshop` checkout. This document captures direction; it does not mean the revised interface has been implemented.
+The discovery workshop is preserved at commit `8a1785b` on `archive/workshop-discovery-2026-09-21`. Main remains unchanged. Adaptation work belongs on `feature/agent-led-workshop` in the separate `openai-agent-workshop` checkout. The adapted interface now includes three simulated agent chapters, condition-driven content planning, capability capture, architecture annotations and readout.
 
 ## Purpose
 

@@ -1094,7 +1094,7 @@ test("workflow simulation adapts all 32 scenarios and persists without generatio
                   room,
                 }),
               );
-              assert.match(html, /Route event signals/);
+              assert.doesNotMatch(html, /Route event signals|Would this work here/);
               assert.ok(!html.includes("Generate AI drafts"));
               assert.equal((html.match(/<select/g) || []).length, room ? 0 : 5);
             }

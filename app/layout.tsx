@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Enterprise Marketing Workshop | OpenAI × Adobe × Code and Theory",
+  title: "Morgan’s Agent Workspace | OpenAI Workshop",
   description:
-    "Facilitated workshop for priorities, current capabilities, operating architecture and content at scale.",
+    "An interactive agent-led marketing prototype for content at scale, capability discovery and working architecture.",
 };
 
 export default function RootLayout({
