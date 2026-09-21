@@ -1124,3 +1124,34 @@ test("outcome readout lands on priorities and architecture without capture forms
   assert.match(empty, /0 priority use cases/);
   assert.ok(!empty.includes("Three priority use cases"));
 });
+
+test("architecture download recreates source diagram and links session annotations", () => {
+  const {
+    architectureDiagram,
+    diagramRefs,
+  } = require("../lib/architecture-diagram.ts");
+  const { architectureDocument } = require("../lib/architecture-pdf.ts");
+  const s = require("../lib/demo-session.ts").createDemoSession();
+  const svg = architectureDiagram(s);
+  for (const component of [
+    "Adobe Workfront",
+    "Adobe CSC",
+    "Adobe CDP",
+    "OpenAI",
+    "ChatGPT Usage",
+    "Salesforce",
+    "Offer Tools",
+    "Customer Journey Analytics",
+  ]) {
+    assert.ok(
+      svg.includes(component) ||
+        svg.includes(component.replace("Adobe Workfront", "Workfront")),
+    );
+  }
+  assert.match(diagramRefs("s3", 1), /C/);
+  assert.match(svg, /#ffffff/);
+  const doc = architectureDocument(s);
+  assert.ok(doc.content.slice(0, 5).some((c) => c.svg));
+  assert.match(JSON.stringify(doc), /SESSION ANNOTATIONS/);
+  assert.match(JSON.stringify(doc), /Use the existing approved library/);
+});

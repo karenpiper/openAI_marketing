@@ -52,14 +52,15 @@ export default function ArchitectureOutput({
         </div>
         {download && (
           <button disabled={busy} onClick={exportPdf}>
-            {busy ? "Preparing PDF…" : "Download architecture PDF"}
+            {busy ? "Preparing PDF…" : "Download annotated architecture PDF"}
           </button>
         )}
       </div>
       {error && <p role="alert">{error}</p>}
       <p className="muted">
         Proposed workflow order · room changes and open questions remain
-        visible. Download the PDF for the full architecture record.
+        visible. The PDF recreates our original architecture diagram with
+        session annotations.
       </p>
       {!model.cases.length && (
         <p>

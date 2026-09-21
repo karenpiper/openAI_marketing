@@ -1,3 +1,4 @@
+import { architectureDiagram, diagramRefs } from "./architecture-diagram";
 import { scenarioFlow, scenarioSummary } from "./workflow-simulation";
 import type { Content, TDocumentDefinitions } from "pdfmake/interfaces";
 import type { Session } from "./workshop";
@@ -5,24 +6,19 @@ import { architectureOutput } from "./architecture-output";
 export function architectureDocument(s: Session): TDocumentDefinitions {
   const model = architectureOutput(s);
   const content: Content[] = [
-    { text: "WORKSHOP OUTPUT / ARCHITECTURE", style: "eyebrow" },
-    { text: "The way of working we discussed", style: "title" },
-    { text: model.title, style: "subtitle" },
+    { text: "PROPOSED ARCHITECTURE / WORKSHOP RECORD", style: "eyebrow" },
+    { text: "OpenAI + Adobe", fontSize: 24, bold: true, margin: [0, 6, 0, 4] },
+    { text: model.title, fontSize: 10, margin: [0, 0, 0, 8] },
+    { svg: architectureDiagram(s), width: 495 },
     {
-      text: `Working set: ${model.selectionConfirmed ? "confirmed" : "proposed / not confirmed"}`,
-      margin: [0, 10, 0, 8],
+      text: "Recreated from our original architecture proposal. Original components and arrows are preserved; markers A-G link to session notes on the following pages. Amber markers show captured workflow reviews (a note may reference several components).",
+      fontSize: 9,
+      margin: [0, 8, 0, 0],
     },
     {
-      text: `Attendees: ${model.attendees || "Not recorded"}`,
-      margin: [0, 0, 0, 12],
-    },
-    {
-      text: "Generated from captured workshop answers. Direction agreed = the proposal looks right to the room, not a technical sign-off. Change requested = room amendment. Open question = unresolved. Proposed = not reviewed. Needs recheck = source evidence changed.",
-      style: "note",
-    },
-    {
-      text: "Arrows show workflow order, not implemented system integrations. Unreviewed steps retain our suggested process; suggested systems remain proposals until reviewed.",
-      style: "note",
+      text: "A Interfaces   B Workfront   C Content assets   D Data / identity   E Touchpoints   F Journey analytics   G Sales tools",
+      fontSize: 8,
+      margin: [0, 5, 0, 0],
     },
   ];
   if (!model.cases.length)
@@ -40,10 +36,14 @@ export function architectureDocument(s: Session): TDocumentDefinitions {
         style: "eyebrow",
       },
       { text: `What to prove: ${c.proof}`, margin: [0, 10, 0, 14] },
+      {
+        text: "The diagram remains the baseline proposal. Direction agreed records workshop alignment; changes and questions below are annotations, not assumed integrations.",
+        style: "note",
+      },
     );
     content.push(
       {
-        text: "WORKFLOW OVERVIEW / detailed entries follow",
+        text: "SESSION ANNOTATIONS / linked to diagram markers A-G",
         style: "eyebrow",
         margin: [0, 4, 0, 10],
       },
@@ -81,7 +81,10 @@ export function architectureDocument(s: Session): TDocumentDefinitions {
     );
     c.nodes.forEach((n, i) => {
       const nodeContent: Content[] = [
-        { text: `${i + 1}. ${n.title}`, style: "stepTitle" },
+        {
+          text: `${i + 1}. ${n.title} [${diagramRefs(c.id, i)}]`,
+          style: "stepTitle",
+        },
         {
           text: n.status.toUpperCase(),
           style: "status",
@@ -217,7 +220,10 @@ export function architectureDocument(s: Session): TDocumentDefinitions {
       },
     );
   return {
-    info: { title: "Workshop architecture", subject: model.title },
+    info: {
+      title: "OpenAI + Adobe architecture with session annotations",
+      subject: model.title,
+    },
     pageSize: "A4",
     pageMargins: [40, 40, 40, 44],
     defaultStyle: {
@@ -235,7 +241,7 @@ export function architectureDocument(s: Session): TDocumentDefinitions {
       stepTitle: { fontSize: 14, bold: true, margin: [0, 12, 0, 4] },
       status: { fontSize: 9, bold: true },
     },
-    content,
+    content: JSON.parse(JSON.stringify(content).replaceAll("→", "->").replaceAll("↩", "Return to")),
     footer: (page, count) => ({
       text: `Workshop record · ${page} / ${count}`,
       alignment: "right",
