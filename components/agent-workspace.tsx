@@ -25,6 +25,7 @@ import PerformanceLoop from "./performance-loop";
 import MorningInbox from "./morning-inbox";
 import AgentBriefing, { MeetMorgan } from "./agent-briefing";
 import ArchitectureOutput from "./architecture-output";
+import BackendIllustration from "./backend-illustration";
 import { Architecture } from "./workshop-mapping";
 import { useCaseCandidates } from "../lib/use-case-candidates";
 import { SaveContext } from "./save-footer";
@@ -825,7 +826,10 @@ export default function AgentWorkspace() {
                         </div>
                       </div>
                     </MorganScreen>
-                    <WorkflowRequirements session={s} id={c.id} />
+                    <aside className="prototype-context-rail">
+                      <WorkflowRequirements session={s} id={c.id} />
+                      <BackendIllustration session={s} id={c.id} />
+                    </aside>
                   </div>
                   <div className="agent-next">
                     <button

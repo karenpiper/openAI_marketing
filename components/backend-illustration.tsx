@@ -91,12 +91,12 @@ export default function BackendIllustration({
         className="backend-launch"
         onClick={() => {
           setFrame(0);
-          setPlaying(false);
+          setPlaying(true);
           setOpen(true);
           dialog.current?.showModal();
         }}
       >
-        ◇ Behind the scenes · follow the agent
+        ◇ Watch the proposed data flow
       </button>
       <dialog
         ref={dialog}
