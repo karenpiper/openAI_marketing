@@ -1,3 +1,4 @@
+import BackendIllustration from "./backend-illustration";
 import type { AgentState } from "../lib/agent-workspace";
 import { workStages, currentWorkStep } from "../lib/workflow-work";
 export function WorkflowWork({
@@ -78,6 +79,7 @@ export function WorkflowRequirements({
         Behind the screen · proposed technical requirements · {index + 1}
       </span>
       <h3>{stage.title}: what enables this work</h3>
+      <BackendIllustration session={session} id={id} key={`${id}-${index}`} />
       <dl>
         {[
           ["INPUT", stage.input],

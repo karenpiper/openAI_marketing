@@ -19,6 +19,7 @@ export function architectureDiagram(
   s: Session,
   caseId?: string,
   stepIndex = -1,
+  focusReferences?: string[],
 ) {
   const steps = caseId ? workflows[caseId] : undefined;
   const shown = steps
@@ -27,7 +28,8 @@ export function architectureDiagram(
       : steps
     : [];
   const active = new Set(
-    shown.flatMap((step) => step.boxes.map((k) => diagramReferences[k])),
+    focusReferences ??
+      shown.flatMap((step) => step.boxes.map((k) => diagramReferences[k])),
   );
   const focused = active.size > 0;
   const groupFor = (x: number, y: number) =>

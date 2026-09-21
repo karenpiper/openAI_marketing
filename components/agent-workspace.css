@@ -1778,3 +1778,139 @@
     gap: 5px;
   }
 }
+.backend-launch {
+  margin: 0 0 18px;
+  background: white !important;
+  color: #365772 !important;
+  border: 1px solid #aabdcf !important;
+}
+.backend-dialog {
+  width: min(1120px, 94vw);
+  max-height: 90vh;
+  border: 1px solid #c6d1da;
+  border-radius: 18px;
+  padding: 0;
+  background: #f8fafc;
+  color: #263d4d;
+  box-shadow: 0 30px 100px #0005;
+}
+.backend-dialog::backdrop {
+  background: #182b3eb3;
+  backdrop-filter: blur(5px);
+}
+.backend-body {
+  padding: 26px;
+}
+.backend-body > header {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  align-items: flex-start;
+}
+.backend-body h2 {
+  font-size: 25px;
+  margin: 10px 0;
+  font-weight: 500;
+}
+.backend-note {
+  font-size: 11px !important;
+  line-height: 1.65;
+  color: #718397;
+}
+.backend-layout {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 25px;
+  margin: 20px 0;
+}
+.backend-map {
+  background: #fff;
+  border: 1px solid #d9e0e6;
+  border-radius: 12px;
+  padding: 12px;
+  align-self: start;
+}
+.backend-map svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 530px;
+}
+.backend-story {
+  padding: 22px;
+  background: white;
+  border: 1px solid #dae1e8;
+  border-radius: 12px;
+}
+.backend-story h3 {
+  font-size: 24px !important;
+  font-weight: 500;
+  line-height: 1.2;
+  margin: 14px 0 22px;
+}
+.backend-story > p {
+  font-size: 15px;
+  line-height: 1.8;
+}
+.backend-route {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 15px;
+  border: 1px dashed #aabccc;
+  border-radius: 9px;
+  background: #f1f5f9;
+  font-size: 12px;
+}
+.backend-route span {
+  flex: 1;
+}
+.backend-route b {
+  font-size: 24px;
+  color: #68859e;
+}
+.backend-story aside {
+  padding: 16px;
+  border-left: 3px solid #7a99b3;
+  background: #f5f7fa;
+  margin-top: 20px;
+  font-size: 12px;
+}
+.backend-story aside p {
+  margin: 8px 0 0;
+}
+.backend-body > footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 15px;
+  border-top: 1px solid #dce2e9;
+  padding-top: 18px;
+}
+.backend-body > footer > div {
+  display: flex;
+  gap: 8px;
+}
+.backend-body > footer button {
+  font-size: 12px;
+}
+.backend-dots button[aria-pressed="true"] {
+  background: #304c64;
+  color: white;
+}
+@media (max-width: 700px) {
+  .backend-body {
+    padding: 18px;
+  }
+  .backend-layout {
+    grid-template-columns: 1fr;
+  }
+  .backend-map svg {
+    max-height: 300px;
+  }
+  .backend-story {
+    padding: 18px;
+  }
+  .backend-body > footer {
+    flex-wrap: wrap;
+  }
+}
