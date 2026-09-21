@@ -1238,13 +1238,14 @@ button {
 }
 .question-banner {
   padding: 25px 30px;
-  background: #183e34;
-  color: #fff;
+  background: #e8eddb;
+  color: #18382c;
   border-radius: 16px;
   margin: 24px 0 30px;
 }
-.question-banner .label {
-  color: #b1c8bc;
+.question-banner .label,
+.question-banner .eyebrow {
+  color: #365343;
 }
 .question-banner h2 {
   font-size: clamp(24px, 3vw, 36px);
@@ -1254,7 +1255,7 @@ button {
   margin: 12px 0;
 }
 .question-banner p {
-  color: #d8e4dd;
+  color: #365343;
   line-height: 1.5;
   margin-bottom: 0;
 }
