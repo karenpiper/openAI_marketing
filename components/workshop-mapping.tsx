@@ -1,3 +1,4 @@
+import SaveFooter from "./save-footer";
 import ArchitectureWalkthrough from "./architecture-walkthrough";
 import LiveSynthesis from "./live-synthesis";
 import { useState, type Dispatch, type SetStateAction } from "react";
@@ -226,6 +227,7 @@ export function CurrentState({ session: s, setSession }: Props) {
               }
             />
           </div>
+          <SaveFooter />
           <LiveSynthesis session={s} setSession={setSession} index={step} />
         </>
       ) : (

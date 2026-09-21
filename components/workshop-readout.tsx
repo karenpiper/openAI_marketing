@@ -1,3 +1,4 @@
+import SaveFooter from "./save-footer";
 import ArchitectureOutput from "./architecture-output";
 import LiveSynthesis from "./live-synthesis";
 import { type Dispatch, type SetStateAction } from "react";
@@ -391,6 +392,7 @@ export default function WorkshopReadout({
                   Remove
                 </button>
               </div>
+              <SaveFooter />
             </>
           )}
         </article>

@@ -1,3 +1,4 @@
+import SaveFooter from "./save-footer";
 import { useState, type Dispatch, type SetStateAction } from "react";
 import {
   type Session,
@@ -19,7 +20,9 @@ export default function ArchitectureDetails({ session, setSession }: Props) {
   const [layer, setLayer] = useState("surface");
   const [from, setFrom] = useState("surface");
   const [to, setTo] = useState("content");
-  const [title, setTitle] = useState("");
+  const title = session.draftDecisionTitle;
+  const setTitle = (draftDecisionTitle: string) =>
+    setSession((s) => ({ ...s, draftDecisionTitle }));
   const focus = useCases.find((c) => c.id === session.focus);
   const boundaries = session.boundaries.filter(
     (b) => b.useCase === session.focus,
@@ -221,6 +224,7 @@ export default function ArchitectureDetails({ session, setSession }: Props) {
                   </p>
                 )}
               </details>
+              <SaveFooter />
             </div>
           </div>
           <h2 className="section-title">Make the handoffs explicit</h2>
@@ -314,6 +318,7 @@ export default function ArchitectureDetails({ session, setSession }: Props) {
                 >
                   Remove handoff
                 </button>
+                <SaveFooter />
               </article>
             ))}
         </>
@@ -372,6 +377,7 @@ export default function ArchitectureDetails({ session, setSession }: Props) {
               onChange={(v) => decision(d.id, { status: v })}
             />
           </div>
+          <SaveFooter />
         </article>
       ))}
       <div className="inline-add">
@@ -400,6 +406,7 @@ export default function ArchitectureDetails({ session, setSession }: Props) {
           Add decision
         </button>
       </div>
+      <SaveFooter />
     </section>
   );
 }

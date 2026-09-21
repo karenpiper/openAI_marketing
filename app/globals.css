@@ -3011,3 +3011,30 @@ body {
     break-inside: avoid;
   }
 }
+.save-footer {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 22px 0 8px;
+  padding-top: 16px;
+  border-top: 1px solid #ccd6cb;
+}
+.save-footer button {
+  background: #245941;
+  color: #fff;
+  border: 1px solid #245941;
+  border-radius: 8px;
+  padding: 10px 24px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+.save-footer span {
+  font-size: 0.8rem;
+  line-height: 1.5;
+  color: #365343;
+}
+@media print {
+  .save-footer {
+    display: none !important;
+  }
+}

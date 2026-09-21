@@ -1,5 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
+import SaveFooter, { SaveContext } from "../components/save-footer";
+import { persistSession } from "../lib/persistence";
 import WorkshopChapter from "../components/workshop-chapter";
 import WorkshopOverview from "../components/workshop-overview";
 import PriorityWorkshop from "../components/priority-workshop";
@@ -119,7 +121,7 @@ export default function Workshop() {
     channelRef.current?.postMessage(data);
     if (storageError) return;
     try {
-      localStorage.setItem(storageKeyRef.current, data);
+      persistSession(localStorage, storageKeyRef.current, session);
     } catch {
       setStorageError(
         "Browser storage is unavailable or full. Export a backup before leaving.",
@@ -137,6 +139,25 @@ export default function Workshop() {
         ? Math.floor((clock - session.timer.runningSince) / 1000)
         : 0),
   );
+  function saveNow() {
+    if (storageError.includes("unreadable saved copy"))
+      return {
+        ok: false,
+        message:
+          "Save blocked: restore or export a backup before replacing the unreadable saved session.",
+      };
+    try {
+      const data = persistSession(localStorage, storageKeyRef.current, session);
+      setStorageError("");
+      channelRef.current?.postMessage(data);
+      return { ok: true, message: "Saved in this browser. Autosave stays on." };
+    } catch {
+      const message =
+        "Could not save in this browser. Export a backup before leaving.";
+      setStorageError(message);
+      return { ok: false, message };
+    }
+  }
   function navigate(stage: number) {
     setSession((s) => ({
       ...s,
@@ -270,6 +291,7 @@ export default function Workshop() {
       >
         Continue to current state →
       </button>
+      <SaveFooter />
     </section>
   );
   if (!loaded)
@@ -299,348 +321,357 @@ export default function Workshop() {
       </>
     );
   return (
-    <div className="workshop-app">
-      <header className="workshop-header">
-        <div className="workshop-brand">
-          <span className="brand-mark">↗</span>
-          <div>
-            <strong>The working session</strong>
-            <span>OpenAI × Adobe × Code and Theory</span>
+    <SaveContext.Provider
+      value={{ save: saveNow, revision: session, error: storageError }}
+    >
+      <div className="workshop-app">
+        <header className="workshop-header">
+          <div className="workshop-brand">
+            <span className="brand-mark">↗</span>
+            <div>
+              <strong>The working session</strong>
+              <span>OpenAI × Adobe × Code and Theory</span>
+            </div>
           </div>
-        </div>
-        <div className="header-actions">
-          <span className={`save-status ${storageError ? "unsaved" : ""}`}>
-            {storageError ? "Not saved" : "Saved in this browser"}
-          </span>
-          {!session.overview && (
-            <button
-              onClick={() => {
-                setPreview(false);
-                setSession((s) => ({
-                  ...s,
-                  overview: true,
-                  briefingPanel: 0,
-                  timer: { ...s.timer, remaining, runningSince: null },
-                }));
-              }}
-            >
-              00 · Workshop overview
-            </button>
-          )}
-          <button onClick={() => setPreview((v) => !v)}>
-            {preview ? "Return to capture" : "Preview room view"}
-          </button>
-          <button onClick={openRoom}>Open projector ↗</button>
-          {!demo && <button onClick={enterDemo}>Try demo data</button>}
-          <button
-            aria-expanded={toolsOpen}
-            onClick={() => setToolsOpen((v) => !v)}
-          >
-            Session tools
-          </button>
-        </div>
-      </header>
-      {demo && (
-        <div className="demo-banner">
-          <div>
-            <strong>Demo data · test anything here</strong>
-            <p>
-              Fictional priorities and step 2 answers for all seven use cases
-              are loaded. Your real workshop is untouched. Enter the workshop,
-              then explore step 2 or jump to architecture, the live build or
-              readout.
-            </p>
-          </div>
-          <div className="inline-actions">
-            <button
-              onClick={() => {
-                if (
-                  confirm(
-                    "Reset only the demo data and discard your demo edits?",
-                  )
-                ) {
-                  setSession(createDemoSession());
-                  setStorageError("");
-                  setPreview(false);
-                }
-              }}
-            >
-              Reset demo data
-            </button>
-            <button
-              onClick={() => window.location.assign(window.location.pathname)}
-            >
-              Return to real workshop
-            </button>
-          </div>
-        </div>
-      )}
-      {!session.overview && (
-        <>
-          <nav className="agenda-tabs" aria-label="Workshop agenda">
-            {stages.map((stage, i) => (
-              <button
-                key={stage.title}
-                aria-current={session.stage === i ? "step" : undefined}
-                className={session.stage === i ? "active" : ""}
-                onClick={() => {
-                  setPreview(false);
-                  navigate(i);
-                }}
-              >
-                <span className="agenda-number">0{i + 1}</span>
-                <span>
-                  <strong>{stage.title}</strong>
-                  <small>{stage.subtitle}</small>
-                </span>
-                <span className="agenda-time">{stage.minutes} min</span>
-              </button>
-            ))}
-          </nav>
-          <div className="facilitator-strip">
-            <span>
-              {session.stage < 2
-                ? "Today · establish and correct"
-                : "Proposed future · test and agree"}{" "}
-              <b> · </b> {activeCases(session).length} selected cases <b> · </b>{" "}
-              {selectionConfirmed(session)
-                ? "Working set confirmed"
-                : "Working set not confirmed"}
+          <div className="header-actions">
+            <span className={`save-status ${storageError ? "unsaved" : ""}`}>
+              {storageError ? "Not saved" : "Saved in this browser"}
             </span>
-            <div className="timer" aria-label="Agenda timer">
-              <span aria-live="off">
-                {Math.floor(remaining / 60)
-                  .toString()
-                  .padStart(2, "0")}
-                :{(remaining % 60).toString().padStart(2, "0")}
-              </span>
+            {!session.overview && (
               <button
                 onClick={() => {
-                  setClock(Date.now());
+                  setPreview(false);
                   setSession((s) => ({
                     ...s,
-                    timer: {
-                      ...s.timer,
-                      remaining: s.timer.runningSince
-                        ? remaining
-                        : s.timer.remaining,
-                      runningSince: s.timer.runningSince ? null : Date.now(),
-                    },
+                    overview: true,
+                    briefingPanel: 0,
+                    timer: { ...s.timer, remaining, runningSince: null },
                   }));
                 }}
               >
-                {session.timer.runningSince ? "Pause" : "Start timer"}
+                00 · Workshop overview
+              </button>
+            )}
+            <button onClick={() => setPreview((v) => !v)}>
+              {preview ? "Return to capture" : "Preview room view"}
+            </button>
+            <button onClick={openRoom}>Open projector ↗</button>
+            {!demo && <button onClick={enterDemo}>Try demo data</button>}
+            <button
+              aria-expanded={toolsOpen}
+              onClick={() => setToolsOpen((v) => !v)}
+            >
+              Session tools
+            </button>
+          </div>
+        </header>
+        {demo && (
+          <div className="demo-banner">
+            <div>
+              <strong>Demo data · test anything here</strong>
+              <p>
+                Fictional priorities and step 2 answers for all seven use cases
+                are loaded. Your real workshop is untouched. Enter the workshop,
+                then explore step 2 or jump to architecture, the live build or
+                readout.
+              </p>
+            </div>
+            <div className="inline-actions">
+              <button
+                onClick={() => {
+                  if (
+                    confirm(
+                      "Reset only the demo data and discard your demo edits?",
+                    )
+                  ) {
+                    setSession(createDemoSession());
+                    setStorageError("");
+                    setPreview(false);
+                  }
+                }}
+              >
+                Reset demo data
               </button>
               <button
-                onClick={() =>
-                  setSession((s) => ({
-                    ...s,
-                    timer: {
-                      stage: s.stage,
-                      remaining: stages[s.stage].minutes * 60,
-                      runningSince: null,
-                    },
-                  }))
-                }
+                onClick={() => window.location.assign(window.location.pathname)}
               >
-                Reset timer
+                Return to real workshop
               </button>
             </div>
-          </div>
-        </>
-      )}
-      {storageError && (
-        <p className="notice error" role="alert">
-          {storageError}
-        </p>
-      )}
-      {message && (
-        <p className="notice" role="status">
-          {message}
-          <button className="quiet" onClick={() => setMessage("")}>
-            Dismiss
-          </button>
-        </p>
-      )}
-      {toolsOpen && (
-        <section className="session-tools">
-          <div>
-            <h2>Keep the room moving.</h2>
-            <p>
-              Use one facilitator capture tab. Open the projector window in the
-              same browser profile and move it to the room screen. It follows
-              your current section and saved answers; it does not sync across
-              devices.
-            </p>
-            <div className="inline-actions">
-              <button onClick={() => download("json")}>
-                Export session backup
-              </button>
-              <button onClick={() => fileRef.current?.click()}>
-                Restore backup
-              </button>
-              <button onClick={() => download("md")}>Export readout</button>
-              <button onClick={() => window.print()}>
-                Print readout / PDF
-              </button>
-            </div>
-            <input
-              ref={fileRef}
-              type="file"
-              accept=".json,application/json"
-              hidden
-              onChange={(e) => importFile(e.target.files?.[0])}
-            />
-          </div>
-          <div>
-            <Field
-              label="Parking lot · questions for later"
-              multiline
-              value={session.parking}
-              onChange={(v) => setSession((s) => ({ ...s, parking: v }))}
-            />
-            <button
-              className="quiet danger"
-              onClick={() => {
-                if (
-                  confirm(
-                    "Clear the full workshop, including scores, decisions and drafts? Export a backup first.",
-                  )
-                ) {
-                  setSession(demo ? createDemoSession() : createSession());
-                  setStorageError("");
-                  setMessage("New workshop started.");
-                }
-              }}
-            >
-              {demo ? "Reset demo workshop" : "Start a fresh workshop"}
-            </button>
-          </div>
-        </section>
-      )}
-      {!session.overview &&
-        session.stage > 0 &&
-        !selectionConfirmed(session) && (
-          <div className="notice">
-            The working set needs confirmation. You can explore these sections,
-            but the readout will show the selection as proposed.{" "}
-            <button
-              onClick={() => {
-                navigate(0);
-                setSession((s) => ({ ...s, scene: 9 }));
-              }}
-            >
-              Return to selection
-            </button>
           </div>
         )}
-      {!session.overview && !preview && (
-        <WorkshopChapter stage={session.stage} />
-      )}
-      <div className="capture-content">
-        {preview ? (
-          <RoomView session={session} />
-        ) : session.overview ? (
-          <WorkshopOverview
-            session={session}
-            setSession={setSession}
-            onEnter={() => {
-              navigate(0);
-              setSession((s) => ({ ...s, scene: 0 }));
-            }}
-            onResume={() => setSession((s) => ({ ...s, overview: false }))}
-          />
-        ) : (
+        {!session.overview && (
           <>
-            {session.stage === 0 && (
-              <PriorityWorkshop
-                state={session.assessments}
-                setState={(action) =>
-                  setSession((s) => ({
-                    ...s,
-                    assessments:
-                      typeof action === "function"
-                        ? action(s.assessments)
-                        : action,
-                  }))
-                }
-                step={session.scene}
-                setStep={(n) => setSession((s) => ({ ...s, scene: n }))}
-                selection={selection}
-              />
-            )}{" "}
-            {session.stage === 1 && (
-              <CurrentState session={session} setSession={setSession} />
-            )}{" "}
-            {session.stage === 2 && (
-              <>
-                <div className="architecture-tabs">
-                  <button
-                    className={
-                      session.architectureTab === "map" ? "selected" : ""
-                    }
-                    onClick={() =>
-                      setSession((s) => ({ ...s, architectureTab: "map" }))
-                    }
-                  >
-                    Architecture & decisions
-                  </button>
-                  <button
-                    className={
-                      session.architectureTab === "lab" ? "selected" : ""
-                    }
-                    onClick={() =>
-                      setSession((s) => ({ ...s, architectureTab: "lab" }))
-                    }
-                  >
-                    Live build · content at scale
-                  </button>
-                  <small>
-                    The exercise sits within the 45-minute architecture block.
-                  </small>
-                </div>
-                {session.architectureTab === "map" ? (
-                  <Architecture session={session} setSession={setSession} />
-                ) : (
-                  <ContentLab session={session} setSession={setSession} />
-                )}
-              </>
-            )}{" "}
-            {session.stage === 3 && (
-              <>
-                <div className="readout-export">
-                  <button onClick={() => download("md")}>Export readout</button>
-                  <button onClick={() => window.print()}>
-                    Print / save PDF
-                  </button>
-                  <button onClick={() => download("json")}>
-                    Backup all inputs
-                  </button>
-                </div>
-                <WorkshopReadout session={session} setSession={setSession} />
-              </>
-            )}
+            <nav className="agenda-tabs" aria-label="Workshop agenda">
+              {stages.map((stage, i) => (
+                <button
+                  key={stage.title}
+                  aria-current={session.stage === i ? "step" : undefined}
+                  className={session.stage === i ? "active" : ""}
+                  onClick={() => {
+                    setPreview(false);
+                    navigate(i);
+                  }}
+                >
+                  <span className="agenda-number">0{i + 1}</span>
+                  <span>
+                    <strong>{stage.title}</strong>
+                    <small>{stage.subtitle}</small>
+                  </span>
+                  <span className="agenda-time">{stage.minutes} min</span>
+                </button>
+              ))}
+            </nav>
+            <div className="facilitator-strip">
+              <span>
+                {session.stage < 2
+                  ? "Today · establish and correct"
+                  : "Proposed future · test and agree"}{" "}
+                <b> · </b> {activeCases(session).length} selected cases{" "}
+                <b> · </b>{" "}
+                {selectionConfirmed(session)
+                  ? "Working set confirmed"
+                  : "Working set not confirmed"}
+              </span>
+              <div className="timer" aria-label="Agenda timer">
+                <span aria-live="off">
+                  {Math.floor(remaining / 60)
+                    .toString()
+                    .padStart(2, "0")}
+                  :{(remaining % 60).toString().padStart(2, "0")}
+                </span>
+                <button
+                  onClick={() => {
+                    setClock(Date.now());
+                    setSession((s) => ({
+                      ...s,
+                      timer: {
+                        ...s.timer,
+                        remaining: s.timer.runningSince
+                          ? remaining
+                          : s.timer.remaining,
+                        runningSince: s.timer.runningSince ? null : Date.now(),
+                      },
+                    }));
+                  }}
+                >
+                  {session.timer.runningSince ? "Pause" : "Start timer"}
+                </button>
+                <button
+                  onClick={() =>
+                    setSession((s) => ({
+                      ...s,
+                      timer: {
+                        stage: s.stage,
+                        remaining: stages[s.stage].minutes * 60,
+                        runningSince: null,
+                      },
+                    }))
+                  }
+                >
+                  Reset timer
+                </button>
+              </div>
+            </div>
           </>
         )}
-      </div>
-      <footer className="workshop-footer">
-        <span>Capture → read back → confirm · Unknowns stay visible</span>
-        {!session.overview && session.stage < 3 && (
-          <button onClick={() => navigate(session.stage + 1)}>
-            Next: {stages[session.stage + 1].title} →
-          </button>
-        )}
-      </footer>
-      <div className="print-only">
-        {demo && (
-          <p>
-            <strong>
-              DEMO DATA · Fictional test records. Not actual workshop findings.
-            </strong>
+        {storageError && (
+          <p className="notice error" role="alert">
+            {storageError}
           </p>
         )}
-        <WorkshopReadout session={session} room />
+        {message && (
+          <p className="notice" role="status">
+            {message}
+            <button className="quiet" onClick={() => setMessage("")}>
+              Dismiss
+            </button>
+          </p>
+        )}
+        {toolsOpen && (
+          <section className="session-tools">
+            <div>
+              <h2>Keep the room moving.</h2>
+              <p>
+                Use one facilitator capture tab. Open the projector window in
+                the same browser profile and move it to the room screen. It
+                follows your current section and saved answers; it does not sync
+                across devices.
+              </p>
+              <div className="inline-actions">
+                <button onClick={() => download("json")}>
+                  Export session backup
+                </button>
+                <button onClick={() => fileRef.current?.click()}>
+                  Restore backup
+                </button>
+                <button onClick={() => download("md")}>Export readout</button>
+                <button onClick={() => window.print()}>
+                  Print readout / PDF
+                </button>
+              </div>
+              <input
+                ref={fileRef}
+                type="file"
+                accept=".json,application/json"
+                hidden
+                onChange={(e) => importFile(e.target.files?.[0])}
+              />
+            </div>
+            <div>
+              <Field
+                label="Parking lot · questions for later"
+                multiline
+                value={session.parking}
+                onChange={(v) => setSession((s) => ({ ...s, parking: v }))}
+              />
+              <button
+                className="quiet danger"
+                onClick={() => {
+                  if (
+                    confirm(
+                      "Clear the full workshop, including scores, decisions and drafts? Export a backup first.",
+                    )
+                  ) {
+                    setSession(demo ? createDemoSession() : createSession());
+                    setStorageError("");
+                    setMessage("New workshop started.");
+                  }
+                }}
+              >
+                {demo ? "Reset demo workshop" : "Start a fresh workshop"}
+              </button>
+            </div>
+            <SaveFooter />
+          </section>
+        )}
+        {!session.overview &&
+          session.stage > 0 &&
+          !selectionConfirmed(session) && (
+            <div className="notice">
+              The working set needs confirmation. You can explore these
+              sections, but the readout will show the selection as proposed.{" "}
+              <button
+                onClick={() => {
+                  navigate(0);
+                  setSession((s) => ({ ...s, scene: 9 }));
+                }}
+              >
+                Return to selection
+              </button>
+            </div>
+          )}
+        {!session.overview && !preview && (
+          <WorkshopChapter stage={session.stage} />
+        )}
+        <div className="capture-content">
+          {preview ? (
+            <RoomView session={session} />
+          ) : session.overview ? (
+            <WorkshopOverview
+              session={session}
+              setSession={setSession}
+              onEnter={() => {
+                navigate(0);
+                setSession((s) => ({ ...s, scene: 0 }));
+              }}
+              onResume={() => setSession((s) => ({ ...s, overview: false }))}
+            />
+          ) : (
+            <>
+              {session.stage === 0 && (
+                <PriorityWorkshop
+                  state={session.assessments}
+                  setState={(action) =>
+                    setSession((s) => ({
+                      ...s,
+                      assessments:
+                        typeof action === "function"
+                          ? action(s.assessments)
+                          : action,
+                    }))
+                  }
+                  step={session.scene}
+                  setStep={(n) => setSession((s) => ({ ...s, scene: n }))}
+                  selection={selection}
+                />
+              )}{" "}
+              {session.stage === 1 && (
+                <CurrentState session={session} setSession={setSession} />
+              )}{" "}
+              {session.stage === 2 && (
+                <>
+                  <div className="architecture-tabs">
+                    <button
+                      className={
+                        session.architectureTab === "map" ? "selected" : ""
+                      }
+                      onClick={() =>
+                        setSession((s) => ({ ...s, architectureTab: "map" }))
+                      }
+                    >
+                      Architecture & decisions
+                    </button>
+                    <button
+                      className={
+                        session.architectureTab === "lab" ? "selected" : ""
+                      }
+                      onClick={() =>
+                        setSession((s) => ({ ...s, architectureTab: "lab" }))
+                      }
+                    >
+                      Live build · content at scale
+                    </button>
+                    <small>
+                      The exercise sits within the 45-minute architecture block.
+                    </small>
+                  </div>
+                  {session.architectureTab === "map" ? (
+                    <Architecture session={session} setSession={setSession} />
+                  ) : (
+                    <ContentLab session={session} setSession={setSession} />
+                  )}
+                </>
+              )}{" "}
+              {session.stage === 3 && (
+                <>
+                  <div className="readout-export">
+                    <button onClick={() => download("md")}>
+                      Export readout
+                    </button>
+                    <button onClick={() => window.print()}>
+                      Print / save PDF
+                    </button>
+                    <button onClick={() => download("json")}>
+                      Backup all inputs
+                    </button>
+                  </div>
+                  <WorkshopReadout session={session} setSession={setSession} />
+                </>
+              )}
+            </>
+          )}
+        </div>
+        <footer className="workshop-footer">
+          <span>Capture → read back → confirm · Unknowns stay visible</span>
+          {!session.overview && session.stage < 3 && (
+            <button onClick={() => navigate(session.stage + 1)}>
+              Next: {stages[session.stage + 1].title} →
+            </button>
+          )}
+        </footer>
+        <div className="print-only">
+          {demo && (
+            <p>
+              <strong>
+                DEMO DATA · Fictional test records. Not actual workshop
+                findings.
+              </strong>
+            </p>
+          )}
+          <WorkshopReadout session={session} room />
+        </div>
       </div>
-    </div>
+    </SaveContext.Provider>
   );
 }

@@ -1,3 +1,4 @@
+import SaveFooter from "./save-footer";
 import { useState, type Dispatch, type SetStateAction } from "react";
 import { type Session, type WorkflowReview } from "../lib/workshop";
 import {
@@ -259,6 +260,7 @@ export default function ArchitectureWalkthrough({
                 <p>Next: {r?.next || "Not captured"}</p>
               </>
             )}
+            {setSession && !room && <SaveFooter />}
           </article>
         </>
       ) : (

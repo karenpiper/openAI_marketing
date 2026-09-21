@@ -898,3 +898,82 @@ test("architecture prefills PDF proposals across all cases without overwriting e
   assert.equal(edited.workflowReviews[0].systems, "Legacy custom tool");
   assert.equal(f.workflowSystems(edited, "s3", 1).suggested, false);
 });
+
+test("manual and automatic saving use the same session snapshot and isolated storage keys; failures propagate", () => {
+  const { persistSession } = require("../lib/persistence.ts");
+  const { DEMO_SESSION_KEY } = require("../lib/demo-session.ts");
+  const saved = new Map();
+  const storage = { setItem: (key, data) => saved.set(key, data) };
+  const s = w.createSession();
+  s.attendees = "Workshop attendees";
+  s.draftDecisionTitle = "A question still being typed";
+  const before = JSON.stringify(s);
+  persistSession(storage, w.SESSION_KEY, s);
+  assert.equal(saved.get(w.SESSION_KEY), before);
+  s.assessments.s3.note = "Latest input";
+  persistSession(storage, DEMO_SESSION_KEY, s);
+  assert.equal(saved.get(w.SESSION_KEY), before);
+  assert.equal(
+    JSON.parse(saved.get(DEMO_SESSION_KEY)).assessments.s3.note,
+    "Latest input",
+  );
+  assert.equal(
+    w.parseSession(JSON.parse(saved.get(DEMO_SESSION_KEY))).draftDecisionTitle,
+    "A question still being typed",
+  );
+  assert.throws(
+    () =>
+      persistSession(
+        {
+          setItem: () => {
+            throw Error("Quota exceeded");
+          },
+        },
+        w.SESSION_KEY,
+        s,
+      ),
+    /Quota/,
+  );
+  assert.equal(s.assessments.s3.discussed, false);
+});
+
+test("data-entry sections expose save controls while read-only sections do not", () => {
+  const Save = require("../components/save-footer.tsx");
+  const s = require("../lib/demo-session.ts").createDemoSession();
+  const noop = () => {};
+  const modules = [
+    require("../components/workshop-overview.tsx").default,
+    require("../components/workshop-mapping.tsx").CurrentState,
+    require("../components/workshop-mapping.tsx").Architecture,
+    require("../components/content-lab.tsx").default,
+    require("../components/workshop-readout.tsx").default,
+  ];
+  for (const Comp of modules) {
+    const html = renderToStaticMarkup(
+      React.createElement(
+        Save.SaveContext.Provider,
+        {
+          value: {
+            save: () => ({ ok: true, message: "Saved" }),
+            revision: s,
+            error: "",
+          },
+        },
+        React.createElement(Comp, { session: s, setSession: noop }),
+      ),
+    );
+    assert.match(html, />Save<\/button>/);
+    assert.match(html, /Autosave is on/);
+  }
+  const noProvider = renderToStaticMarkup(React.createElement(Save.default));
+  assert.equal(noProvider, "");
+  const error = renderToStaticMarkup(
+    React.createElement(
+      Save.SaveContext.Provider,
+      { value: { save: noop, revision: s, error: "Storage unavailable" } },
+      React.createElement(Save.default),
+    ),
+  );
+  assert.match(error, /Storage unavailable/);
+  assert.ok(!error.includes("Autosave is on"));
+});

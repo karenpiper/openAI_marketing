@@ -1,3 +1,4 @@
+import SaveFooter from "./save-footer";
 import {
   useEffect,
   useRef,
@@ -299,6 +300,7 @@ export default function ContentLab({
           makes no product claims. Replacing the brief marks existing drafts
           outdated.
         </p>
+        <SaveFooter />
       </div>
       <h2 className="section-title">2. Who needs a different message?</h2>
       <div className="audience-grid">
@@ -342,6 +344,7 @@ export default function ContentLab({
               value={a.cta}
               onChange={(v) => audience(a.id, { cta: v })}
             />
+            <SaveFooter />
           </article>
         ))}
       </div>
@@ -489,6 +492,7 @@ export default function ContentLab({
               Created {new Date(d.createdAt).toLocaleTimeString()} ·{" "}
               {d.seconds.toFixed(1)}s to assemble this batch
             </small>
+            <SaveFooter />
           </article>
         ))}
       </div>
@@ -526,6 +530,7 @@ export default function ContentLab({
           effort; it does not establish business lift or production-scale
           reliability.
         </p>
+        <SaveFooter />
       </div>
     </section>
   );

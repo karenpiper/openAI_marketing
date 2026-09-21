@@ -1,3 +1,4 @@
+import SaveFooter from "./save-footer";
 import WorkshopGlyph from "./workshop-glyph";
 import { useEffect, type Dispatch, type SetStateAction } from "react";
 import { type Session, stages } from "../lib/workshop";
@@ -274,6 +275,7 @@ export default function WorkshopOverview({
             {s.attendees || "Attendees to be confirmed."}
           </p>
         )}
+        {setSession && <SaveFooter />}
         <footer className="briefing-footer">
           <div>
             <h2>Ready to meet Morgan?</h2>

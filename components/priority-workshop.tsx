@@ -1,4 +1,5 @@
 "use client";
+import SaveFooter from "./save-footer";
 import { type Dispatch, type SetStateAction, type ReactNode } from "react";
 import { useCases, axes, type NoRegret } from "../lib/workshop-data";
 import {
@@ -416,6 +417,7 @@ export default function PriorityWorkshop({
               </div>
             </div>
           )}
+          {current && <SaveFooter />}
           <nav className="scene-nav" aria-label="Workshop navigation">
             <button
               disabled={step === 0}

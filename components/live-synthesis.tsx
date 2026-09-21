@@ -1,3 +1,4 @@
+import SaveFooter from "./save-footer";
 import type { Dispatch, SetStateAction } from "react";
 import { type Session, type Synthesis } from "../lib/workshop";
 import {
@@ -188,6 +189,7 @@ export default function LiveSynthesis({
                 )}
               </>
             )}
+            {setSession && <SaveFooter />}
           </article>
         );
       })}

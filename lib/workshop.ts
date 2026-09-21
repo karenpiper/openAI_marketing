@@ -202,6 +202,7 @@ export type WorkflowReview = {
   source: string;
 };
 export type Session = {
+  draftDecisionTitle: string;
   briefingPanel: number;
   overview: boolean;
   attendees: string;
@@ -277,6 +278,7 @@ export function createSession(): Session {
   return {
     schema: 1,
     overview: true,
+    draftDecisionTitle: "",
     briefingPanel: 0,
     attendees: "",
     workflowReviews: [],
@@ -386,6 +388,7 @@ export function parseSession(raw: unknown): Session {
     throw Error("This is not a supported workshop backup.");
   const s = createSession();
   s.title = str(r.title, s.title);
+  s.draftDecisionTitle = str(r.draftDecisionTitle);
   s.overview = r.overview !== false;
   s.briefingPanel =
     typeof r.briefingPanel === "number" &&

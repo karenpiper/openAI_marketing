@@ -142,3 +142,9 @@ Step 0 is a scrolling visual story with five chapters, directional navigation an
 Each of the 35 workflow steps suggests the relevant system boxes from the internal architecture as an editable starting point. These are our proposed assignments, not statements that the PDF specifies a complete integration. Suggestions are labeled and remain proposed until the room reviews them. They also appear as suggested systems in the generated output. Owners, controls and handoffs are not invented from the diagram.
 
 Existing nonempty system entries are preserved. Editing or explicitly clearing a system field overrides its suggestion and survives reload. Suggestions are saved with the workflow when the facilitator captures an answer or decision; merely viewing a case does not create records or change the working set. Works in both real and demo sessions without resetting data.
+
+## Save controls
+
+Each data-entry section has a **Save** button as well as autosave: attendees, use-case notes/scores, working-set selection, current-state answers, live interpretations, workflow decisions, detailed architecture, source/audience/draft content, results, actions and session notes. Save writes the latest complete session to the same real/demo browser-local key and reports success or failure. It never confirms an answer or room decision. Print and projector views do not show capture controls.
+
+A failed storage write reports an error; manual Save can retry storage and resume autosave. An unreadable existing saved session is protected from overwrite until restored or explicitly reset. The unfinished “another decision” input is also persisted. The optional private AI access code remains deliberately ephemeral and is not saved.
