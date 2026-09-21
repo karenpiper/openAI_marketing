@@ -1,11 +1,16 @@
 import { type Session, activeCases, selectionConfirmed } from "./workshop";
 import { useCases } from "./workshop-data";
-import { workflows, workflowState } from "./architecture-workflow";
+import {
+  workflows,
+  workflowState,
+  workflowSystems,
+} from "./architecture-workflow";
 export type ArchitectureNode = {
   title: string;
   status: "Agreed" | "Proposed" | "Unresolved" | "Needs recheck";
   approach: string;
   systems: string;
+  systemsSuggested: boolean;
   owner: string;
   handoff: string;
   controls: string;
@@ -30,8 +35,9 @@ export function architectureOutput(s: Session) {
       proof: s.assessments[u.id].proofText,
       nodes: workflows[u.id].map((step, i): ArchitectureNode => {
         const { record: r, stale } = workflowState(s, u.id, i);
+        const systems = workflowSystems(s, u.id, i);
         const missing = [
-          ["Systems", r?.systems],
+          ["Systems", systems.unreviewed ? "" : systems.value],
           ["Owner", r?.owner],
           ["Handoff", r?.handoff],
           ["Controls", r?.controls],
@@ -59,7 +65,8 @@ export function architectureOutput(s: Session) {
           title: step.title,
           status,
           approach: r?.change.trim() || step.proposal,
-          systems: r?.systems || "Not decided",
+          systems: systems.value || "Not decided",
+          systemsSuggested: systems.suggested,
           owner: r?.owner || "Not assigned",
           handoff: r?.handoff || "Not captured",
           controls: r?.controls || "Not captured",

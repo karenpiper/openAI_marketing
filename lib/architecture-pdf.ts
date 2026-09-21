@@ -20,7 +20,7 @@ export function architectureDocument(s: Session): TDocumentDefinitions {
       style: "note",
     },
     {
-      text: "Arrows show workflow order, not implemented system integrations. Unreviewed steps retain our suggested process; undecided systems remain explicit.",
+      text: "Arrows show workflow order, not implemented system integrations. Unreviewed steps retain our suggested process; suggested systems remain proposals until reviewed.",
       style: "note",
     },
   ];
@@ -96,7 +96,12 @@ export function architectureDocument(s: Session): TDocumentDefinitions {
             widths: [85, "*"],
             body: [
               ["Approach", n.approach],
-              ["Systems / roles", n.systems],
+              [
+                n.systemsSuggested && n.status !== "Agreed"
+                  ? "Suggested systems"
+                  : "Systems / roles",
+                n.systems,
+              ],
               ["Owner", n.owner],
               ["Handoff", n.handoff],
               ["Controls", n.controls],

@@ -189,6 +189,7 @@ export type Lab = {
   status: Status;
 };
 export type WorkflowReview = {
+  systemsOrigin?: "Suggested" | "Room";
   systems: string;
   handoff: string;
   controls: string;
@@ -479,6 +480,9 @@ export function parseSession(raw: unknown): Session {
       ["Not reviewed", "Keep", "Change", "Unresolved"],
       "Not reviewed",
     ) as WorkflowReview["choice"],
+    ...(x.systemsOrigin === "Suggested" || x.systemsOrigin === "Room"
+      ? { systemsOrigin: x.systemsOrigin }
+      : {}),
     systems: str(x.systems),
     handoff: str(x.handoff),
     controls: str(x.controls),

@@ -308,6 +308,20 @@ export const workflows: Record<string, WorkflowStep[]> = {
     ),
   ],
 };
+export function suggestedSystems(caseId: string, index: number): string {
+  return workflows[caseId][index].boxes.map((key) => pdfBoxes[key]).join("\n");
+}
+export function workflowSystems(s: Session, caseId: string, index: number) {
+  const r = s.workflowReviews.find(
+    (r) => r.useCase === caseId && r.step === index,
+  );
+  const suggested = !r?.systemsOrigin && !r?.systems.trim();
+  return {
+    value: suggested ? suggestedSystems(caseId, index) : r!.systems,
+    suggested: suggested || r?.systemsOrigin === "Suggested",
+    unreviewed: suggested,
+  };
+}
 export function workflowSource(s: Session, caseId: string, index: number) {
   return JSON.stringify(
     workflows[caseId][index].sources.map(
@@ -331,18 +345,26 @@ export function reviewWorkflow(
   patch: Partial<Session["workflowReviews"][number]>,
 ): Session {
   const { record: r } = workflowState(s, caseId, index);
+  const systems = workflowSystems(s, caseId, index);
   const next = {
     useCase: caseId,
     step: index,
     choice: "Not reviewed" as const,
-    systems: "",
+    systems: suggestedSystems(caseId, index),
+    systemsOrigin: systems.suggested
+      ? ("Suggested" as const)
+      : ("Room" as const),
     handoff: "",
     controls: "",
     change: "",
     owner: "",
     next: "",
     ...r,
+    ...(systems.unreviewed
+      ? { systems: systems.value, systemsOrigin: "Suggested" as const }
+      : {}),
     ...patch,
+    ...("systems" in patch ? { systemsOrigin: "Room" as const } : {}),
     source: workflowSource(s, caseId, index),
   };
   return {

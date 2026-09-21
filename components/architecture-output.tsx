@@ -87,7 +87,11 @@ export default function ArchitectureOutput({
                 </div>
                 <p>{n.approach}</p>
                 <dl>
-                  <dt>Systems and roles</dt>
+                  <dt>
+                    {n.systemsSuggested && n.status !== "Agreed"
+                      ? "Suggested systems"
+                      : "Systems and roles"}
+                  </dt>
                   <dd className="preserve-lines">{n.systems}</dd>
                   <dt>Owner</dt>
                   <dd>{n.owner}</dd>

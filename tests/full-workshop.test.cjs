@@ -813,8 +813,9 @@ test("architecture output uses room systems, preserves revisions and flags incom
   s.selected = ["s3"];
   let nodes = architectureOutput(s).cases[0].nodes;
   assert.equal(nodes[0].status, "Proposed");
-  assert.equal(nodes[0].systems, "Not decided");
-  assert.ok(!JSON.stringify(nodes).includes("Adobe CSC"));
+  assert.match(nodes[0].systems, /OpenAI Data Lake/);
+  assert.equal(nodes[0].systemsSuggested, true);
+  assert.ok(JSON.stringify(nodes).includes("Adobe CSC"));
   s = reviewWorkflow(s, "s3", 0, { choice: "Keep" });
   assert.equal(architectureOutput(s).cases[0].nodes[0].status, "Unresolved");
   s = reviewWorkflow(s, "s3", 0, {
@@ -853,10 +854,47 @@ test("generated architecture PDF includes captured systems and open decisions, a
   assert.match(text, /UNRESOLVED/);
   assert.match(text, /PROPOSED/);
   assert.match(text, /Shared decisions and open questions/);
-  assert.ok(!text.includes("Adobe CDP"));
+  assert.ok(text.includes("Adobe CDP"));
+  assert.match(text, /Suggested systems/);
   const pdf = await architecturePdf(s);
   const bytes = await new Promise((resolve) => pdf.getBuffer(resolve));
   assert.equal(Buffer.from(bytes).subarray(0, 5).toString(), "%PDF-");
   assert.ok(bytes.length > 10000);
   fs.writeFileSync("/tmp/workshop-architecture-demo.pdf", bytes);
+});
+
+test("architecture prefills PDF proposals across all cases without overwriting entered or cleared systems", () => {
+  const f = require("../lib/architecture-workflow.ts");
+  let s = w.createSession();
+  for (const c of useCases)
+    for (let i = 0; i < 5; i++) {
+      const systems = f.workflowSystems(s, c.id, i);
+      assert.ok(systems.value.length > 0);
+      assert.equal(systems.suggested, true);
+      assert.equal(systems.unreviewed, true);
+    }
+  assert.equal(s.workflowReviews.length, 0);
+  s = f.reviewWorkflow(s, "s3", 1, { owner: "Content owner" });
+  assert.match(s.workflowReviews[0].systems, /Adobe CSC/);
+  assert.equal(s.workflowReviews[0].choice, "Not reviewed");
+  s = f.reviewWorkflow(s, "s3", 1, { systems: "Our existing library" });
+  assert.equal(f.workflowSystems(s, "s3", 1).value, "Our existing library");
+  assert.equal(f.workflowSystems(s, "s3", 1).suggested, false);
+  s = f.reviewWorkflow(s, "s3", 1, { systems: "" });
+  assert.equal(f.workflowSystems(s, "s3", 1).value, "");
+  assert.equal(
+    f.workflowSystems(w.parseSession(JSON.parse(JSON.stringify(s))), "s3", 1)
+      .value,
+    "",
+  );
+  const legacy = {
+    ...s,
+    workflowReviews: [
+      { ...s.workflowReviews[0], systems: "Legacy custom tool" },
+    ],
+  };
+  delete legacy.workflowReviews[0].systemsOrigin;
+  const edited = f.reviewWorkflow(legacy, "s3", 1, { owner: "New owner" });
+  assert.equal(edited.workflowReviews[0].systems, "Legacy custom tool");
+  assert.equal(f.workflowSystems(edited, "s3", 1).suggested, false);
 });

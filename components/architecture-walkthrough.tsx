@@ -3,6 +3,7 @@ import { type Session, type WorkflowReview } from "../lib/workshop";
 import {
   workflows,
   workflowState,
+  workflowSystems,
   reviewWorkflow,
 } from "../lib/architecture-workflow";
 import {
@@ -17,6 +18,7 @@ export function WorkflowSummary({ session: s }: { session: Session }) {
     <>
       {workflows[s.focus].map((step, i) => {
         const { record: r, stale } = workflowState(s, s.focus, i);
+        const systems = workflowSystems(s, s.focus, i);
         return (
           <article className="capture-card" key={i}>
             <h3>
@@ -42,7 +44,7 @@ export function WorkflowSummary({ session: s }: { session: Session }) {
               <b>Next decision or action:</b> {r?.next || "Not captured"}
             </p>
             <p>
-              <b>Systems:</b> {r?.systems || "Not decided"}
+              <b>Systems:</b> {systems.value || "Not decided"}
             </p>
             <p>
               <b>Handoff:</b> {r?.handoff || "Not captured"}
@@ -73,6 +75,10 @@ export default function ArchitectureWalkthrough({
     index < 5
       ? workflowState(s, s.focus, index)
       : { record: undefined, stale: false };
+  const systems =
+    index < 5
+      ? workflowSystems(s, s.focus, index)
+      : { value: "", suggested: false };
   const update = (patch: Partial<WorkflowReview>) =>
     setSession?.((p) => reviewWorkflow(p, s.focus, index, patch));
   const navigate = (architecture: number) =>
@@ -149,8 +155,9 @@ export default function ArchitectureWalkthrough({
                 step.
               </p>
               <p>
-                No system is assigned until the room names it. “Not decided” is
-                a useful answer.
+                We’ve pre-filled a starting system proposal for this step.
+                Confirm it, replace it with your existing tools, or leave it
+                unresolved.
               </p>
             </article>
           </div>
@@ -192,10 +199,16 @@ export default function ArchitectureWalkthrough({
                     update({ change, choice: "Not reviewed" })
                   }
                 />
+                <p className="muted">
+                  {systems.suggested
+                    ? "Suggested systems · our initial architecture thinking, for the room to review."
+                    : "Systems captured by the room."}{" "}
+                  Ownership, integration and approvals still need agreement.
+                </p>
                 <Field
                   label="Which systems or tools should do this work?"
                   multiline
-                  value={r?.systems || ""}
+                  value={systems.value}
                   placeholder="Name each tool and its role, or record what is not decided."
                   onChange={(systems) =>
                     update({ systems, choice: "Not reviewed" })
@@ -239,7 +252,7 @@ export default function ArchitectureWalkthrough({
             ) : (
               <>
                 <p>{r?.change}</p>
-                <p>Systems: {r?.systems || "Not decided"}</p>
+                <p>Systems: {systems.value || "Not decided"}</p>
                 <p>Handoff: {r?.handoff || "Not captured"}</p>
                 <p>Controls: {r?.controls || "Not captured"}</p>
                 <p>Owner: {r?.owner || "Not assigned"}</p>

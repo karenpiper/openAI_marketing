@@ -115,7 +115,7 @@ Architecture places the relevant source answers beside each proposed workflow st
 
 ## Step 3 proposal walkthrough
 
-All seven use cases have five prepared workflow steps. Content at scale moves through audience needs → approved source → variants → review → delivery and learning. The workflow is our facilitation proposal. Systems and responsibilities come from the room’s captured answers. Nothing is pre-agreed in real sessions. Fresh demo sessions illustrate Keep, Change and Unresolved; use Reset demo data to load those new example decisions into an existing demo session.
+All seven use cases have five prepared workflow steps. Content at scale moves through audience needs → approved source → variants → review → delivery and learning. The workflow is our facilitation proposal. Systems begin with editable proposals from our internal architecture. Responsibilities and final assignments come from the room’s answers. Nothing is pre-agreed in real sessions. Fresh demo sessions illustrate Keep, Change and Unresolved; use Reset demo data to load those new example decisions into an existing demo session.
 
 Workflow decisions persist in the same local session, JSON backup, projected view, printed readout and Markdown export. Existing detailed architecture records remain available and are never replaced by the walkthrough. These choices document workshop direction; they do not provision systems or execute integrations.
 
@@ -132,6 +132,13 @@ Step 0 is the sole home of **What we heard** and the four background decision su
 
 The readout’s **Download architecture PDF** builds a fresh document locally in the browser from current workshop data. No server upload, API key or print dialog is required. It includes selected and discussed workflows (unselected cases are marked), captured systems and roles, handoffs, controls, additional architecture notes and shared decisions. Agreed requires an explicit Keep/Change decision plus captured systems, owner, handoff and controls; incomplete choices remain unresolved, untouched steps remain proposed, and changed source evidence requires rechecking. A Change without a replacement is unresolved. The on-screen view uses the same model. This is the architecture discussed, not a claim of implemented integrations.
 
-The PDF library and embedded Roboto fonts load only when requested. Automated tests generate and inspect a real PDF; the demo output has also been rendered for pagination review. Existing backups without new fields import with blank architecture details rather than inferred systems.
+The PDF library and embedded Roboto fonts load only when requested. Automated tests generate and inspect a real PDF; the demo output has also been rendered for pagination review. Existing backups retain entered systems; empty system fields show editable proposals. Named owners, controls and handoffs remain for the room to establish.
 
 Step 0 is a scrolling visual story with five chapters, directional navigation and no collapsed content. The current chapter follows to the projector. An original generated collage anchors the opening; local SVG activity drawings and paper-style capture cards extend the visual language across the workshop. Reduced-motion preferences are respected. Generated asset: `public/images/workshop-collage.png`; the pre-existing `workshop-team.jpg` is not used or modified.
+
+
+## Architecture system prefills
+
+Each of the 35 workflow steps suggests the relevant system boxes from the internal architecture as an editable starting point. These are our proposed assignments, not statements that the PDF specifies a complete integration. Suggestions are labeled and remain proposed until the room reviews them. They also appear as suggested systems in the generated output. Owners, controls and handoffs are not invented from the diagram.
+
+Existing nonempty system entries are preserved. Editing or explicitly clearing a system field overrides its suggestion and survives reload. Suggestions are saved with the workflow when the facilitator captures an answer or decision; merely viewing a case does not create records or change the working set. Works in both real and demo sessions without resetting data.
