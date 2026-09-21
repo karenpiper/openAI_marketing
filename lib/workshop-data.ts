@@ -1,141 +1,241 @@
+// Verbatim content extracted from reference/claude-workshop.html. Proof prompts are the V1 addition.
 export type NoRegret = "yes" | "unsure" | "no";
-export type Confidence = "confirmed" | "hypothesis" | "open";
-
-export type UseCase = {
-  id: string;
-  time: string;
-  short: string;
-  title: string;
-  dayMoment: string;
-  problem: string;
-  evidence: string;
-  confidence: Confidence;
-  growthOutcome: string;
-  productivityOutcome: string;
-  question: string;
-  proofPrompt: string;
-  dependency: string;
-  noRegret: NoRegret;
-};
-
-export const useCases: UseCase[] = [
+export const useCases = [
   {
-    id: "scale-test",
+    id: "s1",
     time: "8:15 AM",
-    short: "Scale test",
+    frac: 0.06,
+    chapter: "Stop 1",
     title: "The scale test",
-    dayMoment: "The current motion works when the unit is one buyer. Enterprise introduces a group.",
-    problem: "We do not yet know whether the one-buyer motion holds when the decision involves an 18-person buying group.",
-    evidence: "Confirmed: cohort identification and launching work today for SMB / single-buyer motion. Buying-group scale is not yet proven.",
-    confidence: "confirmed",
-    growthOutcome: "Progress larger enterprise opportunities",
-    productivityOutcome: "Campaigns per marketer without new headcount",
-    question: "Where does the current motion actually start to break: more people in the group, more accounts at once, or both?",
-    proofPrompt: "Prove that a coordinated motion can work when the unit of action is a buying group, not one buyer.",
-    dependency: "Depends on Decision 4: where buying-group and identity data lives.",
-    noRegret: "unsure"
+    narrative:
+      "Morgan's team already has something that works: spot one interested person, send them something relevant. That's solved for a single buyer. This morning, though, the account showing interest isn't one person — it's eighteen people at Global Financial Group, spread across security, compliance and IT, with four new faces just this week.",
+    problem:
+      "We don't actually know if today's approach holds up once “the right person” becomes a whole group of people.",
+    evidence:
+      "OpenAI told Adobe directly: the one-buyer version already works. What's untested is a whole buying group.",
+    kpiGrowth: "Reaching the biggest deals",
+    kpiProd: "Campaigns per marketer, without new hires",
+    question:
+      "Where does it actually start to break — more people in the group, more accounts at once, or both?",
+    dependsOn:
+      "Decision 4 — where buying-group and identity data lives. Everything about acting on a group instead of one buyer needs this answered first.",
+    noRegretDefault: "unsure",
+    proofPrompt:
+      "Prove that a coordinated motion can work when the unit of action is a buying group, not one buyer.",
   },
   {
-    id: "next-action",
+    id: "s2",
     time: "9:30 AM",
-    short: "Next action",
+    frac: 0.18,
+    chapter: "Stop 2",
     title: "Knowing what to do next",
-    dayMoment: "The audience is known. The next move is not.",
-    problem: "The right people can be found, but nothing consistently tells the marketer what to do about that signal.",
-    evidence: "Confirmed directly in OpenAI feedback: the named gap is knowing which action to take.",
-    confidence: "confirmed",
-    growthOutcome: "Move demand toward pipeline faster",
-    productivityOutcome: "Time from idea to in-market",
-    question: "How does someone decide what to do next today: playbook, prior performance, human judgment, or something else?",
-    proofPrompt: "Prove that a recommendation is useful enough for a marketer to act on, and explainable enough to trust.",
-    dependency: "No blocking dependency among the four open decisions. The detail still needs to be validated in the room.",
-    noRegret: "yes"
+    narrative:
+      "The system tells Morgan: these eighteen people are worth paying attention to. Good to know — but it doesn't tell her what to actually do about it. Send an email? Set up a meeting? Loop in sales? Right now, nothing helps her make that call.",
+    problem:
+      "Even once the right people are identified, deciding what to actually do next isn't solved.",
+    evidence:
+      "This is the exact gap OpenAI named: finding the right people works, deciding the next move doesn't.",
+    kpiGrowth: "Moving deals forward faster",
+    kpiProd: "Time from idea to something live in-market",
+    question:
+      "Today, how does someone actually decide what to do next — a playbook, gut instinct, or nothing consistent?",
+    dependsOn:
+      "None of the four — this is reasoning inside tools OpenAI already owns outright.",
+    noRegretDefault: "yes",
+    proofPrompt:
+      "Prove that a recommendation is useful enough for a marketer to act on, and explainable enough to trust.",
   },
   {
-    id: "content-ready",
+    id: "s3",
     time: "10:30 AM",
-    short: "Content ready",
+    frac: 0.3,
+    chapter: "Stop 3",
     title: "Do you even have something to send?",
-    dayMoment: "A marketer may know the move before knowing whether approved content exists to make it.",
-    problem: "Especially at first touch, the right approved content may not exist, or may be hard to find.",
-    evidence: "Confirmed directly in OpenAI feedback: approved content availability is a named gap, particularly top-of-funnel.",
-    confidence: "confirmed",
-    growthOutcome: "Create more effective first-touch demand",
-    productivityOutcome: "Campaigns per marketer without new headcount",
-    question: "When this breaks today, is the bigger issue that the content does not exist, or that it exists and nobody can find or reuse it?",
-    proofPrompt: "Prove that the team can quickly determine what approved content exists, what is reusable, and what is genuinely missing.",
-    dependency: "Mostly no blocking dependency. Decision 2 may affect where content governance ultimately lives.",
-    noRegret: "yes"
+    narrative:
+      "Say Morgan knows what to do: reach the security team. Does she already have something good to send them? For a familiar topic, probably. For the very first message to a brand-new type of contact, probably not.",
+    problem:
+      "Even with the right move identified, something worth sending often doesn't exist yet — especially for a first message to someone new.",
+    evidence:
+      "OpenAI said this directly: the content doesn't exist yet, especially for first-touch outreach.",
+    kpiGrowth: "New pipeline from first contact",
+    kpiProd: "Campaigns per marketer, without new hires",
+    question:
+      "When this breaks down, is it because nothing exists — or because it exists and nobody can find it?",
+    dependsOn:
+      "Mostly none — building the library doesn't need to wait, though Decision 2 (who owns content governance long-term) could still shift where it lives.",
+    noRegretDefault: "yes",
+    proofPrompt:
+      "Prove that the team can quickly determine what approved content exists, what is reusable, and what is genuinely missing.",
   },
   {
-    id: "out-the-door",
+    id: "s4",
     time: "12:00 PM",
-    short: "Out the door",
+    frac: 0.42,
+    chapter: "Stop 4",
     title: "Getting it out the door",
-    dayMoment: "Assume the audience, action and content are ready. The remaining question is how long launch still takes.",
-    problem: "Approval, assembly and handoffs may still slow a ready campaign before it reaches market.",
-    evidence: "Hypothesis to test. This was not named as clearly as the content and next-action gaps.",
-    confidence: "hypothesis",
-    growthOutcome: "Reduce lost momentum between signal and activation",
-    productivityOutcome: "Time from idea to in-market",
-    question: "When everything needed already exists, how long does it actually take to get something out today, and where does that time go?",
-    proofPrompt: "Determine whether launch latency is a material problem after content and direction are no longer bottlenecks.",
-    dependency: "Related to Decision 3: how approvals actually get enforced.",
-    noRegret: "unsure"
+    narrative:
+      "The content exists this time. Morgan still has to pull the right list of people, get it approved, and get it sent — and every hour it sits in review is an hour the moment goes cold.",
+    problem:
+      "Even when everything needed already exists, getting it out the door still takes days, not hours.",
+    evidence:
+      "This one wasn't named directly — worth checking if it's still true once content and direction aren't the bottleneck.",
+    kpiGrowth: "Faster-moving deals",
+    kpiProd: "Time from idea to something live in-market",
+    question:
+      "When everything you need already exists, how long does it really take to get something out today?",
+    dependsOn:
+      "Decision 3 — how approvals actually get enforced. Faster shipping only works if there's one defined path to “yes.”",
+    noRegretDefault: "unsure",
+    proofPrompt:
+      "Determine whether launch latency is a material problem after content and direction are no longer bottlenecks.",
   },
   {
-    id: "ask-mops",
+    id: "s5",
     time: "1:30 PM",
-    short: "Routine requests",
+    frac: 0.55,
+    chapter: "Stop 5",
     title: "The easy question that waits in line",
-    dayMoment: "Routine MOPS work competes for attention with work that requires genuine judgment.",
-    problem: "Simple, low-judgment requests can wait in the same queue as genuinely hard ones.",
-    evidence: "Confirmed direction: harden the SMB / marketing-operations work already underway and include a no-regrets set.",
-    confidence: "confirmed",
-    growthOutcome: "Get more useful marketing activity through the system",
-    productivityOutcome: "Campaigns per marketer without new headcount",
-    question: "How much of the current MOPS queue is repeatable work versus a real judgment call?",
-    proofPrompt: "Prove that a routine request can move from intake to completion with materially fewer specialist touches.",
-    dependency: "No blocking dependency among the four open decisions. This is explicitly tied to work already underway.",
-    noRegret: "yes"
+    narrative:
+      "A message lands asking: can we email the people who signed up for the webinar but didn't show? It's not a hard call. But it still sits behind harder problems, because there aren't enough people to clear even the easy ones quickly.",
+    problem:
+      "Simple, low-judgment requests wait in the same queue as genuinely hard ones.",
+    evidence: "This is the work Matt explicitly asked us to fix first.",
+    kpiGrowth: "More campaigns getting through",
+    kpiProd: "Campaigns per marketer, without new hires",
+    question:
+      "How much of what lands in that queue is actually routine, versus a real judgment call?",
+    dependsOn:
+      "None of the four — this is explicitly the work already underway that Matt asked us to harden first.",
+    noRegretDefault: "yes",
+    proofPrompt:
+      "Prove that a routine request can move from intake to completion with materially fewer specialist touches.",
   },
   {
-    id: "human-step-in",
+    id: "s6",
     time: "3:30 PM",
-    short: "Human judgment",
+    frac: 0.72,
+    chapter: "Stop 6",
     title: "The moment a person has to step in",
-    dayMoment: "Some marketing moments are routine. Others carry enough relationship or brand risk to require human judgment.",
-    problem: "The team needs confidence that automation will not act badly in a sensitive, high-stakes moment.",
-    evidence: "Confirmed concern, but the exact high-stakes boundaries still need to be defined with the operators.",
-    confidence: "open",
-    growthOutcome: "Protect high-value relationships and trust",
-    productivityOutcome: "Trust / risk outcome, rather than forcing a productivity KPI",
-    question: "Where do you most worry about something going out that a person should have caught first?",
-    proofPrompt: "Define the moments where human judgment changes the outcome, and the minimum control needed around them.",
-    dependency: "Depends on Decision 3: how approvals and control points get enforced.",
-    noRegret: "no"
+    narrative:
+      "A message comes in from a name Morgan recognizes — someone senior at a major account. This isn't a moment that should be handled the same automatic way as everything else.",
+    problem:
+      "There's real concern that broader automation could act badly in a sensitive, high-stakes moment.",
+    evidence:
+      "That concern already shapes how carefully teams behave today — it isn't hypothetical.",
+    kpiGrowth: "Protecting the relationships that matter most",
+    kpiProd: "Not a productivity metric — this one is about trust",
+    question:
+      "Where do you most worry about something going out that a person should have caught first?",
+    dependsOn:
+      "Decision 3 — how approvals get enforced. This is the sharpest version of that question: what counts as high-stakes, and who has to sign off.",
+    noRegretDefault: "no",
+    proofPrompt:
+      "Define the moments where human judgment changes the outcome, and the minimum control needed around them.",
   },
   {
-    id: "learning-loop",
-    time: "4:30 PM",
-    short: "Learning loop",
+    id: "s7",
+    time: "6:00 PM",
+    frac: 0.9,
+    chapter: "Stop 7",
     title: "Learning from today",
-    dayMoment: "Execution produces data. The unresolved question is whether that learning changes the next decision quickly enough.",
-    problem: "Outcomes do not consistently reshape the next plan in a fast learning loop.",
-    evidence: "Problem is in the candidate set, but the exact current cadence and ownership need validation in the room.",
-    confidence: "hypothesis",
-    growthOutcome: "Improve performance across successive campaigns",
-    productivityOutcome: "Time from execution to knowing what worked",
-    question: "How quickly does what happened today change what you do next: same day, weekly, monthly, or only when someone investigates?",
-    proofPrompt: "Prove that campaign outcomes can be turned into a useful next decision quickly enough to change behavior.",
-    dependency: "Related to Decision 2: stack ownership across measurement and attribution.",
-    noRegret: "unsure"
-  }
+    narrative:
+      "It's evening. Today's outreach got opened, got a click, got one reply. Tomorrow's plan doesn't actually reflect any of that yet.",
+    problem: "What happens today rarely changes what gets planned tomorrow.",
+    evidence: "Today, that kind of check-in happens monthly, if that.",
+    kpiGrowth: "Getting better results over time, not just once",
+    kpiProd: "Time from doing something to knowing if it worked",
+    question:
+      "Do you actually change tomorrow's plan based on today's results — or is that a monthly review, at best?",
+    dependsOn: "Decision 2 — who owns measurement and attribution long-term.",
+    noRegretDefault: "unsure",
+    proofPrompt:
+      "Prove that campaign outcomes can be turned into a useful next decision quickly enough to change behavior.",
+  },
 ];
-
-export const productivityMetrics = [
-  "Campaigns per marketer without new headcount",
-  "Rep time shifted from research to selling",
-  "Time from idea to in-market",
-  "Time from execution to knowing what worked"
+export type UseCase = (typeof useCases)[number];
+export const heard = [
+  {
+    q: "Finding the right people to target, and sending something to them — that part already works.",
+    a: "That's why the first stop today doesn't test whether this works at all. It tests whether it still holds up once “the right person” becomes a whole group.",
+  },
+  {
+    q: "What's missing is knowing what to actually do next.",
+    a: "That's the second stop, word for word.",
+  },
+  {
+    q: "And whether something good already exists to send — especially the very first message to someone new.",
+    a: "That's the third stop.",
+  },
+  {
+    q: "Productivity has to be something we measure directly — not a side effect.",
+    a: "That's why every stop today carries two outcomes, not one: a growth number, and a productivity number — campaigns per marketer, rep time shifted to selling, time from idea to in-market, time from doing something to knowing if it worked.",
+  },
+  {
+    q: "Start with the work already underway, and tell us what can move now versus what has to wait on bigger decisions.",
+    a: "That's why every stop also gets a plain yes / no / not sure — measured against the four open decisions below, not left abstract.",
+  },
 ];
+export const decisions = [
+  {
+    num: 1,
+    t: "Whose data is the system of record",
+    q: "When OpenAI's product data and Adobe's marketing data describe the same account or person, which one wins — and does Adobe get its own copy, or read OpenAI's directly?",
+    known:
+      "Adobe has committed in writing: “we work from your data and your computed signals… we are not proposing a second source of truth.” Adobe is telemetry ingress and an execution layer, not a rival database.",
+    open: "The specifics of the connection — direct read, zero-copy, or periodic sync. That's what Tuesday works through.",
+  },
+  {
+    num: 2,
+    t: "Who owns which piece of the stack",
+    q: "For each layer — content, activation, measurement, governance — is that OpenAI's to build, Adobe's to run, or shared?",
+    known:
+      "OpenAI keeps intelligence, reasoning and attribution. Adobe brings identity, activation infrastructure and content-governance tooling.",
+    open: "The exact line, layer by layer — including judgment calls in between, like whether content-approval logic is a reasoning problem OpenAI owns or a workflow Adobe runs.",
+  },
+  {
+    num: 3,
+    t: "How approvals actually get enforced",
+    q: "Does every campaign run through one defined, governed workflow with a specific tool and an audit trail — or does it stay person-to-person, the way most of it is today?",
+    known:
+      "Adobe is proposing a defined, policy-gated system, not case-by-case judgment.",
+    open: "Whether OpenAI wants that formalized now, or wants to stay lightweight while the rest of this is still being proven out.",
+  },
+  {
+    num: 4,
+    t: "Where buying-group and identity data lives",
+    q: "When you need to know who's actually in a buying group and what their role is, whose system answers that — an OpenAI-native graph, or an Adobe system like Real-Time CDP B2B?",
+    known:
+      "Nothing's decided. OpenAI's current SMB motion doesn't need this today, because it only deals with one buyer at a time.",
+    open: "Almost entirely open — and it's the single biggest thing Stop 1 depends on.",
+  },
+];
+export const axes = [
+  {
+    key: "frequency",
+    label: "How often does this happen?",
+    hint: "Every day, or hardly ever?",
+    lo: "Rare",
+    hi: "Constant",
+  },
+  {
+    key: "severity",
+    label: "How much does it cost when it happens?",
+    hint: "A minor annoyance, or something that kills a deal?",
+    lo: "Minor annoyance",
+    hi: "Deal-breaking",
+  },
+  {
+    key: "evidence",
+    label: "How sure are we?",
+    hint: "Are we guessing, or do we actually know this is true?",
+    lo: "Just a guess",
+    hi: "We heard this directly",
+  },
+  {
+    key: "leverage",
+    label: "How much it matters",
+    hint: "If we fix it, does it help the biggest deals and the path to IPO?",
+    lo: "Nice to have",
+    hi: "One of the biggest bets",
+  },
+] as const;
