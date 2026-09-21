@@ -1,3 +1,5 @@
+import { processState, processDigest } from "./process-state";
+import type { ProcessState } from "./process-state";
 import { createSession, parseSession, type Session } from "./workshop";
 export const AGENT_KEY = "oai-agent-workspace-v1";
 export const availability = [
@@ -120,6 +122,7 @@ export type Finding = {
   decision: string;
 };
 export type AgentState = {
+  process?: Record<string, ProcessState>;
   campaign?: { objective: string; instruction: string };
   artifactEdits?: Record<
     string,
@@ -280,6 +283,26 @@ export function restoreAgentState(raw: unknown): AgentState {
         base.artifactEdits[key] = rows;
     }
   }
+  if (r.process && typeof r.process === "object") {
+    base.process = {};
+    for (const [key, p] of Object.entries(r.process)) {
+      if (
+        p &&
+        typeof p.status === "string" &&
+        typeof p.choice === "string" &&
+        typeof p.note === "string" &&
+        typeof p.owner === "string" &&
+        Number.isInteger(p.version) &&
+        p.version > 0 &&
+        p.reviewers &&
+        typeof p.reviewers === "object" &&
+        Object.values(p.reviewers).every((v) => typeof v === "string") &&
+        Array.isArray(p.events) &&
+        p.events.every((e) => typeof e === "string")
+      )
+        base.process[key] = p;
+    }
+  }
   base.architecture = parseSession(r.architecture);
   return base;
 }
@@ -358,7 +381,7 @@ export function agentReadout(s: AgentState) {
         return `## ${c.title} — ${f.priority}\n\nBusiness outcome: ${f.businessOutcome || "Not captured"}\n\nProcess: ${f.process}\n\n${c.inputs.map(([label]) => `- ${label}: ${f.capabilities[label] || "Unknown"}`).join("\n")}\n\nRoom finding: ${f.note || "Not captured"}\n\nProve: ${f.proof}\n\nDecision / dependency: ${f.decision || "Not captured"}\n\nOwner: ${f.owner || "Unassigned"}`;
       })
       .join("\n\n") +
-    `\n\n## Colin readout\n\nOwnership: ${s.architecture.closing.ownership || "Not agreed"}\n\nOpen decisions: ${s.architecture.closing.open || "Not captured"}\n\nSequence: ${s.architecture.closing.sequence || "Not captured"}\n\nColin asks: ${s.architecture.closing.colin || "Not captured"}`
+    `\n\n## Workflow activity\n${processDigest(s) || "No decisions recorded yet."}\n\n## Colin readout\n\nOwnership: ${s.architecture.closing.ownership || "Not agreed"}\n\nOpen decisions: ${s.architecture.closing.open || "Not captured"}\n\nSequence: ${s.architecture.closing.sequence || "Not captured"}\n\nColin asks: ${s.architecture.closing.colin || "Not captured"}`
   );
 }
 
@@ -400,7 +423,7 @@ export function advanceDay(s: AgentState, chapterIndex: number): AgentState {
       ? "Morgan chose the 12-account adoption opportunity. The agent will prepare an audience-specific plan."
       : chapterIndex === 1
         ? `Morgan approved the proposed plan: ${s.audience}; ${s.channel}; ${s.source}. Required reviews still precede release.`
-        : "Morgan chose to hold the contact with conflicting consent and escalate to the data owner. Eligible contacts still require release approval.";
+        : `Morgan’s containment decision: ${processState(s, "s5", 1).choice || "Not recorded"}. Owner: ${processState(s, "s5", 1).owner || "Unassigned"}. ${processState(s, "s5", 2).events.at(-1) || "Connector acknowledgement not recorded."}`;
   return {
     ...s,
     outcomes: { ...s.outcomes, [c.id]: text },

@@ -16,7 +16,8 @@ import {
 } from "../lib/agent-workspace";
 import { WorkflowWork, WorkflowRequirements } from "./workflow-work";
 import { CampaignEditor } from "./campaign-editor";
-import { workSignature } from "../lib/workflow-work";
+import { processKey } from "../lib/process-state";
+import { currentWorkStep, workSignature } from "../lib/workflow-work";
 import AgentBriefing, { MeetMorgan } from "./agent-briefing";
 import ArchitectureOutput from "./architecture-output";
 import { Architecture } from "./workshop-mapping";
@@ -650,6 +651,19 @@ export default function AgentWorkspace() {
                           }
                         />
                         <WorkflowWork
+                          onProcess={(value) =>
+                            setS((prev) => ({
+                              ...prev,
+                              process: {
+                                ...prev.process,
+                                [processKey(
+                                  prev,
+                                  c.id,
+                                  currentWorkStep(prev, c.id),
+                                )]: value,
+                              },
+                            }))
+                          }
                           key={`${c.id}:${workSignature(s, c.id)}`}
                           onEdit={(key, rows) =>
                             setS((prev) => ({

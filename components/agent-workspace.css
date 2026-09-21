@@ -2366,3 +2366,250 @@
 .artifact-preview > header .agent-kicker {
   color: #557763;
 }
+.process-actions {
+  border: 1px solid #cddbd3;
+  background: #f7faf8;
+  padding: 22px;
+  border-radius: 12px;
+  margin: 25px 0;
+}
+.process-actions h3 {
+  font-size: 20px;
+  font-weight: 500;
+  margin: 10px 0 16px;
+}
+.process-actions p {
+  font-size: 13px;
+  line-height: 1.75;
+  color: #637268;
+}
+.process-actions label {
+  margin: 17px 0;
+  font-size: 12px;
+}
+.process-actions button {
+  font-size: 11px;
+  margin: 7px 8px 7px 0;
+}
+.process-evidence {
+  display: grid;
+  gap: 10px;
+  margin: 18px 0;
+}
+.process-evidence > span {
+  display: flex;
+  justify-content: space-between;
+  gap: 15px;
+  border-bottom: 1px solid #dfe6e1;
+  padding: 10px 0;
+  font-size: 11px;
+  color: #6b7e71;
+}
+.process-evidence b {
+  font-weight: 500;
+  color: #3e5b47;
+  text-align: right;
+}
+.process-reviewers {
+  display: grid;
+  gap: 8px;
+  margin: 20px 0;
+}
+.process-reviewers article {
+  display: flex;
+  justify-content: space-between;
+  background: white;
+  padding: 14px;
+  border: 1px solid #dce5de;
+  border-radius: 7px;
+  font-size: 12px;
+}
+.process-reviewers span {
+  color: #748376;
+}
+.review-simulator {
+  border: 1px dashed #aabacb;
+  background: #f1f5fa;
+  padding: 18px;
+  margin: 15px 0;
+  border-radius: 8px;
+}
+.review-simulator > div {
+  margin-top: 14px;
+}
+.review-simulator > div > b {
+  display: block;
+  font-size: 12px;
+  margin-bottom: 5px;
+}
+.process-change {
+  padding: 18px;
+  background: #fff9ef;
+  border: 1px solid #e6d9bd;
+  border-radius: 8px;
+}
+.process-receipt {
+  margin: 20px 0;
+  padding: 14px;
+  background: white;
+  border: 1px solid #e1e6e2;
+  border-radius: 7px;
+}
+.process-receipt > b {
+  font-size: 11px;
+}
+.process-receipt ol {
+  padding-left: 18px;
+  margin: 10px 0 0;
+}
+.process-receipt li {
+  font-size: 11px;
+  color: #758176;
+  line-height: 1.8;
+  margin-bottom: 7px;
+}
+.handoff-console {
+  margin: 18px 0;
+}
+.handoff-console > header > p {
+  font-size: 12px;
+}
+.handoff-console nav {
+  display: flex;
+  gap: 8px;
+  margin: 18px 0;
+}
+.handoff-console nav button[aria-pressed="true"] {
+  background: #263d32;
+  color: white;
+}
+.handoff-canvas {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+  gap: 18px;
+}
+.handoff-preview {
+  padding: 16px;
+  background: #edf0f3;
+  border-radius: 9px;
+}
+.email-preview {
+  margin-top: 15px;
+  border: 1px solid #d9dee3;
+  border-radius: 8px;
+  background: white;
+  overflow: hidden;
+}
+.email-preview > div {
+  padding: 10px 14px;
+  border-bottom: 1px solid #eee;
+  font-size: 10px;
+  color: #77838c;
+}
+.email-preview b {
+  margin-right: 8px;
+}
+.email-preview article {
+  padding: 30px 22px;
+}
+.email-preview h2,
+.event-preview h2 {
+  font-size: 28px !important;
+  line-height: 1.14 !important;
+  margin: 18px 0 !important;
+  color: #233f32 !important;
+}
+.email-preview article > small {
+  font-size: 9px;
+  letter-spacing: 0.13em;
+  color: #768d7a;
+}
+.source-preview {
+  padding: 20px;
+  border: 1px solid #d7e2d7;
+  background: #f0f5ef;
+  margin: 25px 0;
+  font-size: 12px;
+  border-radius: 6px;
+}
+.source-preview small {
+  font-size: 10px;
+}
+.preview-cta {
+  display: inline-block;
+  background: #243f32;
+  color: white;
+  padding: 11px 16px;
+  border-radius: 6px;
+  font-size: 11px;
+}
+.email-preview footer,
+.event-preview footer {
+  font-size: 9px;
+  color: #8a969e;
+  padding: 14px;
+  background: #fafafa;
+}
+.event-preview article {
+  background: white;
+  border-radius: 8px;
+  padding: 18px;
+  margin: 15px 0;
+}
+.event-preview article b {
+  font-size: 14px;
+}
+.event-preview article span {
+  font-size: 10px;
+  color: #668472;
+}
+.handoff-settings > div {
+  padding: 13px 0;
+  border-bottom: 1px solid #dfe5df;
+}
+.handoff-settings b {
+  font-size: 11px;
+}
+.handoff-settings p {
+  font-size: 11px !important;
+  margin: 6px 0;
+}
+.handoff-settings label {
+  margin-top: 0 !important;
+}
+.handoff-gate {
+  color: #6e816f;
+}
+.handoff-receipt {
+  background: #eaf3e9;
+  border-radius: 8px;
+  padding: 15px !important;
+  border: 1px solid #c9ddc7 !important;
+  margin-top: 10px;
+}
+.handoff-progress {
+  font-size: 11px;
+  color: #738278;
+  padding: 17px 0;
+}
+@media (max-width: 1000px) {
+  .handoff-canvas {
+    grid-template-columns: 1fr;
+  }
+}
+.review-inbox {
+  border: 1px solid #c8d8e5;
+  border-left: 4px solid #668ead;
+  background: #edf4fa;
+  padding: 16px;
+  margin: 20px 0;
+  border-radius: 8px;
+}
+.review-inbox > b {
+  font-size: 13px;
+  color: #456880;
+}
+.review-inbox p {
+  font-size: 12px;
+  color: #587286;
+}

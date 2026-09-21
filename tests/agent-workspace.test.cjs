@@ -139,3 +139,14 @@ test('workflow transition cannot crash on a stale artifact index and produces th
  const afterContent=w.workflowArtifact(s,'s5',3);assert.equal(afterContent.title,'Decision and audit record');
  for(const id of ['s2','s3','s5'])for(const index of [-1,0,1,2,3,999,NaN])assert.ok(w.workflowArtifact(s,id,index).text.length>100);
 });
+
+test('review gates require all reviewers and revisions invalidate approval',()=>{
+ const p=require('../lib/process-state.ts'),w=require('../lib/workflow-work.ts');const s=m.createAgentState();
+ let review=p.processUpdate(p.emptyProcess(),{status:'In review',reviewers:{Morgan:'Approved','Brand / asset owner':'Pending','Legal / privacy':'Pending'}},'Submitted v1');
+ review=p.applyReview(review,'Brand / asset owner','Approved');review=p.applyReview(review,'Legal / privacy','Changes requested');assert.equal(review.status,'Changes requested');
+ review=p.processUpdate(review,{version:2,status:'In review',note:'Confirm release owner',reviewers:{Morgan:'Approved','Brand / asset owner':'Pending','Legal / privacy':'Pending'}},'Resubmitted v2');
+ review=p.applyReview(review,'Brand / asset owner','Approved');review=p.applyReview(review,'Legal / privacy','Approved');s.process={[p.processKey(s,'s3',2)]:review};assert.equal(p.processReady(s,'s3',2),true);
+ const restored=m.restoreAgentState(JSON.parse(JSON.stringify(s)));assert.equal(p.processReady(restored,'s3',2),true);assert.match(w.workflowArtifact(restored,'s3',2).text,/Resubmitted v2/);
+ s.artifactEdits={[w.artifactKey(s,'s3',1)]:[{name:'Changed brief',status:'Revised',detail:'New promise'}]};assert.equal(p.processReady(s,'s3',2),false);
+});
+test('a failed acknowledgement does not count as completed work',()=>{const p=require('../lib/process-state.ts');const s=m.createAgentState();s.process={[p.processKey(s,'s5',2)]:p.processUpdate(p.emptyProcess(),{status:'Failed'},'No acknowledgement')};assert.equal(p.processReady(s,'s5',2),false);s.process[p.processKey(s,'s5',2)].status='Complete';assert.equal(p.processReady(s,'s5',2),true);});

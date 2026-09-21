@@ -1,3 +1,4 @@
+import { processState, processDigest } from "./process-state";
 import type { AgentState } from "./agent-workspace";
 export type WorkStage = {
   title: string;
@@ -394,7 +395,7 @@ export function workflowArtifact(s: AgentState, id: string, index: number) {
           {
             name: "Campaign direction",
             status: "Proposed content plan",
-            detail: `Objective: ${s.campaign?.objective || "Grow enterprise adoption across the buying group"}.\nScope: 12 illustrative target accounts.\nDirection from Morgan: ${s.campaign?.instruction || "Use one approved source to bring the wider buying group into evaluation."}`,
+            detail: `Objective: ${s.campaign?.objective || "Grow enterprise adoption across the buying group"}.\nScope: 12 illustrative target accounts.\nAudience direction: ${processState(s, "s2", 1).choice || "To confirm"}.\nDirection from Morgan: ${s.campaign?.instruction || "Use one approved source to bring the wider buying group into evaluation."}`,
           },
           {
             name: "Audience and deliverables",
@@ -428,7 +429,7 @@ export function workflowArtifact(s: AgentState, id: string, index: number) {
           detail: deliveredDetail(s, id, index, name, detail),
         })));
   const sources = workflowSources(s, id, index);
-  const text = `# ${title}\n\nILLUSTRATIVE PROTOTYPE OUTPUT — no live systems queried or actions executed.\n\nCampaign: Enterprise adoption / 12 target accounts\nObjective: ${s.campaign?.objective || "Grow enterprise adoption across the buying group"}\nMorgan’s instruction: ${s.campaign?.instruction || "None added"}\nAudience: ${s.audience}\nChannels: ${s.channel}\n\n${stage.summary}\n\n${sections.map((r) => `## ${r.name}\nStatus: ${r.status}\n${r.detail}`).join("\n\n")}\n\n## Illustrative sources used\n${sources.map((source) => `- ${source.name}: ${source.purpose} | System: ${source.system} | Connection: ${source.connection}`).join("\n")}\n\n## Handoff\n${stage.output}\n\n## Required control\n${stage.control}`;
+  const text = `# ${title}\n\nILLUSTRATIVE PROTOTYPE OUTPUT — no live systems queried or actions executed.\n\nCampaign: Enterprise adoption / 12 target accounts\nObjective: ${s.campaign?.objective || "Grow enterprise adoption across the buying group"}\nMorgan’s instruction: ${s.campaign?.instruction || "None added"}\nAudience: ${s.audience}\nChannels: ${s.channel}\n\n${stage.summary}\n\n${sections.map((r) => `## ${r.name}\nStatus: ${r.status}\n${r.detail}`).join("\n\n")}\n\n## Illustrative sources used\n${sources.map((source) => `- ${source.name}: ${source.purpose} | System: ${source.system} | Connection: ${source.connection}`).join("\n")}\n\n## Handoff\n${stage.output}\n\n## Required control\n${stage.control}\n\n## Workflow decisions and review history\n${processDigest(s) || "No decisions recorded yet."}`;
   return { title, sections, text, blocked, sources };
 }
 
