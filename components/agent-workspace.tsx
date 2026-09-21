@@ -113,6 +113,7 @@ export default function AgentWorkspace() {
   const [error, setError] = useState("");
   const [saved, setSaved] = useState("");
   const [page, setPage] = useState("intro");
+  const [showStepContext, setShowStepContext] = useState(false);
   const chapter = Math.max(0, Math.min(2, s.day.moment - 1));
   function setChapter(index: number) {
     setS((prev) => ({ ...prev, day: { ...prev.day, moment: index + 1 } }));
@@ -826,10 +827,37 @@ export default function AgentWorkspace() {
                         </div>
                       </div>
                     </MorganScreen>
-                    <aside className="prototype-context-rail">
-                      <WorkflowRequirements session={s} id={c.id} />
-                      <BackendIllustration session={s} id={c.id} />
-                    </aside>
+                    <div className="prototype-context-control">
+                      <button
+                        className="prototype-context-trigger"
+                        aria-expanded={showStepContext}
+                        onClick={() => setShowStepContext((shown) => !shown)}
+                      >
+                        {showStepContext
+                          ? "Close step context"
+                          : "Architecture for this step"}
+                        <span aria-hidden="true">
+                          {showStepContext ? "×" : "◇"}
+                        </span>
+                      </button>
+                      {showStepContext && (
+                        <aside className="prototype-context-popover">
+                          <header>
+                            <span className="agent-kicker">
+                              Proposed architecture context
+                            </span>
+                            <button
+                              aria-label="Close architecture context"
+                              onClick={() => setShowStepContext(false)}
+                            >
+                              ×
+                            </button>
+                          </header>
+                          <WorkflowRequirements session={s} id={c.id} />
+                          <BackendIllustration session={s} id={c.id} />
+                        </aside>
+                      )}
+                    </div>
                   </div>
                   <div className="agent-next">
                     <button
