@@ -137,12 +137,23 @@ export default function WorkshopRecord({
         </article>
       ))}
       <h2 className="section-title">Current-state findings</h2>
+      {Object.entries(session.currentStories).map(([id, note]) => (
+        <article className="readout-card" key={id}>
+          <h3>{caseName(id)}</h3>
+          <p className="preserve-lines">{note || "No notes captured."}</p>
+        </article>
+      ))}
+
       {!session.capabilities.length && (
         <p>No current-state answers captured.</p>
       )}
       <div className="summary-grid">
         {useCases
-          .filter((u) => session.capabilities.some((c) => c.useCase === u.id))
+          .filter(
+            (u) =>
+              session.capabilities.some((c) => c.useCase === u.id) &&
+              !(u.id in session.currentStories),
+          )
           .map((u) => (
             <article className="side-card" key={u.id}>
               <h3>{caseName(u.id)}</h3>
@@ -168,8 +179,10 @@ export default function WorkshopRecord({
           ))}
       </div>
       {useCases
-        .filter((u) =>
-          session.capabilities.some((c) => c.useCase === u.id && c.synthesis),
+        .filter(
+          (u) =>
+            !(u.id in session.currentStories) &&
+            session.capabilities.some((c) => c.useCase === u.id && c.synthesis),
         )
         .map((u) => (
           <section key={u.id}>

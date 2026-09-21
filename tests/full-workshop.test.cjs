@@ -1285,3 +1285,34 @@ test("expanded scenario options round-trip and change their relevant workflow pa
   assert.ok(!html.includes("Who’s in the room"));
   assert.match(html, /Enter workshop/);
 });
+
+test("current-state conversation uses one input and preserves legacy examples and architecture freshness", () => {
+  const { currentStory } = require("../lib/current-story.ts");
+  const { CurrentState } = require("../components/workshop-mapping.tsx");
+  const {
+    reviewWorkflow,
+    workflowState,
+  } = require("../lib/architecture-workflow.ts");
+  for (const focus of ["s1", "s2", "s3", "s4", "s5", "s6", "s7"]) {
+    let s = { ...require("../lib/demo-session.ts").createDemoSession(), focus };
+    const legacy = currentStory(s, focus);
+    assert.ok(legacy.length > 0);
+    const html = renderToStaticMarkup(
+      React.createElement(CurrentState, { session: s, setSession: () => {} }),
+    );
+    assert.equal((html.match(/<textarea/g) || []).length, 1);
+    assert.ok(!html.includes("Does the room agree"));
+    assert.ok(!html.includes("Live interpretation"));
+    assert.ok(!html.includes("Discussion questions"));
+    const capabilities = JSON.stringify(s.capabilities);
+    s = reviewWorkflow(s, focus, 0, { choice: "Keep" });
+    s.currentStories[focus] = "A single room narrative with a manual handoff.";
+    assert.equal(workflowState(s, focus, 0).stale, true);
+    const restored = w.parseSession(JSON.parse(JSON.stringify(s)));
+    assert.equal(currentStory(restored, focus), s.currentStories[focus]);
+    assert.deepEqual(restored.capabilities, JSON.parse(capabilities));
+    assert.match(w.readout(restored), /single room narrative/);
+    restored.currentStories[focus] = "";
+    assert.equal(currentStory(restored, focus), "");
+  }
+});

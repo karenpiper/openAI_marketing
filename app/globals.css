@@ -3577,3 +3577,38 @@ body {
   outline: 3px solid #527864;
   outline-offset: 2px;
 }
+
+.current-conversation {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);
+  gap: 1.5rem;
+  margin: 1.5rem 0;
+  align-items: start;
+}
+.current-prompts article {
+  padding: 1rem 0;
+  border-bottom: 1px solid #c9d2c5;
+}
+.current-prompts h3 {
+  font-size: 1.1rem;
+  margin: 0.5rem 0;
+}
+.current-prompts p {
+  font-size: 0.95rem;
+  margin: 0.4rem 0;
+}
+.current-story {
+  position: sticky;
+  top: 1rem;
+}
+.current-story textarea {
+  min-height: 360px;
+}
+@media (max-width: 800px) {
+  .current-conversation {
+    grid-template-columns: 1fr;
+  }
+  .current-story {
+    position: static;
+  }
+}

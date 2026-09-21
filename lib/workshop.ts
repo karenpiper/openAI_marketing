@@ -208,6 +208,7 @@ export type WorkflowReview = {
   source: string;
 };
 export type Session = {
+  currentStories: Record<string, string>;
   readoutFlow: { caseId: string; step: number };
   closing: { ownership: string; sequence: string; open: string; colin: string };
   scenario: WorkflowScenario;
@@ -293,6 +294,7 @@ export function createSession(): Session {
   return {
     schema: 1,
     overview: true,
+    currentStories: {},
     readoutFlow: { caseId: "", step: -1 },
     closing: { ownership: "", sequence: "", open: "", colin: "" },
     scenario: { ...defaultScenario },
@@ -407,6 +409,12 @@ export function parseSession(raw: unknown): Session {
     throw Error("This is not a supported workshop backup.");
   const s = createSession();
   s.title = str(r.title, s.title);
+  const stories = record(r.currentStories);
+  s.currentStories = Object.fromEntries(
+    useCases
+      .filter((u) => typeof stories[u.id] === "string")
+      .map((u) => [u.id, str(stories[u.id])]),
+  );
   const flow = record(r.readoutFlow);
   s.readoutFlow = {
     caseId: uc(flow.caseId),
@@ -714,6 +722,10 @@ export function readout(s: Session): string {
         (c) =>
           `${name(c.useCase)} | ${c.synthesis!.name} | ${synthesisStatus(c)}\nCoverage: ${c.synthesis!.coverage}\nChange to discuss: ${c.synthesis!.change || "Not captured"}\nWho takes it forward: ${c.synthesis!.nextOwner || "Unassigned"}\nBased on: ${c.evidence}\nTools and roles: ${c.system || "Unknown"}`,
       ),
+    "## Current-state discussion notes",
+    ...Object.entries(s.currentStories).map(
+      ([id, note]) => `${name(id)}\n${note || "No notes captured"}`,
+    ),
     "## Proposed workflow decisions",
     ...s.workflowReviews
       .filter((r) => workflows[r.useCase]?.[r.step])

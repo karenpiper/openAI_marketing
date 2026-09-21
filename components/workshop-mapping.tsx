@@ -1,3 +1,4 @@
+import { currentStory } from "../lib/current-story";
 import SaveFooter from "./save-footer";
 import ArchitectureWalkthrough from "./architecture-walkthrough";
 import LiveSynthesis from "./live-synthesis";
@@ -58,58 +59,6 @@ export function CaseFocus({ session: s, setSession }: Props) {
     </div>
   );
 }
-function Agreement({
-  value,
-  onChange,
-  ready,
-}: {
-  value: Status;
-  onChange: (s: Status) => void;
-  ready: boolean;
-}) {
-  return (
-    <fieldset className="guide-agreement">
-      <legend>Does the room agree with this answer?</legend>
-      {(["Unknown", "Proposed", "Confirmed", "Disputed"] as Status[]).map(
-        (v) => (
-          <button
-            key={v}
-            aria-pressed={value === v}
-            disabled={v === "Confirmed" && !ready}
-            onClick={() => onChange(v)}
-          >
-            {agreementLabel(v)}
-          </button>
-        ),
-      )}
-    </fieldset>
-  );
-}
-function Navigation({
-  step,
-  total,
-  change,
-}: {
-  step: number;
-  total: number;
-  change: (n: number) => void;
-}) {
-  return (
-    <nav className="guide-navigation" aria-label="Discussion questions">
-      <button disabled={step === 0} onClick={() => change(step - 1)}>
-        ← Previous
-      </button>
-      <span>
-        {step === total
-          ? "Read back together"
-          : `Question ${step + 1} of ${total}`}
-      </span>
-      <button disabled={step === total} onClick={() => change(step + 1)}>
-        {step === total - 1 ? "Read back answers →" : "Next →"}
-      </button>
-    </nav>
-  );
-}
 export function CurrentReadback({ session: s }: { session: Session }) {
   return (
     <>
@@ -146,134 +95,86 @@ export function CurrentReadback({ session: s }: { session: Session }) {
   );
 }
 export function CurrentState({ session: s, setSession }: Props) {
-  const questions = currentQuestions[s.focus];
-  const step = s.guide.current;
-  const q = questions[step];
-  const a = q ? findAnswer(s, s.focus, q) : undefined;
-  const change = (current: number) =>
-    setSession((p) => ({ ...p, guide: { ...p.guide, current } }));
-  const used = questions.map((q) => findAnswer(s, s.focus, q)?.id);
-  const earlier = s.capabilities.filter(
-    (c) => c.useCase === s.focus && !used.includes(c.id),
-  );
   return (
     <section className="module-panel guided-panel">
       <div className="module-heading">
         <span className="eyebrow">02 · What happens today · 30 minutes</span>
-        <h1>How do you handle this today?</h1>
+        <h1>Talk through one recent example.</h1>
         <p>
-          Ask one question, capture the answer, then check it with the room. The
-          questions are already provided—you do not need to enter capabilities.
+          Use the prompts to guide the conversation, then capture the story in
+          one place. Include the tools, people and friction you know about;
+          leave unknowns as questions.
         </p>
       </div>
-      <p className="muted">
-        Describe a recent example in everyday language. You do not need to name
-        a capability or design a system. A suggested capability appears as you
-        capture the answer. Check it with the room now.
-      </p>
       <CaseFocus session={s} setSession={setSession} />
-      <Navigation step={step} total={4} change={change} />
-      {q ? (
-        <>
-          <div className="question-banner">
-            <span className="label">Ask the room</span>
-            <h2>{q.question}</h2>
-            <p>{q.hint}</p>
-          </div>
-          <div className="capture-card">
-            <Field
-              label="What happens today?"
-              multiline
-              value={a?.evidence || ""}
-              onChange={(evidence) =>
-                setSession((p) => editAnswer(p, s.focus, q, { evidence }))
-              }
-            />
-            <p className="muted">
-              Think of the last time you did this. You do not need the full
-              system list—one familiar example is enough.
-            </p>
-            <Field
-              label={toolPrompts[s.focus][step]}
-              multiline
-              placeholder={
-                "Start with one place you used recently. A document, email, person or manual process counts. ‘Not sure’ is fine. Add other tools only if you know them."
-              }
-              value={a?.system || ""}
-              onChange={(system) =>
-                setSession((p) => editAnswer(p, s.focus, q, { system }))
-              }
-            />
-            <Field
-              label="Who helped with that example, or could fill in the gap?"
-              value={a?.owner || ""}
-              onChange={(owner) =>
-                setSession((p) => editAnswer(p, s.focus, q, { owner }))
-              }
-            />
-            <Field
-              label="What works, and what is missing?"
-              multiline
-              value={a?.gap || ""}
-              onChange={(gap) =>
-                setSession((p) => editAnswer(p, s.focus, q, { gap }))
-              }
-            />
-            <Agreement
-              value={a?.status || "Unknown"}
-              ready={!!a?.evidence.trim()}
-              onChange={(status) =>
-                setSession((p) => editAnswer(p, s.focus, q, { status }))
-              }
-            />
-          </div>
-          <SaveFooter />
-          <LiveSynthesis session={s} setSession={setSession} index={step} />
-        </>
-      ) : (
-        <>
-          <h2>Have we captured this correctly?</h2>
-          <LiveSynthesis session={s} setSession={setSession} />
-          <div className="guide-links">
-            {questions.map((q, i) => (
-              <button key={q.id} onClick={() => change(i)}>
-                Edit {q.label.toLowerCase()}
-              </button>
-            ))}
-          </div>
-          <button
-            onClick={() =>
-              setSession((p) => ({
-                ...p,
-                stage: 2,
-                architectureTab: "map",
-                guide: { ...p.guide, architecture: 0 },
-                timer: { stage: 2, remaining: 2700, runningSince: null },
-              }))
-            }
-          >
-            Use these answers in architecture →
-          </button>
-        </>
-      )}
-      {earlier.length > 0 && (
-        <details className="starting-context">
-          <summary>Earlier notes ({earlier.length})</summary>
-          {earlier.map((c) => (
-            <article key={c.id}>
-              <h3>{c.name}</h3>
-              <p className="preserve-lines">
-                {c.evidence}
-                <br />
-                {c.system}
-                <br />
-                {c.gap}
-              </p>
-            </article>
-          ))}
-        </details>
-      )}
+      <CurrentConversation session={s} setSession={setSession} />
+      <button
+        onClick={() =>
+          setSession((p) => ({
+            ...p,
+            stage: 2,
+            architectureTab: "map",
+            guide: { ...p.guide, architecture: 0 },
+            timer: { stage: 2, remaining: 2700, runningSince: null },
+          }))
+        }
+      >
+        Take this into architecture →
+      </button>
     </section>
+  );
+}
+export function CurrentConversation({
+  session: s,
+  setSession,
+}: {
+  session: Session;
+  setSession?: Dispatch<SetStateAction<Session>>;
+}) {
+  return (
+    <div className="current-conversation">
+      <section className="current-prompts">
+        <span className="eyebrow">Ask the room · prompts, not a checklist</span>
+        {currentQuestions[s.focus].map((q, i) => (
+          <article key={q.id}>
+            <span className="eyebrow">
+              {i + 1} · {q.label}
+            </span>
+            <h3>{q.question}</h3>
+            <p>{q.hint}</p>
+            <p className="muted">{toolPrompts[s.focus][i]}</p>
+          </article>
+        ))}
+      </section>
+      <section className="capture-card current-story">
+        <h2>How it happens today</h2>
+        <p>
+          Capture the example, where work happens, who is involved and where it
+          gets stuck. Read it back as you go.
+        </p>
+        {setSession ? (
+          <>
+            <Field
+              label="Room notes"
+              multiline
+              value={currentStory(s, s.focus)}
+              placeholder="Last time we did this… We used… The handoff was… What slowed us down was…"
+              onChange={(note) =>
+                setSession((p) => ({
+                  ...p,
+                  currentStories: { ...p.currentStories, [s.focus]: note },
+                }))
+              }
+            />
+            <SaveFooter />
+          </>
+        ) : (
+          <p className="preserve-lines">
+            {currentStory(s, s.focus) || "Waiting for the room’s example."}
+          </p>
+        )}
+      </section>
+    </div>
   );
 }
 export function ArchitectureReadback({ session: s }: { session: Session }) {

@@ -1,3 +1,4 @@
+import { CurrentConversation } from "./workshop-mapping";
 import ContentLab from "./content-lab";
 import WorkshopOverview from "./workshop-overview";
 import ArchitectureWalkthrough from "./architecture-walkthrough";
@@ -145,40 +146,8 @@ export default function RoomView({ session }: { session: Session }) {
       {s.stage === 1 && (
         <section className="room-stage">
           <span className="eyebrow">What happens today · {focus?.label}</span>
-          {s.guide.current === 4 ? (
-            <>
-              <h1>Have we captured this correctly?</h1>
-              <LiveSynthesis session={s} />
-            </>
-          ) : (
-            <>
-              <h1>{currentQuestions[s.focus][s.guide.current].question}</h1>
-              <p className="room-lede">
-                {currentQuestions[s.focus][s.guide.current].hint}
-              </p>
-              {(() => {
-                const a = findAnswer(
-                  s,
-                  s.focus,
-                  currentQuestions[s.focus][s.guide.current],
-                );
-                return (
-                  <div className="room-return">
-                    <Badge value={agreementLabel(a?.status || "Unknown")} />
-                    <p className="preserve-lines">
-                      {a?.evidence || "Waiting for the room’s answer."}
-                    </p>
-                    <p className="preserve-lines">{a?.system}</p>
-                    <p>{a?.owner}</p>
-                    <p>{a?.gap}</p>
-                  </div>
-                );
-              })()}
-            </>
-          )}
-          {s.guide.current < 4 && (
-            <LiveSynthesis session={s} index={s.guide.current} />
-          )}
+          <h1>Talk through one recent example.</h1>
+          <CurrentConversation session={s} />
         </section>
       )}
       {s.stage === 2 && s.architectureTab === "map" && (

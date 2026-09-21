@@ -88,16 +88,25 @@ export default function ArchitectureWalkthrough({
               </p>
               <div className="proposal-evidence">
                 <span className="eyebrow">From today’s workflow</span>
-                {step.sources.map((index) => {
-                  const q = currentQuestions[s.focus][index];
-                  const a = findAnswer(s, s.focus, q);
-                  return (
-                    <p key={q.id}>
-                      <b>{q.label}:</b> {a?.evidence || "Not captured yet."}
-                      {a?.system && <span> Tools: {a.system}.</span>}
-                    </p>
-                  );
-                })}
+                {Object.prototype.hasOwnProperty.call(
+                  s.currentStories,
+                  s.focus,
+                ) ? (
+                  <p className="preserve-lines">
+                    {s.currentStories[s.focus] || "Not captured yet."}
+                  </p>
+                ) : (
+                  step.sources.map((index) => {
+                    const q = currentQuestions[s.focus][index];
+                    const a = findAnswer(s, s.focus, q);
+                    return (
+                      <p key={q.id}>
+                        <b>{q.label}:</b> {a?.evidence || "Not captured yet."}
+                        {a?.system && <span> Tools: {a.system}.</span>}
+                      </p>
+                    );
+                  })
+                )}
               </div>
               {editable && (
                 <div className="guide-links">
