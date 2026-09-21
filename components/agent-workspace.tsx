@@ -491,15 +491,6 @@ export default function AgentWorkspace() {
         ) : page === "workspace" ? (
           <main className="agent-main prototype-main">
             <section className="agent-stage" id="morgan-day">
-              <div className="prototype-human-context">
-                <span className="agent-avatar">M</span>
-                <p>
-                  <b>Morgan’s workspace</b>
-                  <br />A representative workflow for an enterprise marketer who
-                  needs to make a good call, not merely move through a process.
-                </p>
-                <span>Enterprise adoption / 12 target accounts</span>
-              </div>
               {s.day.moment === 0 ? (
                 <>
                   <MorganStory moment={0} />
@@ -610,19 +601,6 @@ export default function AgentWorkspace() {
                 </>
               ) : (
                 <>
-                  <section className="prototype-flow-intro">
-                    <span className="agent-kicker">
-                      Step {chapter + 1} · {c.title}
-                    </span>
-                    <h1>{c.short}</h1>
-                    <p>{c.story}</p>
-                    <p>
-                      Morgan reviews the evidence, sets direction and steps in
-                      where judgment matters. The system does the routine work
-                      around her. Use this flow to assess that proposed
-                      experience and the components it would require.
-                    </p>
-                  </section>
                   <div className="prototype-screen-layout">
                     <MorganScreen workflow>
                       <div className="agent-product">
