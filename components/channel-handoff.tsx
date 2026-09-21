@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { contentVariants, exampleAccounts } from "../lib/content-variants";
 import type { AgentState } from "../lib/agent-workspace";
 import {
   processReady,
@@ -14,6 +15,34 @@ export default function ChannelHandoff({
   onChange: (p: ProcessState) => void;
 }) {
   const [tab, setTab] = useState("Email");
+  const [accountId, setAccountId] = useState("ACCT-01");
+  const [segmentIndex, setSegmentIndex] = useState(0);
+  const variants = contentVariants(session);
+  const accountVariants = variants.filter((v) => v.accountId === accountId);
+  const variant = accountVariants[segmentIndex] || accountVariants[0];
+  function downloadVariants() {
+    const url = URL.createObjectURL(
+      new Blob(
+        [
+          JSON.stringify(
+            {
+              notice:
+                "Fictional candidate variants; not sent or live-generated. Recipient eligibility and review gates still apply.",
+              variants,
+            },
+            null,
+            2,
+          ),
+        ],
+        { type: "application/json" },
+      ),
+    );
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "account-content-variants.json";
+    link.click();
+    URL.revokeObjectURL(url);
+  }
   const p = processState(session, "s3", 3);
   const second = session.channel.includes("event")
     ? "Event follow-up"
@@ -34,7 +63,7 @@ export default function ChannelHandoff({
             ? "Complete"
             : "Staging",
         },
-        `${tab} work order accepted by the simulated connector. Routed to the configured marketing operations team. Not sent.`,
+        `${tab} bundle (${variants.length} candidate email variants across 12 accounts) accepted by the simulated connector. Routed to the configured marketing operations team. Not sent.`,
       ),
     );
   }
@@ -44,10 +73,11 @@ export default function ChannelHandoff({
         <span className="agent-kicker">
           Activation workspace · simulated destination
         </span>
-        <h3>Ready for the next step.</h3>
+        <h3>One source. Twelve account packages.</h3>
         <p>
-          Review the preview, then prepare each channel for release. The agent
-          routes the work to the configured team. Nothing is sent yet.
+          Review the account and audience variants, then prepare each channel
+          for release. The agent routes the work to the configured team. Nothing
+          is sent yet.
         </p>
       </header>
       <nav aria-label="Channel work orders">
@@ -57,37 +87,84 @@ export default function ChannelHandoff({
           </button>
         ))}
       </nav>
+      <section
+        className="variant-browser"
+        aria-label="Account content variants"
+      >
+        <div>
+          <b>
+            {variants.length} candidate email variants · 12 accounts ·{" "}
+            {accountVariants.length} audience{" "}
+            {accountVariants.length === 1 ? "version" : "versions"} each
+          </b>
+          <p>
+            Shared source and layout; different audience needs, message and next
+            action. These are fictional examples, not {variants.length}{" "}
+            confirmed recipients or sends.
+          </p>
+        </div>
+        <div className="variant-controls">
+          <label>
+            Account
+            <select
+              value={accountId}
+              onChange={(e) => setAccountId(e.target.value)}
+            >
+              {exampleAccounts.map((a) => (
+                <option key={a.id} value={a.id}>
+                  {a.name}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label>
+            Audience version
+            <select
+              value={accountVariants.indexOf(variant)}
+              onChange={(e) => setSegmentIndex(Number(e.target.value))}
+            >
+              {accountVariants.map((v, i) => (
+                <option key={v.id} value={i}>
+                  {v.segment}
+                </option>
+              ))}
+            </select>
+          </label>
+          <button onClick={downloadVariants}>
+            Download all {variants.length} variants
+          </button>
+        </div>
+        <p>
+          <b>Account context:</b> {variant.context}. <b>Illustrative inputs:</b>{" "}
+          CRM account context + identity / audience membership + engagement
+          signals.
+        </p>
+      </section>
       <div className="handoff-canvas">
         <div className="handoff-preview">
           <span className="agent-kicker">{tab} · illustrative preview</span>
           {tab === "Email" ? (
             <div className="email-preview">
               <div>
-                <b>To</b> Eligible contacts · role-specific versions
+                <b>To</b> {variant.account} · {variant.segment}
               </div>
               <div>
-                <b>Subject</b> Your next step toward enterprise adoption
+                <b>Subject</b> {variant.subject}
               </div>
               <article>
                 <small>ENTERPRISE ADOPTION</small>
-                <h2>
-                  From evaluation
-                  <br />
-                  to a practical plan.
-                </h2>
-                <p>
-                  An approved-guide placement, adapted to the recipient’s buying
-                  role.
-                </p>
+                <h2>{variant.headline}</h2>
+                <p>{variant.body}</p>
                 <div className="source-preview">
                   ▤ Enterprise adoption guide
                   <br />
                   <small>v3 · source reference attached</small>
                 </div>
-                <span className="preview-cta">Review the adoption guide →</span>
+                <span className="preview-cta">{variant.cta} →</span>
               </article>
               <footer>
-                Preview only · not generated or sent by a live service
+                {variant.id} · fictional copy · not generated or sent by a live
+                service
               </footer>
             </div>
           ) : tab === "Event follow-up" ? (
@@ -163,8 +240,10 @@ export default function ChannelHandoff({
         </div>
         <div className="handoff-settings">
           <div>
-            <b>Audience</b>
-            <p>{session.audience} · 12 illustrative target accounts</p>
+            <b>Account package</b>
+            <p>
+              {variant.account} · {variant.segment} · {variant.id}
+            </p>
           </div>
           <div>
             <b>Exclusions</b>
@@ -174,7 +253,10 @@ export default function ChannelHandoff({
           </div>
           <div>
             <b>Asset binding</b>
-            <p>Adoption guide v3 + accepted audience work package.</p>
+            <p>
+              {variant.source}. All {variants.length} candidate variants are
+              included in the channel bundle; this preview shows one.
+            </p>
           </div>
           <div>
             <b>Destination</b>
@@ -240,7 +322,8 @@ export default function ChannelHandoff({
       </div>
       <div className="handoff-progress">
         {channels.filter((c) => p.reviewers[c] === "Staged").length} of{" "}
-        {channels.length} channels prepared · then we’ll check eligibility before release.
+        {channels.length} channels prepared · then we’ll check eligibility
+        before release.
       </div>
     </section>
   );

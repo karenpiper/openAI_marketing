@@ -1,3 +1,4 @@
+import { contentVariants } from "./content-variants";
 import { processState, processDigest } from "./process-state";
 import type { AgentState } from "./agent-workspace";
 export type WorkStage = {
@@ -430,7 +431,17 @@ export function workflowArtifact(s: AgentState, id: string, index: number) {
         })));
   const sources = workflowSources(s, id, index);
   const text = `# ${title}\n\nILLUSTRATIVE PROTOTYPE OUTPUT — no live systems queried or actions executed.\n\nCampaign: Enterprise adoption / 12 target accounts\nObjective: ${s.campaign?.objective || "Grow enterprise adoption across the buying group"}\nMorgan’s instruction: ${s.campaign?.instruction || "None added"}\nAudience: ${s.audience}\nChannels: ${s.channel}\n\n${stage.summary}\n\n${sections.map((r) => `## ${r.name}\nStatus: ${r.status}\n${r.detail}`).join("\n\n")}\n\n## Illustrative sources used\n${sources.map((source) => `- ${source.name}: ${source.purpose} | System: ${source.system} | Connection: ${source.connection}`).join("\n")}\n\n## Handoff\n${stage.output}\n\n## Required control\n${stage.control}\n\n## Workflow decisions and review history\n${processDigest(s) || "No decisions recorded yet."}`;
-  return { title, sections, text, blocked, sources };
+  const variantText =
+    id === "s3" && index >= 1 && !blocked
+      ? "\n\n## Candidate email variants reviewed and handed off\n" +
+        contentVariants(s)
+          .map(
+            (v) =>
+              `### ${v.id} · ${v.account} · ${v.segment}\nContext: ${v.context}\nSubject: ${v.subject}\n${v.body}\nNext action: ${v.cta}\nSource: ${v.source}\nEligibility: ${v.eligibility}`,
+          )
+          .join("\n\n")
+      : "";
+  return { title, sections, text: text + variantText, blocked, sources };
 }
 
 export function workflowSources(s: AgentState, id: string, index: number) {

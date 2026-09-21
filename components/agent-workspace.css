@@ -3210,3 +3210,43 @@
     font-size: 26px;
   }
 }
+
+.variant-browser {
+  margin: 18px 0;
+  padding: 20px;
+  border: 1px solid #dededb;
+  border-radius: 12px;
+  background: #fafaf8;
+}
+.variant-browser p {
+  font-size: 13px;
+  line-height: 1.55;
+  color: #555e59;
+  margin: 8px 0;
+}
+.variant-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 14px;
+  margin: 16px 0;
+}
+.variant-controls label {
+  display: grid;
+  gap: 6px;
+  flex: 1;
+  min-width: 180px;
+  font-size: 12px;
+  font-weight: 600;
+}
+.variant-controls select {
+  width: 100%;
+  padding: 10px;
+  background: white;
+  color: #202722;
+  border: 1px solid #cdd2cf;
+  border-radius: 8px;
+}
+.variant-controls button {
+  min-height: 40px;
+}

@@ -289,3 +289,24 @@ test("performance decisions persist and appear in the readout without accepting 
     undefined,
   );
 });
+
+test("account content covers every account and selected segmentation with different messages", () => {
+  const { contentVariants } = require("../lib/content-variants.ts");
+  const s = m.createAgentState();
+  const variants = contentVariants(s);
+  assert.equal(variants.length, 36);
+  assert.equal(new Set(variants.map((v) => v.id)).size, 36);
+  assert.equal(new Set(variants.map((v) => v.accountId)).size, 12);
+  assert.notEqual(variants[0].body, variants[1].body);
+  assert.notEqual(variants[0].cta, variants[1].cta);
+  assert.notEqual(variants[0].subject, variants[3].subject);
+  assert.equal(contentVariants({ audience: "One audience" }).length, 12);
+  assert.equal(
+    contentVariants({ audience: "Lifecycle stages" })[0].segment,
+    "Exploring",
+  );
+  const w = require("../lib/workflow-work.ts");
+  const artifact = w.workflowArtifact(s, "s3", 2);
+  assert.match(artifact.text, /ACCT-12-V3/);
+  assert.match(artifact.text, /Candidate email variants/);
+});
