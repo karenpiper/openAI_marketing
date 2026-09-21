@@ -110,6 +110,7 @@ export const chapters = [
   },
 ] as const;
 export type Finding = {
+  businessOutcome?: string;
   priority: string;
   process: string;
   capabilities: Record<string, string>;
@@ -119,6 +120,7 @@ export type Finding = {
   decision: string;
 };
 export type AgentState = {
+  northstar?: string;
   day: {
     moment: number;
     history: { id: string; time: string; text: string }[];
@@ -196,6 +198,9 @@ export function restoreAgentState(raw: unknown): AgentState {
       proof: f.proof,
       owner: f.owner,
       decision: f.decision,
+      ...(typeof f.businessOutcome === "string"
+        ? { businessOutcome: f.businessOutcome }
+        : {}),
     };
   }
   if (
@@ -232,6 +237,7 @@ export function restoreAgentState(raw: unknown): AgentState {
       throw Error("Invalid day");
     base.day = r.day;
   }
+  if (typeof r.northstar === "string") base.northstar = r.northstar;
   base.architecture = parseSession(r.architecture);
   return base;
 }
@@ -303,12 +309,14 @@ export function architectureSession(s: AgentState): Session {
 export function agentReadout(s: AgentState) {
   return (
     "# Agent-led marketing workshop\n\nIllustrative product simulation; capability statements below are room inputs, not verified integrations.\n\n" +
+    `Northstar: ${s.northstar || "Not agreed yet"}\n\n` +
     chapters
       .map((c) => {
         const f = s.findings[c.id];
-        return `## ${c.title} — ${f.priority}\n\nProcess: ${f.process}\n\n${c.inputs.map(([label]) => `- ${label}: ${f.capabilities[label] || "Unknown"}`).join("\n")}\n\nRoom finding: ${f.note || "Not captured"}\n\nProve: ${f.proof}\n\nDecision / dependency: ${f.decision || "Not captured"}\n\nOwner: ${f.owner || "Unassigned"}`;
+        return `## ${c.title} — ${f.priority}\n\nBusiness outcome: ${f.businessOutcome || "Not captured"}\n\nProcess: ${f.process}\n\n${c.inputs.map(([label]) => `- ${label}: ${f.capabilities[label] || "Unknown"}`).join("\n")}\n\nRoom finding: ${f.note || "Not captured"}\n\nProve: ${f.proof}\n\nDecision / dependency: ${f.decision || "Not captured"}\n\nOwner: ${f.owner || "Unassigned"}`;
       })
-      .join("\n\n")
+      .join("\n\n") +
+    `\n\n## Colin readout\n\nOwnership: ${s.architecture.closing.ownership || "Not agreed"}\n\nOpen decisions: ${s.architecture.closing.open || "Not captured"}\n\nSequence: ${s.architecture.closing.sequence || "Not captured"}\n\nColin asks: ${s.architecture.closing.colin || "Not captured"}`
   );
 }
 

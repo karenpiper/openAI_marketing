@@ -14,6 +14,7 @@ import {
   guidedReply,
   advanceDay,
 } from "../lib/agent-workspace";
+import AgentBriefing, { MeetMorgan } from "./agent-briefing";
 import ArchitectureOutput from "./architecture-output";
 import { Architecture } from "./workshop-mapping";
 import { SaveContext } from "./save-footer";
@@ -153,10 +154,12 @@ export default function AgentWorkspace() {
           </a>
           <nav aria-label="Workshop navigation">
             {[
-              ["intro", "Briefing"],
-              ["workspace", "Morgan’s workspace"],
-              ["architecture", "Architecture"],
-              ["readout", "Readout"],
+              ["intro", "0 · Briefing"],
+              ["meet", "Meet Morgan"],
+              ["workspace", "1 · Morgan’s day"],
+              ["capabilities", "2 · Capability reuse"],
+              ["architecture", "3 · Architecture"],
+              ["readout", "4 · Readout"],
             ].map(([id, label]) => (
               <button
                 key={id}
@@ -178,73 +181,100 @@ export default function AgentWorkspace() {
           </p>
         )}
         {page === "intro" ? (
-          <main className="agent-intro">
+          <AgentBriefing
+            onEnter={() => {
+              setPage("meet");
+              window.scrollTo({ top: 0 });
+            }}
+          />
+        ) : page === "meet" ? (
+          <MeetMorgan
+            onEnter={() => {
+              setS((prev) => ({ ...prev, day: { ...prev.day, moment: 0 } }));
+              setPage("workspace");
+              window.scrollTo({ top: 0 });
+            }}
+          />
+        ) : page === "capabilities" ? (
+          <main className="agent-wide">
             <span className="agent-kicker">
-              A 90-minute working conversation
+              Agenda 2 · Current-state architecture and capability reuse · 25
+              minutes
             </span>
-            <h1>
-              What could Morgan
-              <br />
-              put in motion?
-            </h1>
+            <h1>What can we build on?</h1>
             <p className="agent-lede">
-              An agent prepares the work. Morgan brings the judgment.
-              <br />
-              Together, we explore what it would take to make that real.
+              Review the requirements exposed by Morgan’s day. Confirm what
+              exists across Codex, product/growth infrastructure, S3/data,
+              Marketo and internal tooling. These are areas to discuss—not
+              pre-confirmed integrations.
             </p>
-            <div className="agent-intro-grid">
-              <button
-                className={s.day.moment === 0 ? "active" : ""}
-                onClick={() =>
-                  setS((prev) => ({ ...prev, day: { ...prev.day, moment: 0 } }))
-                }
-              >
-                <span>08:45</span>
-                <strong>Morning briefing</strong>
-              </button>
-              {chapters.map((ch, i) => (
-                <button
-                  key={ch.id}
-                  onClick={() => {
-                    setChapter(i);
-                    setPage("workspace");
-                  }}
-                >
-                  <span>
-                    0{i + 1} / {ch.time}
-                  </span>
-                  <h2>{ch.title}</h2>
-                  <p>{ch.short} →</p>
-                </button>
-              ))}
+            <div className="agent-readout-cards">
+              {chapters.map((ch) => {
+                const finding = s.findings[ch.id];
+                return (
+                  <article key={ch.id}>
+                    <h2>{ch.title}</h2>
+                    {ch.inputs.map(([label, detail]) => (
+                      <label key={label}>
+                        {label}
+                        <small>{detail}</small>
+                        <select
+                          value={finding.capabilities[label] || "Unknown"}
+                          onChange={(e) =>
+                            setS((prev) => ({
+                              ...prev,
+                              findings: {
+                                ...prev.findings,
+                                [ch.id]: {
+                                  ...prev.findings[ch.id],
+                                  capabilities: {
+                                    ...prev.findings[ch.id].capabilities,
+                                    [label]: e.target.value,
+                                  },
+                                },
+                              },
+                            }))
+                          }
+                        >
+                          {availability.map((a) => (
+                            <option key={a}>{a}</option>
+                          ))}
+                        </select>
+                      </label>
+                    ))}
+                    <label>
+                      Existing tools, reuse opportunities and missing
+                      foundations
+                      <textarea
+                        value={finding.note}
+                        onChange={(e) =>
+                          setS((prev) => ({
+                            ...prev,
+                            findings: {
+                              ...prev.findings,
+                              [ch.id]: {
+                                ...prev.findings[ch.id],
+                                note: e.target.value,
+                              },
+                            },
+                          }))
+                        }
+                      />
+                    </label>
+                  </article>
+                );
+              })}
             </div>
-            <div className="agent-intro-bottom">
-              <div>
-                <h3>Start with what we heard.</h3>
-                <p>
-                  Content at scale is the clearest area of interest. Signal to
-                  action and routine operations are connected opportunities to
-                  align on—not a predetermined answer.
-                </p>
-              </div>
-              <div>
-                <h3>Leave with three concrete outputs.</h3>
-                <p>
-                  An agreed use-case set. A working architecture with ownership
-                  boundaries. Decisions and dependencies for the next readout.
-                </p>
-              </div>
-            </div>
+            <button onClick={save}>Save capability findings</button>{" "}
             <button
               className="agent-primary"
-              onClick={() => setPage("workspace")}
+              onClick={() => {
+                setPage("architecture");
+                window.scrollTo({ top: 0 });
+              }}
             >
-              Enter Morgan’s workspace →
+              Next · Target architecture →
             </button>
-            <p className="agent-disclaimer">
-              Imagined near-term experience · Fictional data · No connected
-              systems or live actions
-            </p>
           </main>
         ) : page === "workspace" ? (
           <main className="agent-main">
@@ -403,8 +433,8 @@ export default function AgentWorkspace() {
                       Now examine the inputs, connectors, controls and ownership
                       needed to make the proposed experience real.
                     </p>
-                    <button onClick={() => setPage("architecture")}>
-                      Explore the supporting architecture →
+                    <button onClick={() => setPage("capabilities")}>
+                      Next · Capability reuse →
                     </button>
                   </section>
                 </>
@@ -769,6 +799,28 @@ export default function AgentWorkspace() {
                           />
                         </label>
                         <label className="wide">
+                          Business outcome for this use case
+                          <input
+                            value={f.businessOutcome || ""}
+                            onChange={(e) =>
+                              finding({ businessOutcome: e.target.value })
+                            }
+                          />
+                        </label>
+                        <label className="wide">
+                          Shared Northstar
+                          <input
+                            placeholder="What should this make possible for the business?"
+                            value={s.northstar || ""}
+                            onChange={(e) =>
+                              setS((prev) => ({
+                                ...prev,
+                                northstar: e.target.value,
+                              }))
+                            }
+                          />
+                        </label>
+                        <label className="wide">
                           What must we prove first?
                           <textarea
                             value={f.proof}
@@ -817,7 +869,8 @@ export default function AgentWorkspace() {
         ) : page === "architecture" ? (
           <main className="agent-wide">
             <span className="agent-kicker">
-              From possibility to implementation
+              Agenda 3 · Target architecture and operating boundaries · 25
+              minutes
             </span>
             <h1>How would we make it work?</h1>
             <p className="agent-lede">
@@ -853,7 +906,9 @@ export default function AgentWorkspace() {
           </main>
         ) : (
           <main className="agent-wide">
-            <span className="agent-kicker">The working readout</span>
+            <span className="agent-kicker">
+              Agenda 4 · Decisions, sequencing, and Colin readout · 15 minutes
+            </span>
             <h1>What we’re taking forward.</h1>
             <p className="agent-lede">
               {
@@ -863,6 +918,9 @@ export default function AgentWorkspace() {
               }{" "}
               of 3 candidate areas marked as priorities. Unknowns remain open.
             </p>
+            <p>
+              <b>Northstar:</b> {s.northstar || "Not agreed yet"}
+            </p>
             <div className="agent-readout-cards">
               {chapters.map((ch, i) => {
                 const finding = s.findings[ch.id];
@@ -870,6 +928,11 @@ export default function AgentWorkspace() {
                   <article key={ch.id}>
                     <span className="agent-kicker">{finding.priority}</span>
                     <h2>{ch.title}</h2>
+                    <p>
+                      <b>Business outcome</b>
+                      <br />
+                      {finding.businessOutcome || "Not captured yet"}
+                    </p>
                     <p>
                       <b>Prove</b>
                       <br />
@@ -909,6 +972,39 @@ export default function AgentWorkspace() {
                 }))
               }
             />
+            <section className="agent-requirements">
+              <h2>For Colin · the next-day readout</h2>
+              <div className="agent-capture">
+                {(
+                  [
+                    ["ownership", "Agreed ownership boundaries"],
+                    ["open", "Open decisions and dependencies"],
+                    ["sequence", "Proposed sequence of work"],
+                    ["colin", "Decisions or sponsorship needed from Colin"],
+                  ] as const
+                ).map(([key, label]) => (
+                  <label key={key}>
+                    {label}
+                    <textarea
+                      value={s.architecture.closing[key]}
+                      onChange={(e) =>
+                        setS((prev) => ({
+                          ...prev,
+                          architecture: {
+                            ...prev.architecture,
+                            closing: {
+                              ...prev.architecture.closing,
+                              [key]: e.target.value,
+                            },
+                          },
+                        }))
+                      }
+                    />
+                  </label>
+                ))}
+                <button onClick={save}>Save readout</button>
+              </div>
+            </section>
             <button className="agent-primary" onClick={() => download()}>
               Download concise readout
             </button>

@@ -98,3 +98,10 @@ test("earlier backups start at the morning briefing without losing findings", ()
   delete s.day;
   assert.equal(m.restoreAgentState(s).day.moment, 0);
 });
+
+test('agenda outcomes and Colin asks survive restore and reach the readout',()=>{
+ const s=m.createAgentState();s.northstar='Grow enterprise adoption';s.findings.s3.businessOutcome='More relevant campaigns per marketer';s.architecture.closing.sequence='Connect approved assets first';s.architecture.closing.colin='Sponsor the pilot';
+ const restored=m.restoreAgentState(JSON.parse(JSON.stringify(s)));
+ assert.equal(restored.findings.s3.businessOutcome,s.findings.s3.businessOutcome);
+ for(const phrase of [s.northstar,s.findings.s3.businessOutcome,s.architecture.closing.sequence,s.architecture.closing.colin])assert.ok(m.agentReadout(restored).includes(phrase));
+});
