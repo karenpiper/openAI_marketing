@@ -636,6 +636,7 @@ export default function AgentWorkspace() {
               }
             />
             <Architecture
+              agentWorkshop
               session={arch}
               setSession={(action) =>
                 setS((prev) => ({
@@ -712,6 +713,7 @@ export default function AgentWorkspace() {
           </main>
         )}
         <footer className="agent-footer">
+          <a href="/original">Original workshop</a>
           <span role="status">
             {ready
               ? error

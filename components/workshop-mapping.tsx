@@ -272,12 +272,18 @@ export function ArchitectureReadback({ session: s }: { session: Session }) {
     </>
   );
 }
-export function Architecture({ session: s, setSession }: Props) {
+export function Architecture({
+  session: s,
+  setSession,
+  agentWorkshop = false,
+}: Props & { agentWorkshop?: boolean }) {
   return (
     <section className="module-panel guided-panel">
       <div className="module-heading">
         <span className="eyebrow">
-          Proposed way of working · Adapt with the room
+          {agentWorkshop
+            ? "Proposed way of working · Adapt with the room"
+            : "03 · Proposed way of working · 45 minutes"}
         </span>
         <h1>What should change for this use case?</h1>
       </div>
