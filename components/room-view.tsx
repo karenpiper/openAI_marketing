@@ -1,3 +1,4 @@
+import LiveSynthesis from "./live-synthesis";
 import { CurrentReadback, ArchitectureReadback } from "./workshop-mapping";
 import {
   currentQuestions,
@@ -160,7 +161,7 @@ export default function RoomView({ session }: { session: Session }) {
           {s.guide.current === 4 ? (
             <>
               <h1>Have we captured this correctly?</h1>
-              <CurrentReadback session={s} />
+              <LiveSynthesis session={s} />
             </>
           ) : (
             <>
@@ -188,6 +189,9 @@ export default function RoomView({ session }: { session: Session }) {
               })()}
             </>
           )}
+          {s.guide.current < 4 && (
+            <LiveSynthesis session={s} index={s.guide.current} />
+          )}
         </section>
       )}
       {s.stage === 2 && s.architectureTab === "map" && (
@@ -198,6 +202,7 @@ export default function RoomView({ session }: { session: Session }) {
           {s.guide.architecture === 5 ? (
             <>
               <h1>Read back the proposed way of working</h1>
+              <LiveSynthesis session={s} architecture />
               <ArchitectureReadback session={s} />
             </>
           ) : (

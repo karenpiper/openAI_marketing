@@ -1,3 +1,4 @@
+import LiveSynthesis from "./live-synthesis";
 import { useState, type Dispatch, type SetStateAction } from "react";
 import {
   type Session,
@@ -164,8 +165,8 @@ export function CurrentState({ session: s, setSession }: Props) {
       </div>
       <p className="muted">
         Describe a recent example in everyday language. You do not need to name
-        a capability or design a system. The implementation team can translate
-        these answers afterward and check its interpretation with you.
+        a capability or design a system. A suggested capability appears as you
+        capture the answer. Check it with the room now.
       </p>
       <CaseFocus session={s} setSession={setSession} />
       <Navigation step={step} total={4} change={change} />
@@ -219,11 +220,12 @@ export function CurrentState({ session: s, setSession }: Props) {
               }
             />
           </div>
+          <LiveSynthesis session={s} setSession={setSession} index={step} />
         </>
       ) : (
         <>
           <h2>Have we captured this correctly?</h2>
-          <CurrentReadback session={s} />
+          <LiveSynthesis session={s} setSession={setSession} />
           <div className="guide-links">
             {questions.map((q, i) => (
               <button key={q.id} onClick={() => change(i)}>
@@ -358,6 +360,9 @@ export function Architecture({ session: s, setSession }: Props) {
       </div>
       <CaseFocus session={s} setSession={setSession} />
       <Navigation step={step} total={5} change={change} />
+      {(step === 0 || step === 5) && (
+        <LiveSynthesis session={s} setSession={setSession} architecture />
+      )}
       {q ? (
         <>
           <div className="question-banner">

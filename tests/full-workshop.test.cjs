@@ -468,7 +468,7 @@ test("guided capture supports all seven cases, preserves legacy notes and multip
   } = require("../lib/demo-session.ts");
   let s = createDemoSession();
   const original = s.capabilities.find(
-    (c) => c.useCase === "s3" && c.name === "Content operations",
+    (c) => c.useCase === "s3" && c.questionId === "source",
   );
   const prompt = guide.currentQuestions.s3[0];
   const count = s.capabilities.length;
@@ -578,4 +578,84 @@ test("architecture edits stay case-specific and preserve other handoffs", () => 
       (b) => b.useCase === "s1" && b.system === "CRM\nWarehouse",
     ),
   );
+});
+
+test("live synthesis preserves evidence and tools, requires room judgment and invalidates on source changes", () => {
+  const {
+    saveInterpretation,
+    interpretation,
+    capabilityNames,
+  } = require("../lib/live-synthesis.ts");
+  const guide = require("../lib/workshop-guide.ts");
+  let s = w.createSession();
+  for (const c of useCases) assert.equal(capabilityNames[c.id].length, 4);
+  assert.deepEqual(saveInterpretation(s, "s3", 0, { status: "Confirmed" }), s);
+  s = guide.editAnswer(s, "s3", guide.currentQuestions.s3[0], {
+    evidence:
+      "Assets are in three places. We ask in Slack which version is approved.",
+    system:
+      "Library A — documents\nLibrary B — images\nSlack — version questions",
+  });
+  let a = guide.findAnswer(s, "s3", guide.currentQuestions.s3[0]);
+  assert.equal(interpretation(a, 0).name, "Find approved content");
+  assert.match(interpretation(a, 0).reason, /three places/);
+  s = saveInterpretation(s, "s3", 0, { status: "Confirmed" });
+  assert.equal(s.capabilities[0].synthesis.status, "Proposed");
+  s = saveInterpretation(s, "s3", 0, {
+    coverage: "Works with gaps",
+    name: "Find the current approved version",
+    status: "Confirmed",
+  });
+  assert.equal(w.synthesisStatus(s.capabilities[0]), "Confirmed");
+  assert.match(w.readout(s), /Find the current approved version/);
+  assert.deepEqual(w.parseSession(JSON.parse(JSON.stringify(s))), s);
+  s = guide.editAnswer(s, "s3", guide.currentQuestions.s3[0], {
+    evidence: "Correction: one library, with approval records.",
+  });
+  a = s.capabilities[0];
+  assert.equal(interpretation(a, 0).stale, true);
+  assert.equal(w.synthesisStatus(a), "Needs recheck");
+  assert.match(w.readout(s), /Needs recheck/);
+  assert.equal(interpretation(a, 0).name, "Find the current approved version");
+  assert.match(a.system, /Library A/);
+  s = saveInterpretation(s, "s3", 0, { status: "Confirmed" });
+  assert.equal(w.synthesisStatus(s.capabilities[0]), "Confirmed");
+  s = guide.editAnswer(s, "s3", guide.currentQuestions.s3[0], {
+    status: "Disputed",
+  });
+  s = saveInterpretation(s, "s3", 0, { status: "Confirmed" });
+  assert.equal(s.capabilities[0].synthesis.status, "Proposed");
+});
+
+test("live synthesis renders in capture, projector, architecture and readout without requiring credentials", () => {
+  const s = require("../lib/demo-session.ts").createDemoSession();
+  const Live = require("../components/live-synthesis.tsx").default;
+  const html = renderToStaticMarkup(
+    React.createElement(Live, { session: s, setSession: () => {}, index: 0 }),
+  );
+  assert.match(html, /Find approved content/);
+  assert.match(html, /Yes, that describes it/);
+  assert.match(html, /Sample approved asset library/);
+  const architecture = renderToStaticMarkup(
+    React.createElement(Live, {
+      session: s,
+      setSession: () => {},
+      architecture: true,
+    }),
+  );
+  assert.match(architecture, /What should change/);
+  assert.match(architecture, /Demo content operations lead/);
+  assert.match(architecture, /Check this interpretation in step 2/);
+  const bad = {
+    ...s,
+    capabilities: s.capabilities.map((c) => ({
+      ...c,
+      synthesis: c.synthesis
+        ? { ...c.synthesis, coverage: "BAD", status: "BAD" }
+        : undefined,
+    })),
+  };
+  const parsed = w.parseSession(JSON.parse(JSON.stringify(bad)));
+  assert.equal(parsed.capabilities[0].synthesis.coverage, "Not established");
+  assert.equal(parsed.capabilities[0].synthesis.status, "Unknown");
 });

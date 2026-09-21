@@ -74,7 +74,28 @@ export const layerSeeds = [
     purpose: "Coordinate relationship context and sales handoffs",
   },
 ];
+export type Synthesis = {
+  name: string;
+  coverage:
+    | "Not established"
+    | "Works today"
+    | "Works with gaps"
+    | "Not in place";
+  change: string;
+  nextOwner: string;
+  source: string;
+  status: Status;
+};
+export function synthesisSource(c: Capability): string {
+  return JSON.stringify([c.evidence, c.system, c.owner, c.gap, c.status]);
+}
+export function synthesisStatus(c: Capability): string {
+  return c.synthesis?.source === synthesisSource(c)
+    ? c.synthesis.status
+    : "Needs recheck";
+}
 export type Capability = {
+  synthesis?: Synthesis;
   questionId?: string;
   id: string;
   useCase: string;
@@ -380,6 +401,30 @@ export function parseSession(raw: unknown): Session {
     ...(typeof x.questionId === "string"
       ? { questionId: str(x.questionId) }
       : {}),
+    ...(x.synthesis && typeof x.synthesis === "object"
+      ? {
+          synthesis: (() => {
+            const v = record(x.synthesis);
+            return {
+              name: str(v.name),
+              coverage: choice(
+                v.coverage,
+                [
+                  "Not established",
+                  "Works today",
+                  "Works with gaps",
+                  "Not in place",
+                ],
+                "Not established",
+              ) as Synthesis["coverage"],
+              change: str(v.change),
+              nextOwner: str(v.nextOwner),
+              source: str(v.source),
+              status: status(v),
+            };
+          })(),
+        }
+      : {}),
     id: id(x),
     useCase: uc(x.useCase),
     name: str(x.name),
@@ -528,6 +573,13 @@ export function readout(s: Session): string {
       (c) =>
         `${name(c.useCase)} | ${c.name} | ${c.fit} | ${c.status}\nSystem: ${c.system || "Unknown"}; owner: ${c.owner || "Unassigned"}\nEvidence: ${c.evidence || "Not captured"}\nWhat works / needs work: ${c.gap || "Not captured"}`,
     ),
+    "## Live capability map",
+    ...s.capabilities
+      .filter((c) => c.synthesis)
+      .map(
+        (c) =>
+          `${name(c.useCase)} | ${c.synthesis!.name} | ${synthesisStatus(c)}\nCoverage: ${c.synthesis!.coverage}\nChange to discuss: ${c.synthesis!.change || "Not captured"}\nWho takes it forward: ${c.synthesis!.nextOwner || "Unassigned"}\nBased on: ${c.evidence}\nTools and roles: ${c.system || "Unknown"}`,
+      ),
     "## Architecture boundaries",
     ...s.boundaries.map(
       (b) =>

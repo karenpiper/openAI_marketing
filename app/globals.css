@@ -2250,3 +2250,22 @@ details p {
     padding: 10px;
   }
 }
+.live-translation {
+  border-left: 3px solid #598b75;
+  padding: 20px;
+  margin: 24px 0;
+  background: #f3f7f4;
+  border-radius: 8px;
+}
+.live-translation blockquote {
+  border-left: 2px solid #b4c8bc;
+  margin: 18px 0;
+  padding: 6px 18px;
+  color: #355045;
+}
+.live-translation .capture-card {
+  background: white;
+}
+.live-translation .capture-card > .agreement-badge {
+  margin-bottom: 14px;
+}

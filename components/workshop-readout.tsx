@@ -1,3 +1,4 @@
+import LiveSynthesis from "./live-synthesis";
 import { type Dispatch, type SetStateAction } from "react";
 import {
   type Session,
@@ -163,6 +164,16 @@ export default function WorkshopReadout({
             </article>
           ))}
       </div>
+      {useCases
+        .filter((u) =>
+          session.capabilities.some((c) => c.useCase === u.id && c.synthesis),
+        )
+        .map((u) => (
+          <section key={u.id}>
+            <h2>{caseName(u.id)}</h2>
+            <LiveSynthesis session={{ ...session, focus: u.id }} architecture />
+          </section>
+        ))}
       <h2 className="section-title">Architecture & operating boundaries</h2>
       {!session.boundaries.length && <p>No boundaries captured.</p>}
       <div className="readout-table-wrap">

@@ -1,3 +1,4 @@
+import { saveInterpretation } from "./live-synthesis";
 import { currentQuestions, findAnswer, editAnswer } from "./workshop-guide";
 import {
   createSession,
@@ -331,7 +332,19 @@ export function createDemoSession(): Session {
   s.parking =
     "DEMO: Who can confirm source access?\nDEMO: What would count as enough evidence to run a pilot?";
   s.timer = { stage: 1, remaining: 1800, runningSince: null };
-  return addDemoGuideExamples(s);
+  let demo = addDemoGuideExamples(s);
+  demo = saveInterpretation(demo, "s3", 0, {
+    coverage: "Works with gaps",
+    status: "Confirmed",
+    change:
+      "Make the approved source and version easy to find across the tools already in use.",
+    nextOwner: "Demo content operations lead",
+  });
+  demo = saveInterpretation(demo, "s3", 1, {
+    coverage: "Works with gaps",
+    status: "Proposed",
+  });
+  return demo;
 }
 
 /** Add missing rehearsal answers without replacing the user's existing demo edits. */
