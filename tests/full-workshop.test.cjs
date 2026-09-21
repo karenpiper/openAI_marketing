@@ -1155,3 +1155,40 @@ test("architecture download recreates source diagram and links session annotatio
   assert.match(JSON.stringify(doc), /SESSION ANNOTATIONS/);
   assert.match(JSON.stringify(doc), /Use the existing approved library/);
 });
+
+test("closing readout has one diagram, three outputs and a persistent editorial summary", () => {
+  const {
+    closingSummary,
+    middayReadout,
+  } = require("../lib/closing-summary.ts");
+  const Readout = require("../components/workshop-readout.tsx").default;
+  let s = require("../lib/demo-session.ts").createDemoSession();
+  const auto = closingSummary(s);
+  assert.ok(auto.sequence.length > 0);
+  s.closing = {
+    ownership:
+      "OpenAI owns audience reasoning; Adobe owns activation; C&T owns integration.",
+    sequence: "1. Validate audience data. 2. Test the content handoff.",
+    open: "Resolve identity ownership.",
+    colin: "Sponsor a joint implementation lead.",
+  };
+  s = w.parseSession(JSON.parse(JSON.stringify(s)));
+  assert.deepEqual(closingSummary(s), s.closing);
+  const html = renderToStaticMarkup(
+    React.createElement(Readout, { session: s, setSession: () => {} }),
+  );
+  assert.equal((html.match(/<svg/g) || []).length, 1);
+  assert.ok(!html.includes("generated-node"));
+  assert.match(html, /What we take to Colin/);
+  assert.match(html, /Sponsor a joint implementation lead/);
+  assert.match(middayReadout(s), /Resolve identity ownership/);
+  assert.ok(!middayReadout(s).includes("Current-state findings"));
+  const legacy = { ...s };
+  delete legacy.closing;
+  assert.deepEqual(w.parseSession(legacy).closing, {
+    ownership: "",
+    sequence: "",
+    open: "",
+    colin: "",
+  });
+});

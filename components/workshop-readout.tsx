@@ -1,9 +1,16 @@
 import { useState, type Dispatch, type SetStateAction } from "react";
 import { type Session, activeCases, selectionConfirmed } from "../lib/workshop";
+import { closingSummary } from "../lib/closing-summary";
 import ArchitectureOutput from "./architecture-output";
 import WorkshopRecord from "./workshop-record";
-import { Badge } from "./workshop-fields";
-
+import { Badge, Field } from "./workshop-fields";
+import SaveFooter from "./save-footer";
+const labels = {
+  ownership: "Ownership boundaries",
+  sequence: "Proposed sequence of work",
+  open: "Open decisions & dependencies",
+  colin: "Decisions or sponsorship needed from Colin",
+};
 export default function WorkshopReadout({
   session,
   setSession,
@@ -13,36 +20,62 @@ export default function WorkshopReadout({
   setSession?: Dispatch<SetStateAction<Session>>;
   room?: boolean;
 }) {
-  const [record, setRecord] = useState(false);
-  const cases = activeCases(session);
-  if (record && !room)
+  const [view, setView] = useState<"outcomes" | "record" | "edit">("outcomes");
+  const cases = activeCases(session),
+    summary = closingSummary(session);
+  const navigate = (next: typeof view) => {
+    setView(next);
+    window.scrollTo({ top: 0 });
+  };
+  if (view !== "outcomes" && !room)
     return (
       <>
-        <button
-          onClick={() => {
-            setRecord(false);
-            window.scrollTo({ top: 0 });
-          }}
-        >
+        <button onClick={() => navigate("outcomes")}>
           ← Back to workshop outcomes
         </button>
-        <WorkshopRecord session={session} setSession={setSession} />
+        {view === "record" ? (
+          <WorkshopRecord session={session} setSession={setSession} />
+        ) : (
+          <section className="capture-card">
+            <h1>Prepare the midday readout</h1>
+            <p>
+              Keep each answer to three short points. This is the room’s closing
+              summary; the detailed notes stay in the workshop record.
+            </p>
+            {(Object.keys(labels) as (keyof typeof labels)[]).map((key) => (
+              <Field
+                key={key}
+                label={labels[key]}
+                multiline
+                value={session.closing[key] || summary[key]}
+                onChange={(value) =>
+                  setSession?.((s) => ({
+                    ...s,
+                    closing: { ...s.closing, [key]: value },
+                  }))
+                }
+              />
+            ))}
+            <SaveFooter />
+            <button onClick={() => navigate("outcomes")}>
+              Return to the readout →
+            </button>
+          </section>
+        )}
       </>
     );
   return (
-    <section className="module-panel outcomes-readout">
+    <section className="module-panel outcomes-readout closing-readout">
       <div className="module-heading">
-        <span className="eyebrow">04 · Workshop outcomes</span>
-        <h1>Here’s where we landed.</h1>
-        <p>Our priority use cases and the architecture to support them.</p>
+        <span className="eyebrow">
+          04 · Decisions, sequencing & Colin readout · 15 min
+        </span>
+        <h1>Three outputs for the midday readout.</h1>
       </div>
-      <nav className="outcome-nav" aria-label="Workshop outcomes">
-        <a href="#priority-outcomes">01 · Priority use cases</a>
-        <a href="#architecture-outcome">02 · Proposed architecture</a>
-      </nav>
-      <section id="priority-outcomes">
+      <section className="closing-section">
         <div className="card-heading">
           <h2>
+            01 ·{" "}
             {cases.length === 3
               ? "Three priority use cases"
               : `${cases.length} priority use cases`}
@@ -50,60 +83,71 @@ export default function WorkshopReadout({
           <Badge
             value={
               selectionConfirmed(session)
-                ? "Working set confirmed"
-                : "Working set needs confirmation"
+                ? "Agreed working set"
+                : "Working set needs agreement"
             }
           />
         </div>
         {cases.length !== 3 && (
-          <p className="muted">
-            The workshop aims to land on three.{" "}
-            {cases.length === 0
-              ? "Choose the working set in step 1 to populate this readout."
-              : "Review the working set in step 1 before closing."}
-          </p>
+          <p>Agree three use cases in step 1 before closing.</p>
         )}
         <div className="outcome-priorities">
           {cases.map((u, i) => (
             <article className="outcome-priority" key={u.id}>
-              <span className="eyebrow">Priority {i + 1}</span>
+              <span className="eyebrow">{i + 1}</span>
               <h3>{u.label}</h3>
+              <p>
+                {session.assessments[u.id].proofText ||
+                  "What to prove: still to agree."}
+              </p>
               <Badge
                 value={
                   session.assessments[u.id].noRegret === "yes"
                     ? "Can move now"
                     : session.assessments[u.id].noRegret === "no"
                       ? "Cannot move now"
-                      : "Readiness not sure"
+                      : "Readiness to confirm"
                 }
               />
-              <dl>
-                <dt>Growth outcome</dt>
-                <dd>{u.kpiGrowth}</dd>
-                <dt>Productivity outcome</dt>
-                <dd>{u.kpiProd}</dd>
-                <dt>What we need to prove</dt>
-                <dd>{session.assessments[u.id].proofText || "To be agreed"}</dd>
-              </dl>
             </article>
           ))}
         </div>
       </section>
-      <section id="architecture-outcome">
-        <ArchitectureOutput session={session} compact download={!room} />
+      <section className="closing-section closing-architecture">
+        <div>
+          <span className="eyebrow">02 · Working architecture</span>
+          <ArchitectureOutput session={session} compact download={!room} />
+        </div>
+        <aside>
+          <h3>Ownership boundaries</h3>
+          <p className="preserve-lines">{summary.ownership}</p>
+          <p className="muted">
+            Baseline proposal with session annotations. Detailed changes and
+            unresolved boundaries are in the architecture PDF.
+          </p>
+        </aside>
+      </section>
+      <section className="closing-section">
+        <div className="card-heading">
+          <h2>03 · What we take to Colin</h2>
+          {!room && setSession && (
+            <button onClick={() => navigate("edit")}>
+              Edit closing summary
+            </button>
+          )}
+        </div>
+        <div className="closing-asks">
+          {(["sequence", "open", "colin"] as const).map((key) => (
+            <article key={key}>
+              <h3>{key === "colin" ? "Ask for Colin" : labels[key]}</h3>
+              <p className="preserve-lines">{summary[key]}</p>
+            </article>
+          ))}
+        </div>
       </section>
       {!room && (
         <footer className="outcome-record-link">
-          <p>
-            Supporting evidence, shared decisions and follow-up actions are kept
-            in the full workshop record.
-          </p>
-          <button
-            onClick={() => {
-              setRecord(true);
-              window.scrollTo({ top: 0 });
-            }}
-          >
+          <button onClick={() => navigate("record")}>
             Open full workshop record
           </button>
         </footer>

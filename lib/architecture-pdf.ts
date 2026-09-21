@@ -1,3 +1,4 @@
+import { closingSummary } from "./closing-summary";
 import { architectureDiagram, diagramRefs } from "./architecture-diagram";
 import { scenarioFlow, scenarioSummary } from "./workflow-simulation";
 import type { Content, TDocumentDefinitions } from "pdfmake/interfaces";
@@ -211,6 +212,14 @@ export function architectureDocument(s: Session): TDocumentDefinitions {
     style: "caseTitle",
     pageBreak: "before",
   });
+  const closing = closingSummary(s);
+  content.push(
+    { text: "Midday readout", style: "stepTitle" },
+    {
+      text: `Ownership boundaries: ${closing.ownership}\nProposed sequence: ${closing.sequence}\nOpen decisions and dependencies: ${closing.open}\nAsk for Colin: ${closing.colin}`,
+      margin: [0, 0, 0, 14],
+    },
+  );
   for (const d of model.decisions)
     content.push(
       { text: `${d.title} / ${d.status}`, style: "stepTitle" },
@@ -241,7 +250,11 @@ export function architectureDocument(s: Session): TDocumentDefinitions {
       stepTitle: { fontSize: 14, bold: true, margin: [0, 12, 0, 4] },
       status: { fontSize: 9, bold: true },
     },
-    content: JSON.parse(JSON.stringify(content).replaceAll("→", "->").replaceAll("↩", "Return to")),
+    content: JSON.parse(
+      JSON.stringify(content)
+        .replaceAll("→", "->")
+        .replaceAll("↩", "Return to"),
+    ),
     footer: (page, count) => ({
       text: `Workshop record · ${page} / ${count}`,
       alignment: "right",

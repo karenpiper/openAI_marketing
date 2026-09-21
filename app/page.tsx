@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import SaveFooter, { SaveContext } from "../components/save-footer";
+import { middayReadout } from "../lib/closing-summary";
 import { persistSession } from "../lib/persistence";
 import WorkshopChapter from "../components/workshop-chapter";
 import WorkshopOverview from "../components/workshop-overview";
@@ -176,7 +177,7 @@ export default function Workshop() {
     const data =
       kind === "json"
         ? JSON.stringify(session, null, 2)
-        : `${demo ? "DEMO DATA · Fictional test records, not workshop findings.\n\n" : ""}${readout(session)}`;
+        : `${demo ? "DEMO DATA · Fictional test records, not workshop findings.\n\n" : ""}${middayReadout(session)}`;
     const url = URL.createObjectURL(
       new Blob([data], {
         type: kind === "json" ? "application/json" : "text/markdown",

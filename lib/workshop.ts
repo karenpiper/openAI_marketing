@@ -208,6 +208,7 @@ export type WorkflowReview = {
   source: string;
 };
 export type Session = {
+  closing: { ownership: string; sequence: string; open: string; colin: string };
   scenario: WorkflowScenario;
   architectureAdditions: {
     id: string;
@@ -291,6 +292,7 @@ export function createSession(): Session {
   return {
     schema: 1,
     overview: true,
+    closing: { ownership: "", sequence: "", open: "", colin: "" },
     scenario: { ...defaultScenario },
     architectureAdditions: [],
     draftDecisionTitle: "",
@@ -403,6 +405,13 @@ export function parseSession(raw: unknown): Session {
     throw Error("This is not a supported workshop backup.");
   const s = createSession();
   s.title = str(r.title, s.title);
+  const closing = record(r.closing);
+  s.closing = {
+    ownership: str(closing.ownership),
+    sequence: str(closing.sequence),
+    open: str(closing.open),
+    colin: str(closing.colin),
+  };
   s.draftDecisionTitle = str(r.draftDecisionTitle);
   s.overview = r.overview !== false;
   s.briefingPanel =
@@ -720,6 +729,8 @@ export function readout(s: Session): string {
       (d) =>
         `${d.status}: ${d.title}\n${d.answer || "Open"}\nOwner: ${d.owner || "Unassigned"}; needed by: ${d.due || "Not set"}; scope: ${name(d.useCase)}`,
     ),
+    "## Midday readout summary",
+    `Ownership boundaries: ${s.closing.ownership || "See captured boundaries"}\nProposed sequence: ${s.closing.sequence || "See actions"}\nOpen decisions and dependencies: ${s.closing.open || "See decisions"}\nAsk for Colin: ${s.closing.colin || "See sponsorship requests"}`,
     "## Content-at-scale workflow scenario",
     scenarioSummary(s.scenario),
     `Room corrections: ${s.scenario.notes || "None captured"}`,
