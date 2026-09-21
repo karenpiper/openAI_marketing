@@ -1,5 +1,6 @@
-import type { ReactNode } from "react";
 import Image from "next/image";
+import { useCases } from "../lib/workshop-data";
+import { useCaseCandidates } from "../lib/use-case-candidates";
 export const workshopAgenda = [
   {
     title: "Priority use cases and outcomes",
@@ -187,13 +188,7 @@ export default function AgentBriefing({ onEnter }: { onEnter: () => void }) {
     </main>
   );
 }
-export function MeetMorgan({
-  onEnter,
-  discussion,
-}: {
-  onEnter: () => void;
-  discussion: ReactNode;
-}) {
+export function MeetMorgan({ onEnter }: { onEnter: () => void }) {
   return (
     <main className="workshop-opening">
       <section className="opening-hero">
@@ -210,74 +205,91 @@ export function MeetMorgan({
           sizes="(max-width:700px) 90vw, 480px"
         />
         <p>
-          She knows the work is about people: the champion trying to get a pilot
-          going, the sponsor who needs a reason to invest, the colleague waiting
-          for a clear decision.
+          She arrives to a real marketing queue: account signals to interpret,
+          requests waiting for operations, campaigns in review, new contacts to
+          reach and yesterday’s results to learn from. There may be thirty
+          things competing for attention before the first meeting even starts.
         </p>
         <p>
-          She leads growth and account-based marketing. Her goal is to turn
-          enterprise interest into meaningful adoption—without making every
-          audience, content and operational decision by hand.
+          She leads growth and account-based marketing. Her job today is to turn
+          enterprise interest into meaningful adoption while making sound calls
+          across that queue.
         </p>
         <div className="morgan-story-note">
-          <b>This is the day we’re proposing.</b>
+          <b>This is a working hypothesis of Morgan’s day today.</b>
           <p>
-            An imagined near-term experience: the agent brings Morgan the
-            opportunity, prepares the work and keeps it moving. She sets
-            direction, approves consequential choices and handles exceptions.
+            Correct it with the room. We are mapping the current experience
+            before proposing a future workflow or deciding which capabilities
+            should change it.
           </p>
         </div>
         <p className="morgan-human-note">
-          She is not looking for more things to approve. She wants time for the
-          decisions that deserve her experience—and confidence that the routine
-          work is being handled with care.
+          Follow seven moments in that queue. Each reveals a problem worth
+          testing; none is a pre-agreed priority.
         </p>
-        <div className="morgan-clear">{discussion}</div>
-        <h2>One opportunity runs through her day.</h2>
-        <div className="opening-day">
-          {[
-            [
-              "08:45",
-              "She arrives.",
-              "A morning briefing brings an account opportunity to her attention.",
-            ],
-            [
-              "09:15",
-              "She chooses a direction.",
-              "Product and journey signals suggest the wider buying group needs to engage.",
-            ],
-            [
-              "11:00",
-              "She reviews the plan.",
-              "The same audience and objective become a coordinated content and activation plan.",
-            ],
-            [
-              "15:00",
-              "She handles an exception.",
-              "A consent conflict needs judgment while routine checks follow agreed rules.",
-            ],
-            [
-              "17:30",
-              "She sees what moved.",
-              "The same thread returns her decisions, pending handoffs and unresolved work.",
-            ],
-          ].map(([time, title, body]) => (
-            <article key={time}>
-              <span>{time}</span>
-              <div>
-                <h3>{title}</h3>
-                <p>{body}</p>
+        <div className="current-day-stops">
+          {useCases.map((scene) => (
+            <article className="current-day-stop" key={scene.id}>
+              <Image
+                src={`/images/morgan/${scene.id}.png`}
+                alt=""
+                width={640}
+                height={420}
+              />
+              <div className="current-day-copy">
+                <span className="agent-kicker">
+                  {scene.time} · {scene.label}
+                </span>
+                <h2>{scene.title}</h2>
+                <p className="current-day-narrative">{scene.narrative}</p>
+                <div className="current-day-detail">
+                  <div>
+                    <b>The problem we think is real</b>
+                    <p>{scene.problem}</p>
+                  </div>
+                  <div>
+                    <b>Why we think it is real</b>
+                    <p>{scene.evidence}</p>
+                  </div>
+                  <div>
+                    <b>Ask the room</b>
+                    <p>{scene.question}</p>
+                  </div>
+                </div>
+                <div className="current-day-outcomes">
+                  <span>
+                    <b>Growth</b>
+                    {scene.kpiGrowth}
+                  </span>
+                  <span>
+                    <b>Productivity</b>
+                    {scene.kpiProd}
+                  </span>
+                </div>
               </div>
             </article>
           ))}
         </div>
+        <section className="emerging-needs">
+          <span className="agent-kicker">
+            Additional opportunities already surfaced
+          </span>
+          <h2>Carry these into the scoring conversation too.</h2>
+          <div>
+            {useCaseCandidates.slice(7).map((candidate) => (
+              <article key={candidate.id}>
+                <h3>{candidate.title}</h3>
+                <p>{candidate.short}</p>
+              </article>
+            ))}
+          </div>
+        </section>
         <p className="opening-footnote">
-          Inside the monitor: Morgan’s proposed working experience. Outside it:
-          our narrative, technical implications and workshop discussion. All
-          example data and actions are simulated.
+          This is a current-state conversation. The next step turns what the
+          room recognizes into a scored, explicit priority set.
         </p>
         <button className="agent-primary" onClick={onEnter}>
-          Score the candidate use cases →
+          Turn the day into use-case candidates →
         </button>
       </section>
     </main>

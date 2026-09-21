@@ -26,6 +26,7 @@ import MorningInbox from "./morning-inbox";
 import AgentBriefing, { MeetMorgan } from "./agent-briefing";
 import ArchitectureOutput from "./architecture-output";
 import { Architecture } from "./workshop-mapping";
+import { useCaseCandidates } from "../lib/use-case-candidates";
 import { SaveContext } from "./save-footer";
 import "./agent-workspace.css";
 function MorganScreen({
@@ -302,7 +303,6 @@ export default function AgentWorkspace() {
           <nav aria-label="Workshop navigation">
             {[
               ["intro", "0 · Briefing"],
-              ["meet", "Meet Morgan"],
               ["meet", "1 · Morgan’s Tuesday"],
               ["priorities", "2 · Priorities"],
               ["workspace", "3 · Prototype flow"],
@@ -337,40 +337,6 @@ export default function AgentWorkspace() {
           />
         ) : page === "meet" ? (
           <MeetMorgan
-            discussion={
-              <div className="opening-discussion">
-                <span className="agent-kicker">
-                  The day introduces the candidates
-                </span>
-                <h2>Three moments. Three possible problems to solve.</h2>
-                <p>
-                  Follow Morgan’s day to understand the work before anyone
-                  scores it. We will make the prioritization decision on the
-                  next screen.
-                </p>
-                <div className="morgan-use-case-list">
-                  {chapters.map((ch) => (
-                    <article key={ch.id}>
-                      <span>{ch.time}</span>
-                      <div>
-                        <h3>{ch.title}</h3>
-                        <p>{ch.short}</p>
-                      </div>
-                    </article>
-                  ))}
-                </div>
-                <label className="discussion-northstar">
-                  Shared Northstar
-                  <input
-                    value={s.northstar || ""}
-                    placeholder="What should this make possible for the business?"
-                    onChange={(e) =>
-                      setS((prev) => ({ ...prev, northstar: e.target.value }))
-                    }
-                  />
-                </label>
-              </div>
-            }
             onEnter={() => {
               setPage("priorities");
               window.scrollTo({ top: 0 });
@@ -378,13 +344,13 @@ export default function AgentWorkspace() {
           />
         ) : page === "priorities" ? (
           <UseCaseScoring
-            findings={s.findings}
+            assessments={s.useCases}
             onChange={(id, patch) =>
               setS((prev) => ({
                 ...prev,
-                findings: {
-                  ...prev.findings,
-                  [id]: { ...prev.findings[id], ...patch },
+                useCases: {
+                  ...prev.useCases,
+                  [id]: { ...prev.useCases[id], ...patch },
                 },
               }))
             }
@@ -924,15 +890,39 @@ export default function AgentWorkspace() {
             <h1>What we’re taking forward.</h1>
             <p className="agent-lede">
               {
-                chapters.filter(
-                  (ch) => s.findings[ch.id].priority === "Priority",
+                useCaseCandidates.filter(
+                  (candidate) =>
+                    s.useCases[candidate.id].priority === "Priority",
                 ).length
               }{" "}
-              of 3 candidate areas marked as priorities. Unknowns remain open.
+              of {useCaseCandidates.length} candidate areas marked as
+              priorities. Unknowns remain open.
             </p>
             <p>
               <b>Northstar:</b> {s.northstar || "Not agreed yet"}
             </p>
+            <section className="readout-priority-set">
+              <span className="agent-kicker">Agreed priority use-case set</span>
+              {useCaseCandidates.some(
+                (candidate) => s.useCases[candidate.id].priority === "Priority",
+              ) ? (
+                <ol>
+                  {useCaseCandidates
+                    .filter(
+                      (candidate) =>
+                        s.useCases[candidate.id].priority === "Priority",
+                    )
+                    .map((candidate) => (
+                      <li key={candidate.id}>
+                        <b>{candidate.title}</b>
+                        <span>{candidate.short}</span>
+                      </li>
+                    ))}
+                </ol>
+              ) : (
+                <p>The room has not selected a priority set yet.</p>
+              )}
+            </section>
             <div className="agent-readout-cards">
               {chapters.map((ch, i) => {
                 const finding = s.findings[ch.id];

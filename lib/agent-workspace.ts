@@ -1,6 +1,7 @@
 import { processState, processDigest } from "./process-state";
 import type { ProcessState } from "./process-state";
 import { createSession, parseSession, type Session } from "./workshop";
+import { useCaseCandidates } from "./use-case-candidates";
 export const AGENT_KEY = "oai-agent-workspace-v1";
 export const availability = [
   "Unknown",
@@ -111,6 +112,18 @@ export const chapters = [
       "Can routine work be resolved safely, with exceptions escalated and every action traceable?",
   },
 ] as const;
+export type Scorecard = {
+  frequency: number;
+  severity: number;
+  evidence: number;
+  leverage: number;
+  effort: number;
+  opportunity: number;
+};
+export type CandidateAssessment = {
+  priority: string;
+  scores: Scorecard;
+};
 export type Finding = {
   businessOutcome?: string;
   priority: string;
@@ -120,14 +133,7 @@ export type Finding = {
   proof: string;
   owner: string;
   decision: string;
-  scores: {
-    frequency: number;
-    severity: number;
-    evidence: number;
-    leverage: number;
-    effort: number;
-    opportunity: number;
-  };
+  scores: Scorecard;
 };
 export type AgentState = {
   learning?: { choice: string; reason: string; applied: boolean };
@@ -144,6 +150,7 @@ export type AgentState = {
     history: { id: string; time: string; text: string }[];
   };
   findings: Record<string, Finding>;
+  useCases: Record<string, CandidateAssessment>;
   audience: string;
   channel: string;
   source: string;
@@ -176,12 +183,41 @@ export function createAgentState(): AgentState {
         },
       ]),
     ),
+    useCases: Object.fromEntries(
+      useCaseCandidates.map((candidate) => [
+        candidate.id,
+        {
+          priority: "To discuss",
+          scores: {
+            frequency: 3,
+            severity: 3,
+            evidence: 3,
+            leverage: 3,
+            effort: 3,
+            opportunity: 3,
+          },
+        },
+      ]),
+    ),
     audience: "Buying roles",
     channel: "Email + event follow-up",
     source: "Approved source available",
     outcomes: {},
     day: { moment: 0, history: [] },
     architecture,
+  };
+}
+function restoreScorecard(raw: unknown): Scorecard {
+  const scores = raw as Partial<Scorecard> | undefined;
+  const valid = (value: unknown) =>
+    Number.isInteger(value) && Number(value) >= 1 && Number(value) <= 5;
+  return {
+    frequency: valid(scores?.frequency) ? scores!.frequency! : 3,
+    severity: valid(scores?.severity) ? scores!.severity! : 3,
+    evidence: valid(scores?.evidence) ? scores!.evidence! : 3,
+    leverage: valid(scores?.leverage) ? scores!.leverage! : 3,
+    effort: valid(scores?.effort) ? scores!.effort! : 3,
+    opportunity: valid(scores?.opportunity) ? scores!.opportunity! : 3,
   };
 }
 export function restoreAgentState(raw: unknown): AgentState {
@@ -224,48 +260,32 @@ export function restoreAgentState(raw: unknown): AgentState {
       proof: f.proof,
       owner: f.owner,
       decision: f.decision,
-      scores: {
-        frequency:
-          Number.isInteger(f.scores?.frequency) &&
-          f.scores.frequency >= 1 &&
-          f.scores.frequency <= 5
-            ? f.scores.frequency
-            : 3,
-        severity:
-          Number.isInteger(f.scores?.severity) &&
-          f.scores.severity >= 1 &&
-          f.scores.severity <= 5
-            ? f.scores.severity
-            : 3,
-        evidence:
-          Number.isInteger(f.scores?.evidence) &&
-          f.scores.evidence >= 1 &&
-          f.scores.evidence <= 5
-            ? f.scores.evidence
-            : 3,
-        leverage:
-          Number.isInteger(f.scores?.leverage) &&
-          f.scores.leverage >= 1 &&
-          f.scores.leverage <= 5
-            ? f.scores.leverage
-            : 3,
-        effort:
-          Number.isInteger(f.scores?.effort) &&
-          f.scores.effort >= 1 &&
-          f.scores.effort <= 5
-            ? f.scores.effort
-            : 3,
-        opportunity:
-          Number.isInteger(f.scores?.opportunity) &&
-          f.scores.opportunity >= 1 &&
-          f.scores.opportunity <= 5
-            ? f.scores.opportunity
-            : 3,
-      },
+      scores: restoreScorecard(f.scores),
       ...(typeof f.businessOutcome === "string"
         ? { businessOutcome: f.businessOutcome }
         : {}),
     };
+  }
+  if (r.useCases && typeof r.useCases === "object") {
+    for (const candidate of useCaseCandidates) {
+      const assessment = r.useCases[candidate.id];
+      if (
+        assessment &&
+        priorities.includes(assessment.priority as (typeof priorities)[number])
+      )
+        base.useCases[candidate.id] = {
+          priority: assessment.priority,
+          scores: restoreScorecard(assessment.scores),
+        };
+    }
+  } else {
+    // Carry the three prior prototype assessments into the expanded candidate set.
+    for (const id of ["s2", "s3", "s5"]) {
+      base.useCases[id] = {
+        priority: base.findings[id].priority,
+        scores: base.findings[id].scores,
+      };
+    }
   }
   if (
     !["Buying roles", "Lifecycle stages", "One audience"].includes(
@@ -412,11 +432,16 @@ export function planRows(
   ];
 }
 export function architectureSession(s: AgentState): Session {
+  const prototypePriorities = ["s2", "s3", "s5"].filter(
+    (id) => s.useCases[id]?.priority === "Priority",
+  );
   return {
     ...s.architecture,
-    selected: chapters
-      .filter((c) => s.findings[c.id].priority !== "Not needed")
-      .map((c) => c.id),
+    selected: prototypePriorities.length
+      ? prototypePriorities
+      : chapters
+          .filter((c) => s.findings[c.id].priority !== "Not needed")
+          .map((c) => c.id),
     architectureAdditions: [
       ...s.architecture.architectureAdditions.filter(
         (a) => !a.id.startsWith("agent-"),
@@ -437,6 +462,15 @@ export function agentReadout(s: AgentState) {
   return (
     "# Agent-led marketing workshop\n\nIllustrative product simulation; capability statements below are room inputs, not verified integrations.\n\n" +
     `Northstar: ${s.northstar || "Not agreed yet"}\n\n` +
+    "## Priority use-case set\n\n" +
+    useCaseCandidates
+      .filter((candidate) => s.useCases[candidate.id]?.priority === "Priority")
+      .map((candidate) => {
+        const assessment = s.useCases[candidate.id];
+        return `### ${candidate.title}\n\n${candidate.short}\n\nScores: Frequency ${assessment.scores.frequency}, Severity ${assessment.scores.severity}, Evidence ${assessment.scores.evidence}, Leverage ${assessment.scores.leverage}, Estimated opportunity ${assessment.scores.opportunity}, LOE ${assessment.scores.effort}.`;
+      })
+      .join("\n\n") +
+    "\n\n" +
     chapters
       .map((c) => {
         const f = s.findings[c.id];

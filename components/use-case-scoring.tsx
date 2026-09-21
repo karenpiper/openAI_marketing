@@ -1,45 +1,19 @@
-import { chapters, type Finding } from "../lib/agent-workspace";
+import {
+  type CandidateAssessment,
+  type Scorecard,
+} from "../lib/agent-workspace";
+import { useCaseCandidates } from "../lib/use-case-candidates";
 
 const axes = [
-  ["frequency", "Frequency", "How often does this happen?", "Rare", "Constant"],
-  [
-    "severity",
-    "Severity",
-    "What does it cost when it happens?",
-    "Minor",
-    "Deal-breaking",
-  ],
-  [
-    "evidence",
-    "Evidence",
-    "How sure are we the problem is real?",
-    "Guess",
-    "Directly heard",
-  ],
-  [
-    "leverage",
-    "Leverage",
-    "How much would fixing it matter?",
-    "Nice to have",
-    "One of the biggest bets",
-  ],
-  [
-    "opportunity",
-    "Estimated opportunity",
-    "What is the likely upside if proven?",
-    "Limited",
-    "Material",
-  ],
-  [
-    "effort",
-    "Level of effort",
-    "What will it take to prove a useful first version?",
-    "Small test",
-    "Major program",
-  ],
+  ["frequency", "Frequency", "How often does this happen?"],
+  ["severity", "Severity", "What does it cost when it happens?"],
+  ["evidence", "Evidence", "How sure are we the problem is real?"],
+  ["leverage", "Leverage", "How much would fixing it matter?"],
+  ["opportunity", "Est. opportunity", "What is the likely upside if proven?"],
+  ["effort", "LOE", "What will a useful first version take?"],
 ] as const;
 
-export function prioritySignal(f: Finding) {
+export function prioritySignal(f: { scores: Scorecard }) {
   const { frequency, severity, evidence, leverage, opportunity, effort } =
     f.scores;
   const value = Math.pow(
@@ -50,16 +24,17 @@ export function prioritySignal(f: Finding) {
 }
 
 export default function UseCaseScoring({
-  findings,
+  assessments,
   onChange,
   onContinue,
 }: {
-  findings: Record<string, Finding>;
-  onChange: (id: string, patch: Partial<Finding>) => void;
+  assessments: Record<string, CandidateAssessment>;
+  onChange: (id: string, patch: Partial<CandidateAssessment>) => void;
   onContinue: () => void;
 }) {
-  const ranked = [...chapters].sort(
-    (a, b) => prioritySignal(findings[b.id]) - prioritySignal(findings[a.id]),
+  const ranked = [...useCaseCandidates].sort(
+    (a, b) =>
+      prioritySignal(assessments[b.id]) - prioritySignal(assessments[a.id]),
   );
   return (
     <main className="agent-wide scoring-page">
@@ -68,100 +43,108 @@ export default function UseCaseScoring({
       </span>
       <h1>Make the trade-offs visible.</h1>
       <p className="agent-lede">
-        Score the candidate problems as a room. The first five dimensions
-        describe value and confidence; level of effort adjusts the signal so a
-        promising near-term test can rise above a large, uncertain program.
+        Score the candidates as a room. The first five dimensions describe value
+        and confidence; level of effort adjusts the signal so a promising
+        near-term test can rise above a large, uncertain program.
       </p>
       <div className="scoring-legend">
-        <b>Priority signal = value and confidence, adjusted for effort.</b>
+        <b>1 = low / 5 = high.</b>
         <span>
-          It is a decision aid, not an automatic answer. The room chooses the
-          final priority set.
+          Frequency, severity, evidence, leverage and estimated opportunity
+          raise the signal. LOE lowers it.
+        </span>
+        <span>
+          The room—not the calculation—chooses the final priority set.
         </span>
       </div>
-      <div className="scoring-cases">
-        {chapters.map((chapter) => {
-          const finding = findings[chapter.id];
-          const score = prioritySignal(finding);
-          return (
-            <article key={chapter.id}>
-              <header>
-                <div>
-                  <span className="agent-kicker">
-                    {chapter.time} · Candidate use case
-                  </span>
-                  <h2>{chapter.title}</h2>
-                  <p>{chapter.short}</p>
-                </div>
-                <strong className="priority-signal">
-                  {score.toFixed(1)}
-                  <small>/ 5</small>
-                </strong>
-              </header>
-              <div className="score-grid">
-                {axes.map(([key, label, question, low, high]) => (
-                  <label key={key}>
-                    <b>{label}</b>
-                    <small>{question}</small>
+      <div className="scoring-table-wrap">
+        <table className="scoring-table">
+          <thead>
+            <tr>
+              <th>Candidate use case</th>
+              {axes.map(([key, label, question]) => (
+                <th key={key} title={question}>
+                  <abbr title={question}>{label}</abbr>
+                </th>
+              ))}
+              <th>Signal</th>
+              <th>Room decision</th>
+            </tr>
+          </thead>
+          <tbody>
+            {useCaseCandidates.map((candidate) => {
+              const assessment = assessments[candidate.id];
+              return (
+                <tr key={candidate.id}>
+                  <td>
+                    <small>
+                      {candidate.time} · {candidate.source}
+                    </small>
+                    <b>{candidate.title}</b>
+                    <span>{candidate.short}</span>
+                  </td>
+                  {axes.map(([key]) => (
+                    <td key={key}>
+                      <select
+                        aria-label={`${candidate.title}: ${key}`}
+                        value={assessment.scores[key]}
+                        onChange={(e) =>
+                          onChange(candidate.id, {
+                            scores: {
+                              ...assessment.scores,
+                              [key]: Number(e.target.value),
+                            },
+                          })
+                        }
+                      >
+                        {[1, 2, 3, 4, 5].map((n) => (
+                          <option key={n} value={n}>
+                            {n}
+                          </option>
+                        ))}
+                      </select>
+                    </td>
+                  ))}
+                  <td>
+                    <strong className="table-signal">
+                      {prioritySignal(assessment).toFixed(1)}
+                    </strong>
+                  </td>
+                  <td>
                     <select
-                      value={finding.scores[key]}
+                      aria-label={`${candidate.title}: room decision`}
+                      value={assessment.priority}
                       onChange={(e) =>
-                        onChange(chapter.id, {
-                          scores: {
-                            ...finding.scores,
-                            [key]: Number(e.target.value),
-                          },
-                        })
+                        onChange(candidate.id, { priority: e.target.value })
                       }
                     >
-                      {[1, 2, 3, 4, 5].map((n) => (
-                        <option key={n} value={n}>
-                          {n}
-                        </option>
-                      ))}
+                      <option>To discuss</option>
+                      <option>Priority</option>
+                      <option>Later</option>
+                      <option>Not needed</option>
                     </select>
-                    <span>
-                      {low} <i /> {high}
-                    </span>
-                  </label>
-                ))}
-              </div>
-              <div className="priority-choice">
-                <div>
-                  <b>Room decision</b>
-                  <p>
-                    {finding.priority === "Priority"
-                      ? "Carry into the priority set."
-                      : "Leave as a candidate, later consideration, or rule out."}
-                  </p>
-                </div>
-                <select
-                  value={finding.priority}
-                  onChange={(e) =>
-                    onChange(chapter.id, { priority: e.target.value })
-                  }
-                >
-                  <option>To discuss</option>
-                  <option>Priority</option>
-                  <option>Later</option>
-                  <option>Not needed</option>
-                </select>
-              </div>
-            </article>
-          );
-        })}
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
       </div>
       <section className="priority-landing">
         <span className="agent-kicker">Working priority set</span>
         <h2>
-          {ranked.filter((c) => findings[c.id].priority === "Priority").length}{" "}
+          {
+            ranked.filter((c) => assessments[c.id].priority === "Priority")
+              .length
+          }{" "}
           selected by the room
         </h2>
         <p>
           {ranked
+            .slice(0, 5)
             .map(
               (c, i) =>
-                `${i + 1}. ${c.title} · ${prioritySignal(findings[c.id]).toFixed(1)}`,
+                `${i + 1}. ${c.title} · ${prioritySignal(assessments[c.id]).toFixed(1)}`,
             )
             .join("  ·  ")}
         </p>

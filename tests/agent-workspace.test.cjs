@@ -344,3 +344,37 @@ test("priority scoring preserves valid values and safely migrates older workshop
   assert.equal(restored.findings.s3.scores.opportunity, 5);
   assert.equal(restored.findings.s5.scores.frequency, 3);
 });
+
+test("expanded use-case set retains the original seven and Adobe feedback candidates", () => {
+  const { useCaseCandidates } = require("../lib/use-case-candidates.ts");
+  const s = m.createAgentState();
+  assert.equal(useCaseCandidates.length, 10);
+  assert.deepEqual(
+    useCaseCandidates.slice(0, 7).map((c) => c.title),
+    [
+      "Buying-group engagement",
+      "Signal to action",
+      "Content at scale",
+      "Campaign launch & approvals",
+      "Routine marketing operations",
+      "Human oversight",
+      "Measurement & learning",
+    ],
+  );
+  assert.match(useCaseCandidates.find((c) => c.id === "s8").title, /Expansion/);
+  assert.match(
+    useCaseCandidates.find((c) => c.id === "s9").title,
+    /limited data/i,
+  );
+  assert.match(
+    useCaseCandidates.find((c) => c.id === "s10").title,
+    /sales data/i,
+  );
+  assert.equal(Object.keys(s.useCases).length, 10);
+  const old = JSON.parse(JSON.stringify(s));
+  delete old.useCases;
+  old.findings.s3.priority = "Priority";
+  const restored = m.restoreAgentState(old);
+  assert.equal(restored.useCases.s3.priority, "Priority");
+  assert.equal(restored.useCases.s8.priority, "To discuss");
+});
