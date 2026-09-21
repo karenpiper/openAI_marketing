@@ -352,3 +352,34 @@ export function currentWorkStep(s: AgentState, id: string) {
     ? Math.min(w.step, workStages(s, id).length - 1)
     : 0;
 }
+
+export function workflowArtifact(s: AgentState, id: string, index: number) {
+  const stage = workStages(s, id)[index];
+  const names: Record<string, string[]> = {
+    s2: [
+      "Account signal brief",
+      "Buying-group opportunity map",
+      "Campaign action brief",
+    ],
+    s3: [
+      "Approved source manifest",
+      "Audience work packages",
+      "Approval packet",
+      "Channel handoff bundle",
+    ],
+    s5: [
+      "Campaign check report",
+      "Consent exception ticket",
+      "Decision and audit record",
+    ],
+  };
+  const blocked = id === "s3" && s.source === "Source material missing";
+  const title = blocked ? "Source material request" : names[id][index];
+  const sections = stage.rows.map(([name, status, detail]) => ({
+    name,
+    status,
+    detail,
+  }));
+  const text = `# ${title}\n\nILLUSTRATIVE PROTOTYPE OUTPUT — no live systems queried or actions executed.\n\nCampaign: Enterprise adoption / 12 target accounts\nAudience: ${s.audience}\nChannels: ${s.channel}\n\n${stage.summary}\n\n${sections.map((r) => `## ${r.name}\nStatus: ${r.status}\n${r.detail}`).join("\n\n")}\n\n## Handoff\n${stage.output}\n\n## Required control\n${stage.control}`;
+  return { title, sections, text, blocked };
+}

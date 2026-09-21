@@ -117,3 +117,10 @@ test('work packages carry audience and channel context and invalidate when condi
  s.source='Source material missing';assert.match(work.workStages(s,'s3')[0].summary,/on hold/);
  for(const id of ['s2','s3','s5'])for(const step of work.workStages(s,id))for(const key of ['input','output','connection','enables','control'])assert.ok(step[key].length>20);
 });
+
+test('artifacts are concrete, scenario-aware examples with honest provenance',()=>{
+ const w=require('../lib/workflow-work.ts');const s=m.createAgentState();
+ const a=w.workflowArtifact(s,'s3',1);assert.equal(a.title,'Audience work packages');assert.equal(a.sections.length,3);assert.match(a.text,/ILLUSTRATIVE PROTOTYPE OUTPUT/);assert.match(a.text,/Procurement/);
+ s.audience='One audience';assert.equal(w.workflowArtifact(s,'s3',1).sections.length,1);
+ s.source='Source material missing';const blocked=w.workflowArtifact(s,'s3',0);assert.equal(blocked.title,'Source material request');assert.equal(blocked.blocked,true);
+});

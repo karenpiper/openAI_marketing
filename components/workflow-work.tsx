@@ -1,6 +1,13 @@
+"use client";
+import { useEffect, useRef, useState } from "react";
 import BackendIllustration from "./backend-illustration";
 import type { AgentState } from "../lib/agent-workspace";
-import { workStages, currentWorkStep } from "../lib/workflow-work";
+import {
+  workStages,
+  currentWorkStep,
+  workSignature,
+  workflowArtifact,
+} from "../lib/workflow-work";
 export function WorkflowWork({
   session,
   id,
@@ -15,9 +22,88 @@ export function WorkflowWork({
   const stages = workStages(session, id),
     index = currentWorkStep(session, id),
     stage = stages[index],
-    blocked = id === "s3" && session.source === "Source material missing";
+    signature = workSignature(session, id);
+  const runKey = `${id}:${index}:${signature}`;
+  const [run, setRun] = useState({ key: runKey, phase: 0 });
+  const phase = run.key === runKey ? run.phase : 0;
+  const [opened, setOpened] = useState<number | null>(null);
+  const panel = useRef<HTMLDivElement>(null);
+  const blocked = id === "s3" && session.source === "Source material missing";
+  const actions =
+    id === "s3"
+      ? index === 0
+        ? [
+            "Checking the source library",
+            "Reading version and usage permissions",
+            "Assembling the source manifest",
+          ]
+        : index === 1
+          ? [
+              "Reading the campaign brief",
+              "Mapping audience needs to approved material",
+              "Assembling audience work packages",
+            ]
+          : index === 2
+            ? [
+                "Collecting the work packages",
+                "Applying review and permission rules",
+                "Assembling the approval packet",
+              ]
+            : [
+                "Mapping packages to channels",
+                "Adding eligibility and release gates",
+                "Preparing the delivery bundle",
+              ]
+      : id === "s2"
+        ? [
+            "Bringing account context together",
+            "Comparing signals and buying roles",
+            "Preparing the recommendation",
+          ]
+        : [
+            "Checking the campaign work orders",
+            "Applying routine rules and isolating exceptions",
+            "Preparing the action record",
+          ];
+  useEffect(() => {
+    setRun({ key: runKey, phase: 0 });
+    setOpened(null);
+    const timers = [1, 2, 3].map((n) =>
+      setTimeout(() => setRun(prev => ({ key: runKey, phase: prev.key === runKey ? Math.max(prev.phase, n) : n })), n * 900),
+    );
+    return () => timers.forEach(clearTimeout);
+  }, [runKey]);
+  function showArtifact(n: number) {
+    setOpened(n);
+    requestAnimationFrame(() => {
+      const screen = panel.current?.closest(".monitor-screen");
+      if (screen && panel.current)
+        screen.scrollTo({
+          top:
+            panel.current.getBoundingClientRect().top -
+            screen.getBoundingClientRect().top +
+            screen.scrollTop -
+            55,
+          behavior: matchMedia("(prefers-reduced-motion: reduce)").matches
+            ? "instant"
+            : "smooth",
+        });
+    });
+  }
+  const output = opened === null ? null : workflowArtifact(session, id, opened);
+  function download() {
+    if (!output) return;
+    const url = URL.createObjectURL(
+      new Blob([output.text], { type: "text/markdown" }),
+    );
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `DEMO-${output.title.toLowerCase().replace(/[^a-z0-9]+/g, "-")}.md`;
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
   return (
-    <section className="work-artifact">
+    <section className="work-artifact execution-work">
       <div className="work-track">
         {stages.map((s, i) => (
           <span
@@ -28,38 +114,137 @@ export function WorkflowWork({
           </span>
         ))}
       </div>
-      <span className="agent-kicker">
-        Work package {index + 1} / {stages.length}
-      </span>
-      <h3>{stage.title}</h3>
-      <p>{stage.summary}</p>
-      <div className="work-table">
-        {stage.rows.map(([name, status, detail]) => (
-          <article key={name}>
-            <strong>{name}</strong>
-            <span>{status}</span>
-            <p>{detail}</p>
-          </article>
-        ))}
+      <div className="agent-execution" role="status" aria-live="polite">
+        <span className={phase < 3 ? "execution-pulse" : ""}>✳</span>
+        <div>
+          <b>
+            {phase < 3
+              ? actions[phase]
+              : blocked
+                ? "Source gap found"
+                : "Work package ready"}
+          </b>
+          <small>
+            {phase < 3
+              ? "Simulated agent activity"
+              : "Illustrative output · ready to inspect"}
+          </small>
+        </div>
+        {phase < 3 && (
+          <button onClick={() => setRun({ key: runKey, phase: 3 })}>
+            Show result now
+          </button>
+        )}
       </div>
-      {blocked ? (
-        <p role="status" className="work-blocked">
-          Source request prepared. Choose an approved source above to resume.
-        </p>
-      ) : (
-        <button
-          className="agent-primary"
-          onClick={() =>
-            index < stages.length - 1 ? onStep(index + 1) : onFinish()
-          }
-        >
-          {stage.action} →
-        </button>
-      )}
-      {index > 0 && (
-        <button className="work-back" onClick={() => onStep(index - 1)}>
-          Review previous package
-        </button>
+      <ol className="execution-log">
+        {actions.slice(0, Math.min(phase + 1, 3)).map((action, i) => (
+          <li key={action}>
+            <span>{i < phase ? "✓" : "·"}</span>
+            {action}
+          </li>
+        ))}
+      </ol>
+      {phase === 3 && (
+        <>
+          <div className="execution-reply">
+            <b>Marketing agent</b>
+            <p>
+              {blocked
+                ? "I couldn’t find an approved source for this plan. I’ve prepared a source request with the required review gate. Adaptation stays on hold."
+                : `I’ve prepared the ${workflowArtifact(session, id, index).title.toLowerCase()}. ${stage.summary}`}
+            </p>
+          </div>
+          <div className="execution-assets">
+            {Array.from({ length: index + 1 }, (_, i) => {
+              const artifact = workflowArtifact(session, id, i);
+              return (
+                <button
+                  key={artifact.title}
+                  className={opened === i ? "selected" : ""}
+                  onClick={() => showArtifact(i)}
+                >
+                  <span className="asset-file-icon">▤</span>
+                  <span>
+                    <b>{artifact.title}</b>
+                    <small>
+                      {i === index
+                        ? "Just prepared"
+                        : "Earlier in this workflow"}{" "}
+                      · Open artifact
+                    </small>
+                  </span>
+                  <span>↗</span>
+                </button>
+              );
+            })}
+          </div>
+          <div ref={panel}>
+            {output && (
+              <article className="artifact-preview">
+                <header>
+                  <div>
+                    <span className="agent-kicker">
+                      Illustrative document · enterprise adoption
+                    </span>
+                    <h3>{output.title}</h3>
+                  </div>
+                  <button
+                    aria-label="Close artifact preview"
+                    onClick={() => setOpened(null)}
+                  >
+                    ✕
+                  </button>
+                </header>
+                <div className="artifact-meta">
+                  <span>Audience: {session.audience}</span>
+                  <span>Channels: {session.channel}</span>
+                </div>
+                {output.sections.map((row) => (
+                  <section key={row.name}>
+                    <span>{row.status}</span>
+                    <h4>{row.name}</h4>
+                    <p>{row.detail}</p>
+                    {id === "s3" && opened === 1 && (
+                      <p className="artifact-brief-note">
+                        <b>Production instruction:</b> Prepare a channel-ready
+                        variant from the approved source. Keep factual claims
+                        fixed, adapt emphasis to this audience’s decision, and
+                        return source references with the draft for review.
+                      </p>
+                    )}
+                  </section>
+                ))}
+                <footer>
+                  <p>
+                    No live content was generated or delivered. This is a
+                    prepared example of the work product.
+                  </p>
+                  <button onClick={download}>Download example artifact</button>
+                </footer>
+              </article>
+            )}
+          </div>
+          {blocked ? (
+            <p className="work-blocked">
+              Choose an approved source above to resume. The source request
+              remains available to inspect.
+            </p>
+          ) : (
+            <button
+              className="agent-primary"
+              onClick={() =>
+                index < stages.length - 1 ? onStep(index + 1) : onFinish()
+              }
+            >
+              {stage.action} →
+            </button>
+          )}
+          {index > 0 && (
+            <button className="work-back" onClick={() => onStep(index - 1)}>
+              Review previous package
+            </button>
+          )}
+        </>
       )}
     </section>
   );
