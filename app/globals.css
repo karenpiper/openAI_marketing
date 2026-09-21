@@ -3380,3 +3380,24 @@ body {
     grid-template-columns: 1fr;
   }
 }
+
+/* Keep each outcome label above its own value, never in separate grid cells. */
+.outcome-priority dl,
+.readout-card dl {
+  display: block;
+  margin: 1rem 0;
+}
+.outcome-priority dl > div,
+.readout-card dl > div {
+  margin-top: 1rem;
+  padding-top: 0;
+  border-top: 0;
+}
+.outcome-priority dt,
+.readout-card dt {
+  margin-top: 0;
+}
+.outcome-priority dd,
+.readout-card dd {
+  margin: 0.4rem 0 1rem;
+}

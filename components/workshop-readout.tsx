@@ -96,10 +96,14 @@ export default function WorkshopReadout({
             <article className="outcome-priority" key={u.id}>
               <span className="eyebrow">{i + 1}</span>
               <h3>{u.label}</h3>
-              <p>
-                {session.assessments[u.id].proofText ||
-                  "What to prove: still to agree."}
-              </p>
+              <dl>
+                <div>
+                  <dt>What we need to prove</dt>
+                  <dd>
+                    {session.assessments[u.id].proofText || "Still to agree."}
+                  </dd>
+                </div>
+              </dl>
               <Badge
                 value={
                   session.assessments[u.id].noRegret === "yes"
