@@ -431,7 +431,7 @@ export function parseSession(raw: unknown): Session {
     typeof r.briefingPanel === "number" &&
     Number.isInteger(r.briefingPanel) &&
     r.briefingPanel >= 0 &&
-    r.briefingPanel < 5
+    r.briefingPanel < 4
       ? r.briefingPanel
       : 0;
   s.attendees = str(r.attendees);
@@ -693,7 +693,6 @@ export function readout(s: Session): string {
       : "");
   return [
     `# Workshop readout\n${s.title}\n\nWorking set: ${selectionConfirmed(s) ? `Confirmed by ${s.selectionBy}` : "Proposed / needs confirmation"}`,
-    `Attendees: ${s.attendees || "Not recorded"}`,
     "## Priority use cases",
     ...activeCases(s).map(
       (u) =>

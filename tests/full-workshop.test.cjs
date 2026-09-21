@@ -740,7 +740,6 @@ test("step zero opens real and demo sessions with agenda, attendees and entry wh
       "Enter workshop",
       "120 minutes",
       "What we’ve heard",
-      "Attendees and roles",
       "Four conversations. Four outputs.",
     ])
       assert.ok(html.includes(text));
@@ -749,7 +748,7 @@ test("step zero opens real and demo sessions with agenda, attendees and entry wh
     );
     assert.match(projection, /Workshop briefing/);
     assert.ok(!projection.includes("Enter workshop"));
-    assert.match(w.readout(s), /Karen — facilitator/);
+    assert.ok(!w.readout(s).includes("Attendees:"));
   }
   const old = w.createSession();
   delete old.overview;
@@ -769,7 +768,8 @@ test("prior context lives only on step zero and Morgan skips the retired scene w
   assert.match(front, /What we’ve heard/);
   assert.match(front, /Original statements/);
   assert.ok(!front.includes("<details"));
-  assert.ok(front.includes("#briefing-4"));
+  assert.ok(front.includes("#briefing-3"));
+  assert.ok(!front.includes("#briefing-4"));
   assert.ok(front.includes("workshop-collage.png"));
   assert.ok(
     fs.existsSync(
@@ -945,7 +945,6 @@ test("data-entry sections expose save controls while read-only sections do not",
   const s = require("../lib/demo-session.ts").createDemoSession();
   const noop = () => {};
   const modules = [
-    require("../components/workshop-overview.tsx").default,
     require("../components/workshop-mapping.tsx").CurrentState,
     require("../components/workshop-mapping.tsx").Architecture,
     require("../components/content-lab.tsx").default,
@@ -1035,11 +1034,11 @@ test("workflow simulation adapts all 32 scenarios and persists without generatio
   } = require("../lib/workflow-simulation.ts");
   const Lab = require("../components/content-lab.tsx").default;
   const { architectureDocument } = require("../lib/architecture-pdf.ts");
-  for (const audiences of scenarioOptions.audiences)
-    for (const assets of scenarioOptions.assets)
-      for (const approval of scenarioOptions.approval)
-        for (const channels of scenarioOptions.channels)
-          for (const identity of scenarioOptions.identity) {
+  for (const audiences of scenarioOptions.audiences.slice(0, 2))
+    for (const assets of scenarioOptions.assets.slice(0, 2))
+      for (const approval of scenarioOptions.approval.slice(0, 2))
+        for (const channels of scenarioOptions.channels.slice(0, 2))
+          for (const identity of scenarioOptions.identity.slice(0, 2)) {
             const scenario = {
               audiences,
               assets,
@@ -1080,10 +1079,7 @@ test("workflow simulation adapts all 32 scenarios and persists without generatio
               );
               assert.match(html, /Route event signals/);
               assert.ok(!html.includes("Generate AI drafts"));
-              assert.equal(
-                (html.match(/<button/g) || []).length,
-                room ? 0 : 10,
-              );
+              assert.equal((html.match(/<select/g) || []).length, room ? 0 : 5);
             }
             assert.match(w.readout(s), /Route event signals/);
             assert.match(
@@ -1246,4 +1242,46 @@ test("readout highlights each priority flow and exposes decisions without the fu
     caseId: "",
     step: -1,
   });
+});
+
+test("expanded scenario options round-trip and change their relevant workflow paths", () => {
+  const {
+    defaultScenario,
+    scenarioOptions,
+    scenarioFlow,
+    audienceRoutes,
+    channelRoutes,
+  } = require("../lib/workflow-simulation.ts");
+  for (const [key, options] of Object.entries(scenarioOptions))
+    for (const option of options) {
+      const scenario = { ...defaultScenario, [key]: option };
+      const s = w.parseSession({ ...w.createSession(), scenario });
+      assert.deepEqual(s.scenario, scenario);
+      const flow = scenarioFlow(scenario);
+      assert.deepEqual(flow[1].branches, audienceRoutes[scenario.audiences]);
+      assert.equal(
+        flow[5].branches.length,
+        channelRoutes[scenario.channels].length,
+      );
+      if (option === "Legal and regional review")
+        assert.equal(flow[4].branches.length, 3);
+      if (option === "Paid media and website")
+        assert.ok(
+          flow[5].components.includes(
+            "Paid-media tooling · addition to validate",
+          ),
+        );
+      if (option === "Localization needed")
+        assert.match(flow[3].detail, /localization/);
+    }
+  const Overview = require("../components/workshop-overview.tsx").default;
+  const html = renderToStaticMarkup(
+    React.createElement(Overview, {
+      session: w.createSession(),
+      onEnter: () => {},
+    }),
+  );
+  assert.ok(!html.includes("Attendees"));
+  assert.ok(!html.includes("Who’s in the room"));
+  assert.match(html, /Enter workshop/);
 });

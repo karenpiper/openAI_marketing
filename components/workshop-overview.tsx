@@ -1,15 +1,12 @@
-import SaveFooter from "./save-footer";
 import WorkshopGlyph from "./workshop-glyph";
 import { useEffect, type Dispatch, type SetStateAction } from "react";
 import { type Session, stages } from "../lib/workshop";
 import { heard, decisions } from "../lib/workshop-data";
-import { Field } from "./workshop-fields";
 const chapters = [
   "Why we’re here",
   "The agenda",
   "What we heard",
   "Open decisions",
-  "Who’s here",
 ];
 function StoryNav({ index }: { index: number }) {
   return (
@@ -246,36 +243,6 @@ export default function WorkshopOverview({
             </article>
           ))}
         </div>
-        <StoryNav index={3} />
-      </section>
-      <section id="briefing-4" className="briefing-frame">
-        <div className="briefing-section-title">
-          <span className="eyebrow">Participants</span>
-          <h2>Who’s in the room</h2>
-          <p>
-            Bring your experience of the work. You don’t need an exhaustive view
-            of the systems.
-          </p>
-        </div>
-        <div className="briefing-orgs">
-          <span>OpenAI</span>
-          <span>Adobe</span>
-          <span>Code and Theory</span>
-        </div>
-        {setSession ? (
-          <Field
-            label="Attendees and roles"
-            multiline
-            value={s.attendees}
-            placeholder="Name · team · role in this discussion"
-            onChange={(attendees) => setSession((p) => ({ ...p, attendees }))}
-          />
-        ) : (
-          <p className="preserve-lines">
-            {s.attendees || "Attendees to be confirmed."}
-          </p>
-        )}
-        {setSession && <SaveFooter />}
         <footer className="briefing-footer">
           <div>
             <h2>Ready to meet Morgan?</h2>
@@ -289,7 +256,7 @@ export default function WorkshopOverview({
             </button>
           )}
         </footer>
-        <StoryNav index={4} />
+        <StoryNav index={3} />
       </section>
     </section>
   );

@@ -136,9 +136,6 @@ export default function WorkshopRecord({
           </p>
         </article>
       ))}
-      <p className="preserve-lines">
-        <b>Attendees:</b> {session.attendees || "Not recorded"}
-      </p>
       <h2 className="section-title">Current-state findings</h2>
       {!session.capabilities.length && (
         <p>No current-state answers captured.</p>

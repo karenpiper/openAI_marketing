@@ -63,18 +63,20 @@ export default function ContentLab({
           ).map((key) => (
             <fieldset key={key}>
               <legend>{labels[key]}</legend>
-              {scenarioOptions[key].map((value) =>
-                editable ? (
-                  <button
-                    key={value}
-                    aria-pressed={s[key] === value}
-                    onClick={() => patch({ [key]: value })}
-                  >
-                    {value}
-                  </button>
-                ) : s[key] === value ? (
-                  <p key={value}>{value}</p>
-                ) : null,
+              {editable ? (
+                <select
+                  aria-label={labels[key]}
+                  value={s[key]}
+                  onChange={(e) => patch({ [key]: e.target.value })}
+                >
+                  {scenarioOptions[key].map((value) => (
+                    <option key={value} value={value}>
+                      {value}
+                    </option>
+                  ))}
+                </select>
+              ) : (
+                <p>{s[key]}</p>
               )}
             </fieldset>
           ))}
@@ -87,15 +89,9 @@ export default function ContentLab({
           </div>
           <ol className="simulation-map">
             {flow.map((node, i) => (
-              <li
-                key={node.id}
-                className={`simulation-node ${node.changed ? "simulation-changed" : ""}`}
-              >
+              <li key={node.id} className="simulation-node">
                 <span className="eyebrow">
-                  {i + 1} ·{" "}
-                  {node.changed
-                    ? "Adapted for this scenario"
-                    : "Shared foundation"}
+                  Step {i + 1} of {flow.length}
                 </span>
                 <h3>{node.title}</h3>
                 <div className="proposal-components">
@@ -118,10 +114,12 @@ export default function ContentLab({
                 )}
                 <p className="simulation-reason">{node.why}</p>
                 <div className="simulation-handoff" key={node.passes}>
-                  <span aria-hidden="true">
-                    {i === flow.length - 1 ? "↩" : "↓"}
-                  </span>{" "}
-                  {node.passes}
+                  <span className="simulation-handoff-label">
+                    {i === flow.length - 1
+                      ? "Returns to journey analysis"
+                      : "Passes to the next step"}
+                  </span>
+                  <p>{node.passes}</p>
                 </div>
               </li>
             ))}

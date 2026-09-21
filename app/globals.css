@@ -3123,20 +3123,23 @@ body {
   font-weight: 700;
   margin-bottom: 0.5rem;
 }
-.simulation-controls button {
+.simulation-controls fieldset button {
   display: block;
   width: 100%;
   text-align: left;
   margin: 0.4rem 0;
 }
-.simulation-controls button[aria-pressed="true"] {
+.simulation-controls fieldset button[aria-pressed="true"] {
   background: #18382c;
   color: #fffdf7;
   border-color: #18382c;
 }
 .simulation-summary {
-  padding: 1rem 1.5rem;
-  border-left: 4px solid #365343;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1rem;
+  border: 1px solid #c9d2c5;
+  border-radius: 12px;
+  background: #f0f3ed;
 }
 .simulation-map {
   list-style: none;
@@ -3154,10 +3157,6 @@ body {
     border-color 0.25s,
     background-color 0.25s;
 }
-.simulation-node.simulation-changed {
-  border-color: #9c6c30;
-  background: #fcf4df;
-}
 .simulation-node h3 {
   font-size: 1.4rem;
   margin-top: 0.5rem;
@@ -3171,24 +3170,71 @@ body {
 .simulation-branches span {
   flex: 1;
   min-width: 140px;
-  border-left: 3px solid #527864;
+  border: 1px solid #bdcbbc;
+  border-radius: 8px;
   padding: 0.7rem;
   background: #e8eddb;
   color: #18382c;
 }
 .simulation-reason {
-  font-weight: 600;
-  color: #654713;
+  font-weight: 500;
+  color: #365343;
 }
 .simulation-handoff {
-  padding: 0.7rem;
-  border-top: 1px dashed #93a68f;
+  padding: 1rem;
+  margin-top: 1rem;
+  border: 0;
+  border-radius: 10px;
+  background: #f0f3ed;
   color: #18382c;
   animation: workflow-arrive 0.35s ease-out;
 }
-.simulation-handoff span {
-  font-size: 1.5rem;
+.simulation-handoff-label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
+.simulation-handoff p {
+  margin: 0.4rem 0 0;
+}
+.simulation .save-footer {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 0.85rem;
+  align-items: center;
+  background: #f7f8f3;
+  border: 1px solid #bdcbbc;
+  border-radius: 10px;
+  padding: 1rem;
+  margin: 1.2rem 0 0;
+}
+.simulation-controls .save-footer {
+  grid-template-columns: 1fr;
+}
+.simulation .save-footer button {
+  display: inline-flex;
+  width: auto;
+  justify-content: center;
+  align-items: center;
+  justify-self: start;
+  min-height: 42px;
+  margin: 0;
+  background: #245941;
+  color: #fff;
+  border: 1px solid #245941;
+  padding: 0.65rem 1.4rem;
+}
+.simulation .save-footer span {
+  display: block;
+  margin: 0;
+}
+.simulation-controls .save-footer button {
+  width: 100%;
+  justify-self: stretch;
+}
+
 @keyframes workflow-arrive {
   from {
     opacity: 0.3;
@@ -3515,4 +3561,19 @@ body {
   .architecture-story-layout > div {
     position: static;
   }
+}
+.simulation-controls select {
+  display: block;
+  width: 100%;
+  min-height: 44px;
+  border: 1px solid #9aaf9e;
+  border-radius: 8px;
+  padding: 0.7rem 0.6rem;
+  background: #fffdf7;
+  color: #18382c;
+  font: inherit;
+}
+.simulation-controls select:focus-visible {
+  outline: 3px solid #527864;
+  outline-offset: 2px;
 }

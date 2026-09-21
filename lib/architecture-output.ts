@@ -33,7 +33,6 @@ export function architectureOutput(s: Session) {
   );
   return {
     title: s.title,
-    attendees: s.attendees,
     selectionConfirmed: selectionConfirmed(s),
     cases: cases.map((u) => ({
       id: u.id,
