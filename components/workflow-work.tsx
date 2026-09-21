@@ -405,37 +405,36 @@ export function WorkflowRequirements({
   return (
     <section className="work-requirements">
       <span className="agent-kicker">
-        Alongside the prototype · proposed components · {index + 1}
+        Behind this step · proposed components · {index + 1}
       </span>
-      <h3>{stage.title}: what is involved at this step</h3>
+      <h3>What this step needs to work</h3>
       <div
         className="requirement-route"
         aria-label="Components used by this prototype step"
       >
         {components[id].map((component, i) => (
-          <span key={component}>
+          <div className="requirement-route-step" key={component}>
             {i > 0 && <b aria-hidden="true">→</b>}
-            {component}
-          </span>
-        ))}
-      </div>
-      <dl>
-        {[
-          ["INPUT", stage.input],
-          ["DATA + CONNECTION", stage.connection],
-          ["OUTPUT", stage.output],
-          ["ENABLES", stage.enables],
-          ["CONTROL", stage.control],
-        ].map(([label, value]) => (
-          <div key={label}>
-            <dt>{label}</dt>
-            <dd>{value}</dd>
+            <span>{component}</span>
           </div>
         ))}
-      </dl>
+      </div>
+      <div className="requirement-specs">
+        {[
+          ["Starts with", stage.input],
+          ["Connects", stage.connection],
+          ["Produces", stage.output],
+          ["Keeps control", stage.control],
+        ].map(([label, value]) => (
+          <article key={label}>
+            <b>{label}</b>
+            <p>{value}</p>
+          </article>
+        ))}
+      </div>
       <p>
-        These are the components and data movement relevant to this step—not the
-        full architecture. Proposed connections still need validation.
+        This is the relevant data movement for this moment, not the full
+        architecture. The proposed connections still need validation.
       </p>
     </section>
   );

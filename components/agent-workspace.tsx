@@ -53,7 +53,7 @@ function MorganScreen({
   return (
     <div className="monitor-wrap">
       <div className="monitor-label">
-        <b>MORGAN’S COMPUTER</b>
+        <b>MORGAN’S WORKSPACE</b>
         <span>Proposed experience · fictional data · no live actions</span>
       </div>
       <div className="monitor-bezel">
@@ -61,7 +61,7 @@ function MorganScreen({
         <div className="monitor-screen">
           <div className="monitor-toolbar">
             <span aria-hidden="true">● ● ●</span>
-            <span>ChatGPT · Marketing workspace</span>
+            <span>ChatGPT Work · Enterprise marketing</span>
             <span>Morgan</span>
           </div>
           <div className="workspace-desktop">
