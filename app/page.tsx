@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import { eventContext, eventSegments } from "../lib/event-context";
 import {
   useCases,
   heard,
@@ -147,6 +148,23 @@ export default function Home() {
                 This is her Tuesday — as we’re betting it could look, not as it
                 looks today.
               </p>
+              <div className="event-context">
+                <span className="label">
+                  The event running through this day · Illustrative scenario
+                </span>
+                <h3>One event. Different reasons to follow up.</h3>
+                <p>
+                  Imagine Morgan working through an enterprise webinar and its
+                  follow-up. She needs to connect what people did before, during
+                  and after the event, group them by what they need next, and
+                  deliver relevant messages at a scale her team can sustain.
+                </p>
+                <p>
+                  The question for the room: can understanding the whole journey
+                  help one marketer turn event interest into more useful
+                  conversations?
+                </p>
+              </div>
               <p className="intro-copy">
                 Every stop names a problem we think is real — not a proposed
                 feature. We’re not solutioning yet. Score whether it’s real and
@@ -220,6 +238,42 @@ export default function Home() {
               </div>
               <h2>{current.title}</h2>
               <p className="moment">{current.narrative}</p>
+              <div className="event-context">
+                <span className="label">
+                  Through the event · Illustrative scenario to test
+                </span>
+                <p>{eventContext[current.id].story}</p>
+              </div>
+              {current.id === "s2" && (
+                <div className="segment-example">
+                  <h3>What changes when you can see the journey?</h3>
+                  <p>
+                    Use these example audiences to challenge the next-action
+                    problem. The messages illustrate different needs; they are
+                    not approved campaign copy.
+                  </p>
+                  <div className="segment-grid">
+                    {eventSegments.map((segment) => (
+                      <article className="side-card" key={segment.audience}>
+                        <h4>{segment.audience}</h4>
+                        <span className="label">What we can observe</span>
+                        <p>{segment.signal}</p>
+                        <span className="label">A relevant next message</span>
+                        <p>“{segment.message}”</p>
+                        <span className="label">What to measure</span>
+                        <p>{segment.outcome}</p>
+                      </article>
+                    ))}
+                  </div>
+                  <p className="rubric-note">
+                    Define who qualifies and when they leave each audience. An
+                    explicit contact request takes precedence; check contact
+                    permissions and active sales conversations before sending.
+                    Reuse approved messages and audience rules across events to
+                    test whether personalization can scale with the same team.
+                  </p>
+                </div>
+              )}
               <div className="fact-grid">
                 <article>
                   <span className="label">The problem we think is real</span>
@@ -328,6 +382,10 @@ export default function Home() {
                 We don’t actually have this problem — rule it out
               </label>
               <div className="proof-block">
+                <p className="event-proof">
+                  <strong>Event proof to consider:</strong>{" "}
+                  {eventContext[current.id].proof}
+                </p>
                 <label className="label" htmlFor="proof">
                   What should we prove first?
                 </label>
@@ -446,6 +504,42 @@ export default function Home() {
                   )}
                 </article>
               ))}
+              <details className="event-context recap-event">
+                <summary>
+                  Proof to consider: more relevant event follow-up at scale
+                </summary>
+                <p>
+                  This is a candidate experiment for the room, not an agreed
+                  priority. Use it only if the related problems survive the
+                  discussion.
+                </p>
+                <p>
+                  For one event, connect registration, attendance, email and
+                  website activity. Test whether the team can use that history
+                  to create distinct audiences, deliver approved messages and
+                  learn which paths lead to a useful next step.
+                </p>
+                <p>
+                  <strong>Growth:</strong> compare next-step conversion and
+                  drop-off for each audience over a defined follow-up window.
+                  Track later opportunity progression separately. Compare
+                  tailored follow-up with the existing approach using a
+                  randomized holdout where feasible; differences between
+                  audiences alone don’t prove lift.
+                </p>
+                <p>
+                  <strong>Productivity:</strong> measure hours spent building
+                  audiences and preparing messages, time from event to
+                  follow-up, and audiences served per marketer.
+                </p>
+                <p>
+                  <strong>What needs to be available:</strong> reliable person
+                  and account matching, event and follow-up history, contact
+                  permissions and approved content. A joined view helps the team
+                  understand and compare journeys; sending still depends on the
+                  execution workflow.
+                </p>
+              </details>
               <div className="handoff">
                 <span className="label">Handoff into agenda item 2</span>
                 <h3>These are the use cases worth solving first.</h3>

@@ -46,3 +46,7 @@ Validated inputs persist locally under `oai-adobe-morgan-workshop-v2`. The forme
 - `lib/workshop-data.ts`: original workshop copy plus proof prompts.
 - `lib/assessment.ts`: score calculation, ranking and validated storage restoration.
 - `tests/workshop.test.cjs`: content fidelity and behavioral checks.
+
+## Event journey extension
+
+The original scene text and attributed feedback remain intact. `lib/event-context.ts` adds an explicitly illustrative webinar thread across the seven stops: connect engagement across the journey, form behavioral audiences, match approved messages, deliver at scale, and compare outcomes. Stop 2 shows three audience/message/measurement examples. Each stop offers an event-specific proof prompt alongside the existing editable proof field; saved workshop notes and proof statements are preserved. The recap has an optional candidate experiment, clearly distinguished from the room’s agreed ranking. No analytics product is named or represented as the execution system.
