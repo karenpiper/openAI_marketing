@@ -365,7 +365,8 @@ export function reviewWorkflow(
       : {}),
     ...patch,
     ...("systems" in patch ? { systemsOrigin: "Room" as const } : {}),
-    source: workflowSource(s, caseId, index),
+    source:
+      "choice" in patch || !r ? workflowSource(s, caseId, index) : r.source,
   };
   return {
     ...s,

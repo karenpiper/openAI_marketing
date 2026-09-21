@@ -7,8 +7,14 @@ import {
 } from "./architecture-workflow";
 export type ArchitectureNode = {
   title: string;
-  status: "Agreed" | "Proposed" | "Unresolved" | "Needs recheck";
+  status:
+    | "Direction agreed"
+    | "Proposed"
+    | "Change requested"
+    | "Open question"
+    | "Needs recheck";
   approach: string;
+  annotation: string;
   systems: string;
   systemsSuggested: boolean;
   owner: string;
@@ -22,7 +28,8 @@ export function architectureOutput(s: Session) {
   const cases = useCases.filter(
     (u) =>
       selected.includes(u.id) ||
-      s.workflowReviews.some((r) => r.useCase === u.id),
+      s.workflowReviews.some((r) => r.useCase === u.id) ||
+      s.architectureAdditions.some((a) => a.useCase === u.id),
   );
   return {
     title: s.title,
@@ -36,35 +43,21 @@ export function architectureOutput(s: Session) {
       nodes: workflows[u.id].map((step, i): ArchitectureNode => {
         const { record: r, stale } = workflowState(s, u.id, i);
         const systems = workflowSystems(s, u.id, i);
-        const missing = [
-          ["Systems", systems.unreviewed ? "" : systems.value],
-          ["Owner", r?.owner],
-          ["Handoff", r?.handoff],
-          ["Controls", r?.controls],
-        ]
-          .filter(
-            ([, v]) =>
-              !v?.trim() ||
-              /^(unknown|not decided|not sure|tbd|to be agreed|not captured|unassigned)[.!]?$/i.test(
-                v.trim(),
-              ),
-          )
-          .map(([label]) => label!);
-        if (r?.choice === "Change" && !r.change.trim())
-          missing.push("Revised approach");
+        const missing: string[] = [];
         const status = stale
           ? "Needs recheck"
-          : r?.choice === "Unresolved"
-            ? "Unresolved"
-            : r?.choice === "Keep" || r?.choice === "Change"
-              ? missing.length
-                ? "Unresolved"
-                : "Agreed"
-              : "Proposed";
+          : r?.choice === "Keep"
+            ? "Direction agreed"
+            : r?.choice === "Change"
+              ? "Change requested"
+              : r?.choice === "Unresolved"
+                ? "Open question"
+                : "Proposed";
         return {
           title: step.title,
           status,
-          approach: r?.change.trim() || step.proposal,
+          approach: step.proposal,
+          annotation: r?.change || "",
           systems: systems.value || "Not decided",
           systemsSuggested: systems.suggested,
           owner: r?.owner || "Not assigned",
@@ -74,6 +67,7 @@ export function architectureOutput(s: Session) {
           missing,
         };
       }),
+      additions: s.architectureAdditions.filter((a) => a.useCase === u.id),
       boundaries: s.boundaries.filter((b) => b.useCase === u.id),
       handoffs: s.handoffs.filter((h) => h.useCase === u.id),
     })),

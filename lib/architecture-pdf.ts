@@ -16,7 +16,7 @@ export function architectureDocument(s: Session): TDocumentDefinitions {
       margin: [0, 0, 0, 12],
     },
     {
-      text: "Generated from captured workshop answers. Agreed = the room chose Keep or Change and captured systems, owner, handoff and controls. Proposed = not reviewed. Unresolved = open choices or missing details. Needs recheck = source evidence changed.",
+      text: "Generated from captured workshop answers. Direction agreed = the proposal looks right to the room, not a technical sign-off. Change requested = room amendment. Open question = unresolved. Proposed = not reviewed. Needs recheck = source evidence changed.",
       style: "note",
     },
     {
@@ -85,7 +85,7 @@ export function architectureDocument(s: Session): TDocumentDefinitions {
           text: n.status.toUpperCase(),
           style: "status",
           color:
-            n.status === "Agreed"
+            n.status === "Direction agreed"
               ? "#23664a"
               : n.status === "Proposed"
                 ? "#526875"
@@ -95,16 +95,23 @@ export function architectureDocument(s: Session): TDocumentDefinitions {
           table: {
             widths: [85, "*"],
             body: [
-              ["Approach", n.approach],
+              ["Proposal", n.approach],
+              ...(n.annotation ? [["Room input", n.annotation]] : []),
               [
-                n.systemsSuggested && n.status !== "Agreed"
+                n.systemsSuggested && n.status !== "Direction agreed"
                   ? "Suggested systems"
                   : "Systems / roles",
                 n.systems,
               ],
-              ["Owner", n.owner],
-              ["Handoff", n.handoff],
-              ["Controls", n.controls],
+              ...(n.owner !== "Not assigned"
+                ? [["Follow-up owner", n.owner]]
+                : []),
+              ...(n.handoff !== "Not captured"
+                ? [["Captured handoff", n.handoff]]
+                : []),
+              ...(n.controls !== "Not captured"
+                ? [["Captured controls", n.controls]]
+                : []),
               ...(n.missing.length
                 ? [["Still needed", n.missing.join(", ")]]
                 : []),
@@ -131,11 +138,22 @@ export function architectureDocument(s: Session): TDocumentDefinitions {
       content.push({
         stack: nodeContent,
         unbreakable:
-          [n.approach, n.systems, n.owner, n.handoff, n.controls, n.next].join(
-            "",
-          ).length < 1800,
+          [
+            n.approach,
+            n.annotation,
+            n.systems,
+            n.owner,
+            n.handoff,
+            n.controls,
+            n.next,
+          ].join("").length < 1800,
       });
     });
+    for (const a of c.additions)
+      content.push({
+        text: `Room addition: ${a.note || "Not yet described"}\nFollow-up: ${a.owner || "Not assigned"}`,
+        margin: [0, 10, 0, 10],
+      });
     if (c.boundaries.length || c.handoffs.length)
       content.push({
         text: "Additional architecture captured in the workshop",

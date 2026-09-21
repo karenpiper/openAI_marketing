@@ -703,12 +703,12 @@ test("walkthrough shows current evidence and room decisions without internal PDF
     );
     assert.match(html, /Find the right approved content/);
     assert.ok(!html.includes("supplied PDF"));
-    assert.ok(!html.includes("Adobe CSC"));
+    assert.ok(html.includes("Adobe CSC"));
     assert.match(html, /Sample approved asset library/);
     assert.match(html, /Use the existing approved library/);
     if (!room) {
-      assert.match(html, /Keep/);
-      assert.match(html, /Unresolved/);
+      assert.match(html, /Looks right/);
+      assert.match(html, /Open question/);
     }
   }
 });
@@ -817,7 +817,10 @@ test("architecture output uses room systems, preserves revisions and flags incom
   assert.equal(nodes[0].systemsSuggested, true);
   assert.ok(JSON.stringify(nodes).includes("Adobe CSC"));
   s = reviewWorkflow(s, "s3", 0, { choice: "Keep" });
-  assert.equal(architectureOutput(s).cases[0].nodes[0].status, "Unresolved");
+  assert.equal(
+    architectureOutput(s).cases[0].nodes[0].status,
+    "Direction agreed",
+  );
   s = reviewWorkflow(s, "s3", 0, {
     choice: "Change",
     change: "The room’s revised workflow",
@@ -827,8 +830,8 @@ test("architecture output uses room systems, preserves revisions and flags incom
     controls: "Alex checks permission",
   });
   nodes = architectureOutput(s).cases[0].nodes;
-  assert.equal(nodes[0].status, "Agreed");
-  assert.equal(nodes[0].approach, "The room’s revised workflow");
+  assert.equal(nodes[0].status, "Change requested");
+  assert.equal(nodes[0].annotation, "The room’s revised workflow");
   assert.equal(nodes[0].systems, "Our warehouse\nOur CRM");
   assert.deepEqual(w.parseSession(JSON.parse(JSON.stringify(s))), s);
   s = guide.editAnswer(s, "s3", guide.currentQuestions.s3[1], {
@@ -851,7 +854,7 @@ test("generated architecture PDF includes captured systems and open decisions, a
   assert.match(text, /Sample analytics workspace/);
   assert.match(text, /Use the existing approved library/);
   assert.match(text, /AGREED/);
-  assert.match(text, /UNRESOLVED/);
+  assert.match(text, /OPEN QUESTION/);
   assert.match(text, /PROPOSED/);
   assert.match(text, /Shared decisions and open questions/);
   assert.ok(text.includes("Adobe CDP"));
@@ -976,4 +979,50 @@ test("data-entry sections expose save controls while read-only sections do not",
   );
   assert.match(error, /Storage unavailable/);
   assert.ok(!error.includes("Autosave is on"));
+});
+
+test("proposal board needs no technical forms and additions survive backup and exports", () => {
+  const { reviewWorkflow } = require("../lib/architecture-workflow.ts");
+  const { architectureOutput } = require("../lib/architecture-output.ts");
+  const { architectureDocument } = require("../lib/architecture-pdf.ts");
+  const Walk = require("../components/architecture-walkthrough.tsx").default;
+  for (const focus of ["s1", "s2", "s3", "s4", "s5", "s6", "s7"]) {
+    let s = { ...w.createSession(), focus, selected: [focus] };
+    s = reviewWorkflow(s, focus, 0, { choice: "Keep" });
+    assert.equal(
+      architectureOutput(s).cases[0].nodes[0].status,
+      "Direction agreed",
+    );
+    let html = renderToStaticMarkup(
+      React.createElement(Walk, { session: s, setSession: () => {} }),
+    );
+    assert.equal((html.match(/<textarea/g) || []).length, 0);
+    assert.ok(!html.includes("detailed architecture"));
+    s = reviewWorkflow(s, focus, 0, {
+      choice: "Change",
+      change: "Use our existing event platform",
+    });
+    s.architectureAdditions = [
+      {
+        id: "addition",
+        useCase: focus,
+        note: "Connect event attendance to the audience profile",
+        owner: "Sam",
+      },
+    ];
+    s = w.parseSession(JSON.parse(JSON.stringify(s)));
+    html = renderToStaticMarkup(
+      React.createElement(Walk, { session: s, setSession: () => {} }),
+    );
+    assert.equal((html.match(/<textarea/g) || []).length, 2);
+    assert.match(
+      JSON.stringify(architectureDocument(s)),
+      /Connect event attendance/,
+    );
+    assert.match(w.readout(s), /Connect event attendance/);
+    assert.equal(
+      architectureOutput(s).cases[0].nodes[0].annotation,
+      "Use our existing event platform",
+    );
+  }
 });

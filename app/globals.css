@@ -3038,3 +3038,63 @@ body {
     display: none !important;
   }
 }
+
+.proposal-board {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  gap: 2.4rem;
+}
+.proposal-step {
+  position: relative;
+  border: 1px solid #b6c6b9;
+  border-radius: 20px;
+  padding: clamp(1rem, 3vw, 2rem);
+  background: #fffdf7;
+}
+.proposal-step h3 {
+  font-size: 1.5rem;
+}
+.proposal-components {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  padding: 1rem;
+  border-radius: 12px;
+  background: #e8eddb;
+  color: #18382c;
+}
+.proposal-components .eyebrow {
+  flex-basis: 100%;
+  color: #365343;
+}
+.proposal-component {
+  display: block;
+  padding: 0.65rem 0.9rem;
+  border: 1px solid #97ac97;
+  border-radius: 8px;
+  background: #fffdf7;
+  font-weight: 600;
+}
+.proposal-delivery {
+  padding: 0.7rem 0;
+  border-bottom: 1px solid #d8dfd3;
+}
+.proposal-evidence {
+  color: #365343;
+  font-size: 0.95rem;
+}
+.proposal-annotation {
+  padding: 1rem;
+  margin: 1rem 0;
+  border-left: 4px solid #9c6c30;
+  background: #f6efdd;
+  color: #18382c;
+}
+.proposal-arrow {
+  position: absolute;
+  bottom: -2.3rem;
+  left: 50%;
+  font-size: 1.8rem;
+  color: #365343;
+}

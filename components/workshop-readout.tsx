@@ -241,7 +241,51 @@ export default function WorkshopReadout({
           <article key={d.id} className="side-card">
             <Badge value={d.status} />
             <h3>{d.title}</h3>
-            <p>{d.answer || "No answer captured"}</p>
+            {setSession && !room ? (
+              <>
+                <Field
+                  label="Decision or open question"
+                  multiline
+                  value={d.answer}
+                  onChange={(answer) =>
+                    setSession((p) => ({
+                      ...p,
+                      decisions: p.decisions.map((x) =>
+                        x.id === d.id
+                          ? { ...x, answer, status: "Proposed" }
+                          : x,
+                      ),
+                    }))
+                  }
+                />
+                <Field
+                  label="Follow-up owner (optional)"
+                  value={d.owner}
+                  onChange={(owner) =>
+                    setSession((p) => ({
+                      ...p,
+                      decisions: p.decisions.map((x) =>
+                        x.id === d.id ? { ...x, owner } : x,
+                      ),
+                    }))
+                  }
+                />
+                <StatusField
+                  value={d.status}
+                  onChange={(status) =>
+                    setSession((p) => ({
+                      ...p,
+                      decisions: p.decisions.map((x) =>
+                        x.id === d.id ? { ...x, status } : x,
+                      ),
+                    }))
+                  }
+                />
+                <SaveFooter />
+              </>
+            ) : (
+              <p>{d.answer || "No answer captured"}</p>
+            )}
             <p className="muted">
               {d.owner || "Owner unassigned"} · {d.due || "Timing not set"} ·{" "}
               {caseName(d.useCase)}

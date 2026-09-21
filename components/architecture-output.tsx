@@ -60,8 +60,8 @@ export default function ArchitectureOutput({
         workflow sequence, not implemented integrations.
       </p>
       <p className="muted">
-        A step is agreed only after the room chooses Keep or Change and captures
-        systems, owner, handoff and controls. Changed source answers require a
+        “Looks right” means agreement on direction. Room changes and questions
+        remain visible alongside our proposal. Changed source answers require a
         recheck.
       </p>
       {!model.cases.length && (
@@ -86,19 +86,36 @@ export default function ArchitectureOutput({
                   <Badge value={n.status} />
                 </div>
                 <p>{n.approach}</p>
+                {n.annotation && (
+                  <p className="proposal-annotation">
+                    <b>Room input:</b> {n.annotation}
+                  </p>
+                )}
                 <dl>
                   <dt>
-                    {n.systemsSuggested && n.status !== "Agreed"
+                    {n.systemsSuggested && n.status !== "Direction agreed"
                       ? "Suggested systems"
                       : "Systems and roles"}
                   </dt>
                   <dd className="preserve-lines">{n.systems}</dd>
-                  <dt>Owner</dt>
-                  <dd>{n.owner}</dd>
-                  <dt>What passes on</dt>
-                  <dd className="preserve-lines">{n.handoff}</dd>
-                  <dt>Review and controls</dt>
-                  <dd className="preserve-lines">{n.controls}</dd>
+                  {n.owner !== "Not assigned" && (
+                    <>
+                      <dt>Follow-up owner</dt>
+                      <dd>{n.owner}</dd>
+                    </>
+                  )}
+                  {n.handoff !== "Not captured" && (
+                    <>
+                      <dt>Captured handoff</dt>
+                      <dd>{n.handoff}</dd>
+                    </>
+                  )}
+                  {n.controls !== "Not captured" && (
+                    <>
+                      <dt>Captured controls</dt>
+                      <dd>{n.controls}</dd>
+                    </>
+                  )}
                 </dl>
                 {n.missing.length > 0 && (
                   <p className="muted">Still needed: {n.missing.join(", ")}</p>
@@ -116,6 +133,12 @@ export default function ArchitectureOutput({
               </li>
             ))}
           </ol>
+          {c.additions.map((a) => (
+            <p className="proposal-annotation" key={a.id}>
+              <b>Room addition:</b> {a.note || "Not yet described"}
+              {a.owner && ` · Follow-up: ${a.owner}`}
+            </p>
+          ))}
         </section>
       ))}
     </section>

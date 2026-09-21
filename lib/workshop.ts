@@ -202,6 +202,12 @@ export type WorkflowReview = {
   source: string;
 };
 export type Session = {
+  architectureAdditions: {
+    id: string;
+    useCase: string;
+    note: string;
+    owner: string;
+  }[];
   draftDecisionTitle: string;
   briefingPanel: number;
   overview: boolean;
@@ -278,6 +284,7 @@ export function createSession(): Session {
   return {
     schema: 1,
     overview: true,
+    architectureAdditions: [],
     draftDecisionTitle: "",
     briefingPanel: 0,
     attendees: "",
@@ -469,6 +476,12 @@ export function parseSession(raw: unknown): Session {
     gap: str(x.gap),
     status: status(x),
   }));
+  s.architectureAdditions = rows(r.architectureAdditions, (x) => ({
+    id: str(x.id),
+    useCase: uc(x.useCase),
+    note: str(x.note),
+    owner: str(x.owner),
+  }));
   s.workflowReviews = rows(r.workflowReviews, (x) => ({
     useCase: uc(x.useCase),
     step:
@@ -647,6 +660,11 @@ export function readout(s: Session): string {
         (r) =>
           `${name(r.useCase)} | ${workflows[r.useCase][r.step].title} | ${workflowState(s, r.useCase, r.step).stale ? "Evidence changed — recheck" : r.choice}\nProposal: ${workflows[r.useCase][r.step].proposal}\nCorrection: ${r.change || "None captured"}\nSystems: ${r.systems || "Not captured"}\nHandoff: ${r.handoff || "Not captured"}\nControls: ${r.controls || "Not captured"}\nOwner: ${r.owner || "Unassigned"}\nNext decision or action: ${r.next || "Not captured"}`,
       ),
+    "## Additions proposed by the room",
+    ...s.architectureAdditions.map(
+      (a) =>
+        `${name(a.useCase)}: ${a.note}\nFollow-up: ${a.owner || "Unassigned"}`,
+    ),
     "## Architecture boundaries",
     ...s.boundaries.map(
       (b) =>
