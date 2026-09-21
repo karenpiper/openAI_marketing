@@ -1914,3 +1914,38 @@
     flex-wrap: wrap;
   }
 }
+/* Work advances within the monitor, independently of the workshop document. */
+.monitor-screen {
+  height: clamp(440px, 72vh, 780px);
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  scrollbar-gutter: stable;
+  overflow-anchor: none;
+}
+.monitor-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: #f5f5f5;
+}
+.monitor-wrap {
+  overflow-anchor: none;
+}
+.monitor-screen .work-artifact {
+  scroll-margin-top: 55px;
+}
+@media (max-width: 700px) {
+  .monitor-screen {
+    height: 70svh;
+    min-height: 380px;
+  }
+}
+@media print {
+  .monitor-screen {
+    height: auto;
+    overflow: visible;
+  }
+  .monitor-toolbar {
+    position: static;
+  }
+}

@@ -53,12 +53,32 @@ export default function AgentWorkspace() {
   function setChapter(index: number) {
     setS((prev) => ({ ...prev, day: { ...prev.day, moment: index + 1 } }));
   }
-  function scrollThread() {
-    requestAnimationFrame(() =>
-      document
-        .getElementById("morgan-day")
-        ?.scrollIntoView({ block: "start", behavior: "smooth" }),
-    );
+  function updateInMonitor(update: () => void, showWork = false) {
+    const before = document
+      .querySelector(".monitor-bezel")
+      ?.getBoundingClientRect().top;
+    update();
+    requestAnimationFrame(() => {
+      const monitor = document.querySelector(".monitor-bezel");
+      const screen = document.querySelector<HTMLElement>(".monitor-screen");
+      if (before !== undefined && monitor)
+        window.scrollBy({
+          top: monitor.getBoundingClientRect().top - before,
+          behavior: "instant",
+        });
+      if (screen) {
+        const artifact = showWork
+          ? screen.querySelector<HTMLElement>(".work-artifact")
+          : null;
+        const top = artifact
+          ? artifact.getBoundingClientRect().top -
+            screen.getBoundingClientRect().top +
+            screen.scrollTop -
+            55
+          : 0;
+        screen.scrollTo({ top, behavior: "instant" });
+      }
+    });
   }
   const [capture, setCapture] = useState(false);
   const [demo, setDemo] = useState(false);
@@ -365,8 +385,7 @@ export default function AgentWorkspace() {
                       <button
                         className="agent-primary"
                         onClick={() => {
-                          setChapter(0);
-                          scrollThread();
+                          updateInMonitor(() => setChapter(0));
                         }}
                       >
                         Show me the opportunity →
@@ -536,21 +555,26 @@ export default function AgentWorkspace() {
                           session={s}
                           id={c.id}
                           onStep={(step) =>
-                            setS((prev) => ({
-                              ...prev,
-                              work: {
-                                ...prev.work,
-                                [c.id]: {
-                                  signature: workSignature(prev, c.id),
-                                  step,
-                                },
-                              },
-                            }))
+                            updateInMonitor(
+                              () =>
+                                setS((prev) => ({
+                                  ...prev,
+                                  work: {
+                                    ...prev.work,
+                                    [c.id]: {
+                                      signature: workSignature(prev, c.id),
+                                      step,
+                                    },
+                                  },
+                                })),
+                              true,
+                            )
                           }
                           onFinish={() => {
-                            setS((prev) => advanceDay(prev, chapter));
-                            setCapture(false);
-                            scrollThread();
+                            updateInMonitor(() => {
+                              setS((prev) => advanceDay(prev, chapter));
+                              setCapture(false);
+                            });
                           }}
                         />
                         {(conversation[c.id] || []).map((turn, i) => (
