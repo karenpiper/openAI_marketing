@@ -73,7 +73,7 @@ function MorganScreen({
                   jump(".agent-product, .day-arrival, .day-evening", e)
                 }
               >
-                ◌ Morgan’s Tuesday
+                ◌ Morgan’s workspace
               </button>
               {workflow && (
                 <>
@@ -512,59 +512,15 @@ export default function AgentWorkspace() {
             </button>
           </main>
         ) : page === "workspace" ? (
-          <main className="agent-main">
-            <aside className="agent-sidebar">
-              <div className="agent-workspace-name">
-                <span className="agent-avatar">M</span>
-                <div>
-                  <b>Representative prototype</b>
-                  <small>One connected workflow</small>
-                </div>
-              </div>
-              <span className="agent-kicker">
-                Prototype flow · illustrative near-term experience
-              </span>
-              <button
-                className={s.day.moment === 0 ? "active" : ""}
-                onClick={() =>
-                  setS((prev) => ({ ...prev, day: { ...prev.day, moment: 0 } }))
-                }
-              >
-                <span>01</span>
-                <strong>Account opportunity</strong>
-              </button>
-              {chapters.map((ch, i) => (
-                <button
-                  key={ch.id}
-                  className={s.day.moment === i + 1 ? "active" : ""}
-                  onClick={() => {
-                    setChapter(i);
-                  }}
-                >
-                  <span>0{i + 2}</span>
-                  <strong>{ch.short}</strong>
-                  <small>{s.findings[ch.id].priority}</small>
-                </button>
-              ))}
-              <button
-                className={s.day.moment === 4 ? "active" : ""}
-                onClick={() =>
-                  setS((prev) => ({ ...prev, day: { ...prev.day, moment: 4 } }))
-                }
-              >
-                <span>04</span>
-                <strong>Learning loop</strong>
-              </button>
-              <div className="agent-sidebar-foot">
-                <b>How to use this</b>
-                <br />
-                Inspect the work in the screen. Read the components beside it.
-                The full architecture comes after the flow.
-              </div>
-            </aside>
+          <main className="agent-main prototype-main">
             <section className="agent-stage" id="morgan-day">
-              <div className="day-context">
-                <span>✳ Representative workflow</span>
+              <div className="prototype-human-context">
+                <span className="agent-avatar">M</span>
+                <p>
+                  <b>Morgan’s workspace</b>
+                  <br />A representative workflow for an enterprise marketer who
+                  needs to make a good call, not merely move through a process.
+                </p>
                 <span>Enterprise adoption / 12 target accounts</span>
               </div>
               {s.day.moment === 0 ? (
@@ -684,9 +640,10 @@ export default function AgentWorkspace() {
                     <h1>{c.short}</h1>
                     <p>{c.story}</p>
                     <p>
-                      Use this flow to assess the proposed experience and the
-                      components it would require. It is an illustration, not a
-                      claim that this is how the team works today.
+                      Morgan reviews the evidence, sets direction and steps in
+                      where judgment matters. The system does the routine work
+                      around her. Use this flow to assess that proposed
+                      experience and the components it would require.
                     </p>
                   </section>
                   <div className="prototype-screen-layout">
