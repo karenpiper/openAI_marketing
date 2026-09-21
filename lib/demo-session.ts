@@ -1,3 +1,4 @@
+import { currentQuestions, findAnswer, editAnswer } from "./workshop-guide";
 import {
   createSession,
   selectionStamp,
@@ -330,5 +331,82 @@ export function createDemoSession(): Session {
   s.parking =
     "DEMO: Who can confirm source access?\nDEMO: What would count as enough evidence to run a pilot?";
   s.timer = { stage: 1, remaining: 1800, runningSince: null };
+  return addDemoGuideExamples(s);
+}
+
+/** Add missing rehearsal answers without replacing the user's existing demo edits. */
+export function addDemoGuideExamples(session: Session): Session {
+  let s = session;
+  const examples: Record<string, string[]> = {
+    s1: [
+      "The account owner checks contact roles in the CRM and fills gaps in a shared account sheet.",
+      "An analyst combines website activity, event attendance and sales notes in a weekly account review.",
+      "Marketing and sales compare planned outreach in a shared calendar before contacting the account.",
+      "The team checks meetings and opportunity movement; individual engagement is easier to see than buying-group progress.",
+    ],
+    s2: [
+      "A weekly report combines website visits, content engagement and event attendance to flag audiences needing attention.",
+      "A marketer reviews recent activity alongside account context and asks sales about intent.",
+      "The marketer chooses content, an event invitation, a sales follow-up or no action, and records the rationale in a brief.",
+      "The next weekly review compares response and progression; the original rationale is not consistently linked to the result.",
+    ],
+    s3: [
+      "Approved assets live in a shared library. A separate review record holds approval and version details.",
+      "The team manually combines content engagement, event attendance and sales context to write audience briefs.",
+      "A writer adapts the approved source for each audience in a document. A reviewer checks claims; operations copies approved versions into the delivery tool.",
+      "The team checks engagement by campaign. Editing effort and audience progression across touchpoints are not consistently connected.",
+    ],
+    s4: [
+      "The campaign owner assembles an audience brief, approved copy and a channel checklist before requesting launch.",
+      "Brand and operations review the draft in a shared document. Changes can trigger another review.",
+      "Operations builds the campaign in a delivery tool, runs a test and schedules it after sign-off.",
+      "Request and approval timestamps show some waiting time, but rework in chat is not tracked.",
+    ],
+    s5: [
+      "Requests arrive through a shared form and sometimes chat. Operations copies them into the queue.",
+      "The specialist checks a checklist for routine requests and asks for missing audience or approval details.",
+      "Operations uses saved templates for recurring requests and manually verifies the result.",
+      "Unusual cases go to a specialist. The requester gets an update in the ticket when someone takes ownership.",
+    ],
+    s6: [
+      "The account owner flags sensitive contacts in the CRM and tells marketing about active conversations.",
+      "A marketer sends the proposed action and account context to the relationship owner for a decision.",
+      "Operations can pause scheduled delivery; late requests depend on someone seeing the message in time.",
+      "The decision is noted in the request record, with some supporting context still left in chat.",
+    ],
+    s7: [
+      "An analyst pulls channel reports, event attendance and sales outcomes into a weekly report.",
+      "Audience comparisons use a spreadsheet. Following one audience across touchpoints requires manual matching.",
+      "Marketing reviews the results and adjusts the next audience brief and message priorities.",
+      "A weekly meeting shares recommendations; the next campaign may already be in production before the report arrives.",
+    ],
+  };
+  const tools: Record<string, string> = {
+    data: "Sample CRM — account and contact records\nSample warehouse — website, content and event history\nSample identity service — person-to-account matching",
+    reasoning:
+      "Sample analytics workspace — compare audience activity\nSample planning document — record interpretation and recommended action",
+    surface:
+      "Sample request workspace — marketer input and progress\nSample team chat — follow-up questions",
+    content:
+      "Sample asset library — approved source and version\nSample document editor — audience variants\nSample review tool — comments and approval record",
+    activation:
+      "Sample marketing delivery tool — audience setup and delivery\nSample request queue — handoffs and launch checklist",
+    measurement:
+      "Sample analytics workspace — audience journeys and drop-off\nSample reporting sheet — review notes and production effort",
+    sales:
+      "Sample CRM — relationship context\nSample request queue — specialist follow-up",
+  };
+  for (const [caseId, questions] of Object.entries(currentQuestions))
+    questions.forEach((q, i) => {
+      if (!findAnswer(s, caseId, q))
+        s = editAnswer(s, caseId, q, {
+          evidence: "Fictional example: " + examples[caseId][i],
+          system: tools[q.layer],
+          owner: "Demo team lead — verify with the real operator",
+          gap: "The process works manually. Confirm actual coverage, delays and handoffs with the team.",
+          fit: "Unknown",
+          status: i === 3 ? "Unknown" : "Proposed",
+        });
+    });
   return s;
 }

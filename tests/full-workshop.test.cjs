@@ -411,7 +411,7 @@ test("demo starts at step 2 with confirmed choices and complete linked examples,
     ...demo.handoffs,
     ...demo.actions,
   ])
-    assert.ok(demo.selected.includes(row.useCase));
+    assert.ok(useCases.some((c) => c.id === row.useCase));
   assert.ok(demo.actions.some((a) => !a.owner));
   assert.equal(demo.lab.drafts.length, 3);
   for (const d of demo.lab.drafts) {
@@ -442,7 +442,7 @@ test("populated demo renders steps 2–4 and projector views with fictional read
     assert.ok(
       renderToStaticMarkup(
         React.createElement(Comp, { session: demo, setSession: noop }),
-      ).length > 1000,
+      ).length > 500,
     );
   for (const stage of [1, 2, 3])
     for (const architectureTab of ["map", "lab"])
@@ -451,11 +451,131 @@ test("populated demo renders steps 2–4 and projector views with fictional read
           React.createElement(Room, {
             session: { ...demo, stage, architectureTab },
           }),
-        ).length > 1000,
+        ).length > 500,
       );
   const text = w.readout(demo);
   assert.match(text, /DEMO DATA/);
   assert.match(text, /Fictional test result/);
   assert.match(text, /Needs edits/);
   assert.match(text, /Unassigned/);
+});
+
+test("guided capture supports all seven cases, preserves legacy notes and multiple tools, and reopens edited agreements", () => {
+  const guide = require("../lib/workshop-guide.ts");
+  const {
+    createDemoSession,
+    addDemoGuideExamples,
+  } = require("../lib/demo-session.ts");
+  let s = createDemoSession();
+  const original = s.capabilities.find(
+    (c) => c.useCase === "s3" && c.name === "Content operations",
+  );
+  const prompt = guide.currentQuestions.s3[0];
+  const count = s.capabilities.length;
+  s = guide.editAnswer(s, "s3", prompt, {
+    system: "Library — approved source\nReview tool — approval record",
+  });
+  assert.equal(s.capabilities.length, count);
+  assert.equal(guide.findAnswer(s, "s3", prompt).id, original.id);
+  assert.equal(guide.findAnswer(s, "s3", prompt).status, "Proposed");
+  assert.equal(guide.findAnswer(s, "s3", prompt).evidence, original.evidence);
+  assert.deepEqual(w.parseSession(JSON.parse(JSON.stringify(s))), s);
+  assert.equal(
+    guide.findAnswer(addDemoGuideExamples(s), "s3", prompt).system,
+    "Library — approved source\nReview tool — approval record",
+  );
+  for (const c of useCases) {
+    assert.equal(guide.currentQuestions[c.id].length, 4);
+    assert.equal(
+      new Set(guide.currentQuestions[c.id].map((q) => q.id)).size,
+      4,
+    );
+    for (const q of guide.currentQuestions[c.id])
+      assert.ok(guide.findAnswer(s, c.id, q)?.evidence);
+  }
+  let real = w.createSession();
+  const assessments = JSON.stringify(real.assessments);
+  real = guide.editAnswer(real, "s4", guide.currentQuestions.s4[0], {
+    evidence: "A real answer",
+  });
+  assert.equal(real.selected.length, 0);
+  assert.equal(JSON.stringify(real.assessments), assessments);
+  assert.equal(real.capabilities.length, 1);
+  const legacy = { ...real };
+  delete legacy.guide;
+  assert.deepEqual(w.parseSession(legacy).guide, {
+    current: 0,
+    architecture: 0,
+  });
+  assert.deepEqual(
+    w.parseSession({ ...real, guide: { current: 99, architecture: -1 } }).guide,
+    { current: 0, architecture: 0 },
+  );
+});
+
+test("all guided questions and readbacks render in real, demo and projected sessions", () => {
+  const { createDemoSession } = require("../lib/demo-session.ts");
+  const {
+    CurrentState,
+    Architecture,
+  } = require("../components/workshop-mapping.tsx");
+  const Room = require("../components/room-view.tsx").default;
+  const guide = require("../lib/workshop-guide.ts");
+  for (const s of [w.createSession(), createDemoSession()])
+    for (const c of useCases) {
+      s.focus = c.id;
+      for (const [stage, Comp, key, max] of [
+        [1, CurrentState, "current", 4],
+        [2, Architecture, "architecture", 5],
+      ]) {
+        s.stage = stage;
+        for (let step = 0; step <= max; step++) {
+          s.guide[key] = step;
+          const html = renderToStaticMarkup(
+            React.createElement(Comp, { session: s, setSession: () => {} }),
+          );
+          const room = renderToStaticMarkup(
+            React.createElement(Room, { session: s }),
+          );
+          assert.ok(html.length > 500 && room.length > 500);
+          if (stage === 1 && step < 4) {
+            assert.ok(
+              html.includes(guide.currentQuestions[c.id][step].question),
+            );
+            assert.ok(
+              room.includes(guide.currentQuestions[c.id][step].question),
+            );
+            assert.ok(
+              html.includes("Which tools are involved, and what does each do?"),
+            );
+          }
+          assert.ok(!html.includes("Start with a capability"));
+          assert.ok(!html.includes("Define the boundary"));
+        }
+      }
+    }
+});
+
+test("architecture edits stay case-specific and preserve other handoffs", () => {
+  const guide = require("../lib/workshop-guide.ts");
+  let s = require("../lib/demo-session.ts").createDemoSession();
+  const old = s.handoffs.find((h) => h.id === "demo-h1");
+  s = guide.editHandoff(s, "s3", { payload: "Updated payload" });
+  assert.deepEqual(
+    s.handoffs.find((h) => h.id === "demo-h1"),
+    old,
+  );
+  assert.equal(guide.primaryHandoff(s, "s3").status, "Proposed");
+  s = guide.editBoundary(s, "s1", "data", {
+    system: "CRM\nWarehouse",
+    owner: "Data team",
+  });
+  assert.ok(
+    !s.boundaries.some((b) => b.useCase === "s2" && b.layer === "data"),
+  );
+  assert.ok(
+    s.boundaries.some(
+      (b) => b.useCase === "s1" && b.system === "CRM\nWarehouse",
+    ),
+  );
 });

@@ -2172,3 +2172,81 @@ details p {
     display: none !important;
   }
 }
+
+/* Guided capture keeps one discussion in focus. */
+.guided-panel {
+  max-width: 960px;
+  margin-inline: auto;
+}
+.guided-panel .case-focus {
+  display: grid;
+  gap: 10px;
+}
+.guided-panel .case-focus select {
+  width: 100%;
+  padding: 14px;
+  border: 1px solid #cbd5d1;
+  border-radius: 10px;
+  background: white;
+  color: #183b32;
+  font: inherit;
+}
+.guide-navigation {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 24px 0;
+}
+.guide-navigation span {
+  text-align: center;
+  color: #52665d;
+  font-size: 0.9rem;
+}
+.guide-agreement {
+  border: 0;
+  padding: 0;
+  margin: 24px 0 0;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.guide-agreement legend {
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+.guide-agreement button[aria-pressed="true"] {
+  background: #183b32;
+  color: white;
+  border-color: #183b32;
+}
+.guide-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 22px 0;
+}
+.guided-panel .capture-card > .capture-field {
+  margin-bottom: 20px;
+}
+.guided-panel .capture-card > details {
+  margin: 20px 0;
+}
+.guided-panel .capture-card > summary {
+  cursor: pointer;
+  font-weight: 600;
+}
+.guided-panel .capture-card > summary + .capture-field {
+  margin-top: 20px;
+}
+.guided-panel .capture-card textarea {
+  min-height: 110px;
+}
+@media (max-width: 600px) {
+  .guide-navigation {
+    gap: 6px;
+  }
+  .guide-navigation button {
+    padding: 10px;
+  }
+}

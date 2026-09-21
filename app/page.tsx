@@ -20,6 +20,7 @@ import {
 import { rank, restore, STORAGE_KEY } from "../lib/assessment";
 import {
   createDemoSession,
+  addDemoGuideExamples,
   DEMO_SESSION_KEY,
   DEMO_CHANNEL,
 } from "../lib/demo-session";
@@ -47,8 +48,10 @@ export default function Workshop() {
     setDemo(isDemo);
     try {
       const raw = localStorage.getItem(key);
-      if (raw) setSession(parseSession(JSON.parse(raw)));
-      else if (isDemo) setSession(createDemoSession());
+      if (raw) {
+        const saved = parseSession(JSON.parse(raw));
+        setSession(isDemo ? addDemoGuideExamples(saved) : saved);
+      } else if (isDemo) setSession(createDemoSession());
       else {
         const old = localStorage.getItem(STORAGE_KEY);
         if (old)
@@ -115,9 +118,7 @@ export default function Workshop() {
     setSession((s) => ({
       ...s,
       stage,
-      focus: activeCases(s).some((c) => c.id === s.focus)
-        ? s.focus
-        : activeCases(s)[0]?.id || s.focus,
+      focus: s.focus,
       timer: {
         stage,
         remaining: stages[stage].minutes * 60,
@@ -305,9 +306,9 @@ export default function Workshop() {
           <div>
             <strong>Demo data · test anything here</strong>
             <p>
-              Fictional priorities and sample answers are loaded. Your real
-              workshop is untouched. Start in step 2, or jump to architecture,
-              the live build or readout.
+              Fictional priorities and step 2 answers for all seven use cases
+              are loaded. Your real workshop is untouched. Start in step 2, or
+              jump to architecture, the live build or readout.
             </p>
           </div>
           <div className="inline-actions">

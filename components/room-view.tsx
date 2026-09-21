@@ -1,3 +1,12 @@
+import { CurrentReadback, ArchitectureReadback } from "./workshop-mapping";
+import {
+  currentQuestions,
+  architectureQuestions,
+  findAnswer,
+  primaryLayer,
+  primaryHandoff,
+  agreementLabel,
+} from "../lib/workshop-guide";
 import {
   type Session,
   stages,
@@ -147,78 +156,104 @@ export default function RoomView({ session }: { session: Session }) {
       )}
       {s.stage === 1 && (
         <section className="room-stage">
-          <span className="eyebrow">Current state · {focus?.label}</span>
-          <h1>What can we build on?</h1>
-          <p className="room-lede">
-            {focus && s.assessments[focus.id].proofText}
-          </p>
-          <div className="summary-grid">
-            {["Reuse", "Extend", "Missing", "Unknown"].map((f) => (
-              <article className="side-card" key={f}>
-                <h2>{f}</h2>
-                {s.capabilities
-                  .filter((c) => c.useCase === s.focus && c.fit === f)
-                  .map((c) => (
-                    <div className="summary-entry" key={c.id}>
-                      <h3>{c.name}</h3>
-                      <p>{c.system || "System unknown"}</p>
-                      <p>
-                        {c.evidence || c.gap || "Tell us what exists today."}
-                      </p>
-                      <Badge value={c.status} />
-                    </div>
-                  ))}
-              </article>
-            ))}
-          </div>
-          <div className="question-banner">
-            <h2>
-              Have we captured what exists, what needs extending, and what we
-              don’t know?
-            </h2>
-          </div>
+          <span className="eyebrow">What happens today · {focus?.label}</span>
+          {s.guide.current === 4 ? (
+            <>
+              <h1>Have we captured this correctly?</h1>
+              <CurrentReadback session={s} />
+            </>
+          ) : (
+            <>
+              <h1>{currentQuestions[s.focus][s.guide.current].question}</h1>
+              <p className="room-lede">
+                {currentQuestions[s.focus][s.guide.current].hint}
+              </p>
+              {(() => {
+                const a = findAnswer(
+                  s,
+                  s.focus,
+                  currentQuestions[s.focus][s.guide.current],
+                );
+                return (
+                  <div className="room-return">
+                    <Badge value={agreementLabel(a?.status || "Unknown")} />
+                    <p className="preserve-lines">
+                      {a?.evidence || "Waiting for the room’s answer."}
+                    </p>
+                    <p className="preserve-lines">{a?.system}</p>
+                    <p>{a?.owner}</p>
+                    <p>{a?.gap}</p>
+                  </div>
+                );
+              })()}
+            </>
+          )}
         </section>
       )}
       {s.stage === 2 && s.architectureTab === "map" && (
         <section className="room-stage">
           <span className="eyebrow">
-            Proposed operating model · {focus?.label}
+            Proposed way of working · {focus?.label}
           </span>
-          <h1>Who owns the work?</h1>
-          <div className="room-map">
-            {layerSeeds.map((l) => {
-              const b = s.boundaries.find(
-                (b) => b.useCase === s.focus && b.layer === l.id,
-              );
-              return (
-                <article className="side-card" key={l.id}>
-                  <span className="label">
-                    {b?.owner || "Owner to confirm"}
-                  </span>
-                  <h2>{l.title}</h2>
-                  <p>{b?.system || l.suggestion}</p>
-                  <p>{b?.control || "Controls not captured"}</p>
-                  <Badge value={b?.status || "Unknown"} />
-                </article>
-              );
-            })}
-          </div>
-          {s.handoffs
-            .filter((h) => h.useCase === s.focus)
-            .map((h) => (
-              <p className="handoff-summary" key={h.id}>
-                <b>
-                  {h.from} → {h.to}
-                </b>{" "}
-                · {h.payload || "Payload to confirm"} · {h.status}
+          {s.guide.architecture === 5 ? (
+            <>
+              <h1>Read back the proposed way of working</h1>
+              <ArchitectureReadback session={s} />
+            </>
+          ) : (
+            <>
+              <h1>{architectureQuestions[s.guide.architecture].question}</h1>
+              <p className="room-lede">
+                {architectureQuestions[s.guide.architecture].hint}
               </p>
-            ))}
-          <div className="question-banner">
-            <h2>
-              Where does state live, and who can approve or stop the next
-              action?
-            </h2>
-          </div>
+              {(() => {
+                const step = s.guide.architecture;
+                const q = architectureQuestions[step];
+                const b = s.boundaries.find(
+                  (b) =>
+                    b.useCase === s.focus &&
+                    b.layer ===
+                      (q.layer === "primary" ? primaryLayer(s.focus) : q.layer),
+                );
+                const h = primaryHandoff(s, s.focus);
+                return (
+                  <div className="room-return">
+                    {step < 3 ? (
+                      <>
+                        <Badge value={agreementLabel(b?.status || "Unknown")} />
+                        <p className="preserve-lines">
+                          {b?.system || "Waiting for the room’s proposal."}
+                        </p>
+                        <p>{b?.owner}</p>
+                        <p>{b?.truth}</p>
+                        <p>{b?.implementer}</p>
+                        <p>{b?.control}</p>
+                      </>
+                    ) : step === 3 ? (
+                      <>
+                        <Badge value={agreementLabel(h?.status || "Unknown")} />
+                        <p>{h?.payload || "Handoff not yet captured."}</p>
+                        <p>{h?.trigger}</p>
+                        <p>{h?.owner}</p>
+                        <p>{h?.control}</p>
+                      </>
+                    ) : (
+                      s.decisions
+                        .filter((d) => !d.useCase || d.useCase === s.focus)
+                        .map((d) => (
+                          <article key={d.id}>
+                            <h2>{d.title}</h2>
+                            <Badge value={agreementLabel(d.status)} />
+                            <p>{d.answer || "Still unknown"}</p>
+                            <p>{d.owner}</p>
+                          </article>
+                        ))
+                    )}
+                  </div>
+                );
+              })()}
+            </>
+          )}
         </section>
       )}
       {s.stage === 2 && s.architectureTab === "lab" && (

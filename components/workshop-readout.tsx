@@ -66,7 +66,7 @@ export default function WorkshopReadout({
                 .length
             }
           </strong>
-          <span>confirmed capabilities</span>
+          <span>agreed current-state answers</span>
         </div>
         <div>
           <strong>{unresolved.length}</strong>
@@ -126,35 +126,42 @@ export default function WorkshopReadout({
           )}
           <p className="muted">
             {session.capabilities.filter((c) => c.useCase === u.id).length}{" "}
-            capabilities mapped ·{" "}
+            current-state answers ·{" "}
             {session.boundaries.filter((b) => b.useCase === u.id).length}{" "}
             boundaries discussed
           </p>
         </article>
       ))}
       <h2 className="section-title">Current-state findings</h2>
+      {!session.capabilities.length && (
+        <p>No current-state answers captured.</p>
+      )}
       <div className="summary-grid">
-        {["Reuse", "Extend", "Missing", "Unknown"].map((f) => (
-          <article className="side-card" key={f}>
-            <h3>{f}</h3>
-            {session.capabilities
-              .filter((c) => c.fit === f)
-              .map((c) => (
-                <div className="summary-entry" key={c.id}>
-                  <b>{c.name}</b>
-                  <Badge value={c.status} />
-                  <p>
-                    {caseName(c.useCase)} · {c.system || "System unknown"}
-                  </p>
-                  <p>{c.evidence || "Evidence not captured"}</p>
-                  {c.gap && <p>Gap: {c.gap}</p>}
-                </div>
-              ))}
-            {!session.capabilities.some((c) => c.fit === f) && (
-              <p>None captured</p>
-            )}
-          </article>
-        ))}
+        {useCases
+          .filter((u) => session.capabilities.some((c) => c.useCase === u.id))
+          .map((u) => (
+            <article className="side-card" key={u.id}>
+              <h3>{caseName(u.id)}</h3>
+              {session.capabilities
+                .filter((c) => c.useCase === u.id)
+                .map((c) => (
+                  <div className="summary-entry" key={c.id}>
+                    <b>{c.name}</b>
+                    <Badge value={c.status} />
+                    <p className="preserve-lines">
+                      {c.evidence || "Answer not captured"}
+                    </p>
+                    <p className="preserve-lines">
+                      <b>Tools and roles:</b> {c.system || "Not captured"}
+                    </p>
+                    <p>
+                      <b>People:</b> {c.owner || "Not captured"}
+                    </p>
+                    {c.gap && <p>What works / needs work: {c.gap}</p>}
+                  </div>
+                ))}
+            </article>
+          ))}
       </div>
       <h2 className="section-title">Architecture & operating boundaries</h2>
       {!session.boundaries.length && <p>No boundaries captured.</p>}

@@ -75,6 +75,7 @@ export const layerSeeds = [
   },
 ];
 export type Capability = {
+  questionId?: string;
   id: string;
   useCase: string;
   name: string;
@@ -172,6 +173,7 @@ export type Session = {
   scene: number;
   focus: string;
   architectureTab: "map" | "lab";
+  guide: { current: number; architecture: number };
   assessments: StateMap;
   selected: string[];
   selectionSignature: string;
@@ -240,6 +242,7 @@ export function createSession(): Session {
     scene: 0,
     focus: "s3",
     architectureTab: "map",
+    guide: { current: 0, architecture: 0 },
     assessments: defaults(),
     selected: [],
     selectionSignature: "",
@@ -356,6 +359,13 @@ export function parseSession(raw: unknown): Session {
       : 0;
   s.focus = uc(r.focus) || "s3";
   s.architectureTab = choice(r.architectureTab, ["map", "lab"], "map");
+  const guide = record(r.guide);
+  const step = (v: unknown, max: number) =>
+    typeof v === "number" && Number.isInteger(v) && v >= 0 && v <= max ? v : 0;
+  s.guide = {
+    current: step(guide.current, 4),
+    architecture: step(guide.architecture, 5),
+  };
   s.assessments = restore(r.assessments);
   s.selected = Array.isArray(r.selected)
     ? [...new Set(r.selected.map(uc).filter(Boolean))]
@@ -367,6 +377,9 @@ export function parseSession(raw: unknown): Session {
   s.selectionBy = str(r.selectionBy);
   s.parking = str(r.parking);
   s.capabilities = rows(r.capabilities, (x) => ({
+    ...(typeof x.questionId === "string"
+      ? { questionId: str(x.questionId) }
+      : {}),
     id: id(x),
     useCase: uc(x.useCase),
     name: str(x.name),
@@ -513,7 +526,7 @@ export function readout(s: Session): string {
     "## Current capabilities",
     ...s.capabilities.map(
       (c) =>
-        `${name(c.useCase)} | ${c.name} | ${c.fit} | ${c.status}\nSystem: ${c.system || "Unknown"}; owner: ${c.owner || "Unassigned"}\nEvidence: ${c.evidence || "Not captured"}\nGap: ${c.gap || "Not captured"}`,
+        `${name(c.useCase)} | ${c.name} | ${c.fit} | ${c.status}\nSystem: ${c.system || "Unknown"}; owner: ${c.owner || "Unassigned"}\nEvidence: ${c.evidence || "Not captured"}\nWhat works / needs work: ${c.gap || "Not captured"}`,
     ),
     "## Architecture boundaries",
     ...s.boundaries.map(

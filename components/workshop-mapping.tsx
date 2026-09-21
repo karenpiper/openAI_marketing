@@ -1,644 +1,561 @@
 import { useState, type Dispatch, type SetStateAction } from "react";
 import {
   type Session,
-  type Capability,
+  type Status,
   type Boundary,
-  type Handoff,
   type Decision,
-  layerSeeds,
   activeCases,
-  newId,
 } from "../lib/workshop";
-import { decisions as contextDecisions, useCases } from "../lib/workshop-data";
-import { Field, Select, StatusField, Badge } from "./workshop-fields";
+import { useCases } from "../lib/workshop-data";
+import {
+  currentQuestions,
+  architectureQuestions,
+  findAnswer,
+  editAnswer,
+  editBoundary,
+  editHandoff,
+  primaryLayer,
+  primaryHandoff,
+  agreementLabel,
+} from "../lib/workshop-guide";
+import { Field, Badge } from "./workshop-fields";
+import ArchitectureDetails from "./architecture-details";
 type Props = {
   session: Session;
   setSession: Dispatch<SetStateAction<Session>>;
 };
-export function CaseFocus({ session, setSession }: Props) {
-  const cases = activeCases(session);
+export function CaseFocus({ session: s, setSession }: Props) {
   return (
     <div className="case-focus">
-      <span className="label">Working on</span>
-      <div className="case-pills">
-        {cases.map((c) => (
-          <button
-            key={c.id}
-            aria-pressed={session.focus === c.id}
-            className={session.focus === c.id ? "selected" : ""}
-            onClick={() => setSession((s) => ({ ...s, focus: c.id }))}
-          >
+      <label htmlFor="case-focus">Use case to discuss</label>
+      <select
+        id="case-focus"
+        value={s.focus}
+        onChange={(e) =>
+          setSession((p) => ({
+            ...p,
+            focus: e.target.value,
+            guide: { current: 0, architecture: 0 },
+          }))
+        }
+      >
+        {useCases.map((c) => (
+          <option key={c.id} value={c.id}>
             {c.label}
-          </button>
+            {activeCases(s).some((a) => a.id === c.id) ? " · working set" : ""}
+          </option>
         ))}
-      </div>
-      {!cases.length && (
-        <p>Select the working set in the use-case recap first.</p>
+      </select>
+      {!activeCases(s).some((c) => c.id === s.focus) && (
+        <small>
+          Exploring this case does not add it to the agreed working set.
+        </small>
       )}
     </div>
   );
 }
-export function CurrentState({ session, setSession }: Props) {
-  const [custom, setCustom] = useState("");
-  const focus = activeCases(session).find((c) => c.id === session.focus);
-  const list = session.capabilities.filter((c) => c.useCase === session.focus);
-  function update(id: string, patch: Partial<Capability>) {
-    setSession((s) => ({
-      ...s,
-      capabilities: s.capabilities.map((c) =>
-        c.id === id
-          ? {
-              ...c,
-              ...patch,
-              ...(!("status" in patch) ? { status: "Proposed" as const } : {}),
-            }
-          : c,
-      ),
-    }));
-  }
-  function add(name: string) {
-    if (!focus || !name.trim()) return;
-    setSession((s) => ({
-      ...s,
-      capabilities: [
-        ...s.capabilities,
-        {
-          id: newId(),
-          useCase: focus.id,
-          name: name.trim(),
-          system: "",
-          fit: "Unknown",
-          owner: "",
-          evidence: "",
-          gap: "",
-          status: "Unknown",
-        },
-      ],
-    }));
-    setCustom("");
-  }
+function Agreement({
+  value,
+  onChange,
+  ready,
+}: {
+  value: Status;
+  onChange: (s: Status) => void;
+  ready: boolean;
+}) {
   return (
-    <section className="module-panel">
+    <fieldset className="guide-agreement">
+      <legend>Does the room agree with this answer?</legend>
+      {(["Unknown", "Proposed", "Confirmed", "Disputed"] as Status[]).map(
+        (v) => (
+          <button
+            key={v}
+            aria-pressed={value === v}
+            disabled={v === "Confirmed" && !ready}
+            onClick={() => onChange(v)}
+          >
+            {agreementLabel(v)}
+          </button>
+        ),
+      )}
+    </fieldset>
+  );
+}
+function Navigation({
+  step,
+  total,
+  change,
+}: {
+  step: number;
+  total: number;
+  change: (n: number) => void;
+}) {
+  return (
+    <nav className="guide-navigation" aria-label="Discussion questions">
+      <button disabled={step === 0} onClick={() => change(step - 1)}>
+        ← Previous
+      </button>
+      <span>
+        {step === total
+          ? "Read back together"
+          : `Question ${step + 1} of ${total}`}
+      </span>
+      <button disabled={step === total} onClick={() => change(step + 1)}>
+        {step === total - 1 ? "Read back answers →" : "Next →"}
+      </button>
+    </nav>
+  );
+}
+export function CurrentReadback({ session: s }: { session: Session }) {
+  return (
+    <>
+      {currentQuestions[s.focus].map((q) => {
+        const a = findAnswer(s, s.focus, q);
+        return (
+          <article className="capture-card" key={q.id}>
+            <h3>{q.question}</h3>
+            <Badge value={agreementLabel(a?.status || "Unknown")} />
+            <p className="preserve-lines">
+              {a?.evidence || "Not captured yet."}
+            </p>
+            {a?.system && (
+              <p className="preserve-lines">
+                <b>Tools and their roles</b>
+                <br />
+                {a.system}
+              </p>
+            )}
+            {a?.owner && (
+              <p>
+                <b>People:</b> {a.owner}
+              </p>
+            )}
+            {a?.gap && (
+              <p className="preserve-lines">
+                <b>What works / needs work:</b> {a.gap}
+              </p>
+            )}
+          </article>
+        );
+      })}
+    </>
+  );
+}
+export function CurrentState({ session: s, setSession }: Props) {
+  const questions = currentQuestions[s.focus];
+  const step = s.guide.current;
+  const q = questions[step];
+  const a = q ? findAnswer(s, s.focus, q) : undefined;
+  const change = (current: number) =>
+    setSession((p) => ({ ...p, guide: { ...p.guide, current } }));
+  const used = questions.map((q) => findAnswer(s, s.focus, q)?.id);
+  const earlier = s.capabilities.filter(
+    (c) => c.useCase === s.focus && !used.includes(c.id),
+  );
+  return (
+    <section className="module-panel guided-panel">
       <div className="module-heading">
-        <span className="eyebrow">
-          02 · Current-state capability reuse · 30 minutes
-        </span>
-        <h1>What can we build on?</h1>
+        <span className="eyebrow">02 · What happens today · 30 minutes</span>
+        <h1>How do you handle this today?</h1>
         <p>
-          For each selected problem, name the capability, what it does today and
-          what still needs work. Unknown is a useful answer.
+          Ask one question, capture the answer, then check it with the room. The
+          questions are already provided—you do not need to enter capabilities.
         </p>
       </div>
-      <details className="starting-context">
-        <summary>Starting context from the earlier conversations</summary>
-        <p>
-          Cohort identification and launching were described as working for the
-          SMB / single-buyer motion. That does not establish buying-group
-          coverage. The supplied diagram also identifies CRM and offer tools as
-          already built.
-        </p>
-        <p>
-          Check the current capability and its scope with the operators. Discuss
-          Codex / ChatGPT Work, product and growth infrastructure, data, Marketo
-          and internal tooling. Record evidence below; these prompts are not new
-          confirmations from this room.
-        </p>
-      </details>
-      <CaseFocus session={session} setSession={setSession} />
-      {focus && (
+      <p className="muted">
+        Describe a recent example in everyday language. You do not need to name
+        a capability or design a system. The implementation team can translate
+        these answers afterward and check its interpretation with you.
+      </p>
+      <CaseFocus session={s} setSession={setSession} />
+      <Navigation step={step} total={4} change={change} />
+      {q ? (
         <>
           <div className="question-banner">
             <span className="label">Ask the room</span>
-            <h2>What already exists to help us prove this?</h2>
-            <p>{session.assessments[focus.id].proofText}</p>
+            <h2>{q.question}</h2>
+            <p>{q.hint}</p>
           </div>
-          <div className="capture-layout">
-            <div>
-              <div className="seed-picker">
-                <span className="label">Start with a capability</span>
-                {layerSeeds.map((l) => (
-                  <button
-                    key={l.id}
-                    onClick={() => add(l.title)}
-                    disabled={list.some((c) => c.name === l.title)}
-                  >
-                    + {l.title}
-                  </button>
-                ))}
-              </div>
-              <div className="inline-add">
-                <Field
-                  label="Another capability"
-                  value={custom}
-                  onChange={setCustom}
-                  placeholder="A capability the room names"
-                />
-                <button onClick={() => add(custom)} disabled={!custom.trim()}>
-                  Add
-                </button>
-              </div>
-              {list.map((c) => (
-                <article className="capture-card" key={c.id}>
-                  <div className="card-heading">
-                    <h3>{c.name}</h3>
-                    <Badge value={c.status} />
-                  </div>
-                  <div className="field-grid">
-                    <Field
-                      label="System or tool"
-                      value={c.system}
-                      onChange={(v) => update(c.id, { system: v })}
-                      placeholder="Codex, data platform, Marketo, internal tooling…"
-                    />
-                    <Select
-                      label="What do we need to do?"
-                      value={c.fit}
-                      options={["Unknown", "Reuse", "Extend", "Missing"]}
-                      onChange={(v) =>
-                        update(c.id, { fit: v as Capability["fit"] })
-                      }
-                    />
-                    <Field
-                      label="Who can verify it?"
-                      value={c.owner}
-                      onChange={(v) => update(c.id, { owner: v })}
-                    />
-                    <StatusField
-                      value={c.status}
-                      canConfirm={
-                        !!c.owner.trim() &&
-                        !!c.evidence.trim() &&
-                        (c.fit === "Missing" || !!c.system.trim()) &&
-                        c.fit !== "Unknown"
-                      }
-                      onChange={(v) => update(c.id, { status: v })}
-                    />
-                  </div>
-                  <Field
-                    label="What works today? Evidence or correction"
-                    multiline
-                    value={c.evidence}
-                    onChange={(v) => update(c.id, { evidence: v })}
-                    placeholder="What has been demonstrated? What does the operator say?"
-                  />
-                  <Field
-                    label="What is missing or needs extending?"
-                    multiline
-                    value={c.gap}
-                    onChange={(v) => update(c.id, { gap: v })}
-                  />
-                  <button
-                    className="quiet danger"
-                    onClick={() => {
-                      if (confirm("Remove this capability and its notes?"))
-                        setSession((s) => ({
-                          ...s,
-                          capabilities: s.capabilities.filter(
-                            (x) => x.id !== c.id,
-                          ),
-                        }));
-                    }}
-                  >
-                    Remove capability
-                  </button>
-                </article>
-              ))}
-              {!list.length && (
-                <div className="empty-state">
-                  Add a capability above as the room names it. Nothing is
-                  assumed to be built.
-                </div>
-              )}
-            </div>
-            <aside className="live-summary">
-              <span className="eyebrow">Returning to the room</span>
-              <h2>Here’s what we have.</h2>
-              {["Reuse", "Extend", "Missing", "Unknown"].map((f) => (
-                <div key={f}>
-                  <h3>
-                    {f} <span>{list.filter((c) => c.fit === f).length}</span>
-                  </h3>
-                  {list
-                    .filter((c) => c.fit === f)
-                    .map((c) => (
-                      <p key={c.id}>
-                        {c.name}
-                        <Badge value={c.status} />
-                      </p>
-                    ))}
-                </div>
-              ))}
-              <p className="muted">
-                Read this back. Confirm what the room agrees on; keep disputed
-                items visible.
-              </p>
-            </aside>
+          <div className="capture-card">
+            <Field
+              label="What happens today?"
+              multiline
+              value={a?.evidence || ""}
+              onChange={(evidence) =>
+                setSession((p) => editAnswer(p, s.focus, q, { evidence }))
+              }
+            />
+            <Field
+              label="Which tools are involved, and what does each do?"
+              multiline
+              placeholder={
+                "One tool per line is fine. For example:\nCRM — account and contact records\nWarehouse — activity history\nIdentity service — connects people across touchpoints"
+              }
+              value={a?.system || ""}
+              onChange={(system) =>
+                setSession((p) => editAnswer(p, s.focus, q, { system }))
+              }
+            />
+            <Field
+              label="Who is involved / can verify this?"
+              value={a?.owner || ""}
+              onChange={(owner) =>
+                setSession((p) => editAnswer(p, s.focus, q, { owner }))
+              }
+            />
+            <Field
+              label="What works, and what is missing?"
+              multiline
+              value={a?.gap || ""}
+              onChange={(gap) =>
+                setSession((p) => editAnswer(p, s.focus, q, { gap }))
+              }
+            />
+            <Agreement
+              value={a?.status || "Unknown"}
+              ready={!!a?.evidence.trim()}
+              onChange={(status) =>
+                setSession((p) => editAnswer(p, s.focus, q, { status }))
+              }
+            />
           </div>
         </>
+      ) : (
+        <>
+          <h2>Have we captured this correctly?</h2>
+          <CurrentReadback session={s} />
+          <div className="guide-links">
+            {questions.map((q, i) => (
+              <button key={q.id} onClick={() => change(i)}>
+                Edit {q.label.toLowerCase()}
+              </button>
+            ))}
+          </div>
+          <button
+            onClick={() =>
+              setSession((p) => ({
+                ...p,
+                stage: 2,
+                architectureTab: "map",
+                guide: { ...p.guide, architecture: 0 },
+                timer: { stage: 2, remaining: 2700, runningSince: null },
+              }))
+            }
+          >
+            Use these answers in architecture →
+          </button>
+        </>
+      )}
+      {earlier.length > 0 && (
+        <details className="starting-context">
+          <summary>Earlier notes ({earlier.length})</summary>
+          {earlier.map((c) => (
+            <article key={c.id}>
+              <h3>{c.name}</h3>
+              <p className="preserve-lines">
+                {c.evidence}
+                <br />
+                {c.system}
+                <br />
+                {c.gap}
+              </p>
+            </article>
+          ))}
+        </details>
       )}
     </section>
   );
 }
-
-export function Architecture({ session, setSession }: Props) {
-  const [layer, setLayer] = useState("surface");
-  const [from, setFrom] = useState("surface");
-  const [to, setTo] = useState("content");
-  const [title, setTitle] = useState("");
-  const focus = activeCases(session).find((c) => c.id === session.focus);
-  const boundaries = session.boundaries.filter(
-    (b) => b.useCase === session.focus,
+export function ArchitectureReadback({ session: s }: { session: Session }) {
+  return (
+    <>
+      {s.boundaries
+        .filter((b) => b.useCase === s.focus)
+        .map((b) => (
+          <article className="capture-card" key={b.id}>
+            <h3>
+              {b.layer === "surface"
+                ? "Where work starts"
+                : b.layer === "data"
+                  ? "Information we trust"
+                  : b.layer === primaryLayer(s.focus)
+                    ? "Who does the work"
+                    : b.layer}
+            </h3>
+            <Badge value={agreementLabel(b.status)} />
+            <p className="preserve-lines">{b.system || "Tools not decided"}</p>
+            <p>{b.owner || "Owner not decided"}</p>
+            <p>{b.truth}</p>
+            <p>{b.control}</p>
+          </article>
+        ))}
+      {s.handoffs
+        .filter((h) => h.useCase === s.focus)
+        .map((h) => (
+          <article className="capture-card" key={h.id}>
+            <h3>Check and pass it on</h3>
+            <Badge value={agreementLabel(h.status)} />
+            <p>{h.payload}</p>
+            <p>
+              {h.trigger} · {h.owner}
+            </p>
+            <p>{h.control}</p>
+          </article>
+        ))}
+      {!s.boundaries.some((b) => b.useCase === s.focus) && (
+        <p>No proposed design captured for this case yet.</p>
+      )}
+      {s.decisions
+        .filter(
+          (d) =>
+            (!d.useCase || d.useCase === s.focus) && d.status !== "Confirmed",
+        )
+        .map((d) => (
+          <p key={d.id}>
+            <b>Still open: {d.title}</b> · {d.answer || "No answer yet"} ·{" "}
+            {d.owner || "Owner needed"}
+          </p>
+        ))}
+    </>
   );
-  const selected = boundaries.find((b) => b.layer === layer);
-  const seed = layerSeeds.find((l) => l.id === layer)!;
-  const capabilities = session.capabilities.filter(
-    (c) => c.useCase === session.focus,
+}
+export function Architecture({ session: s, setSession }: Props) {
+  const [details, setDetails] = useState(false);
+  const step = s.guide.architecture;
+  const q = architectureQuestions[step];
+  const layer = q?.layer === "primary" ? primaryLayer(s.focus) : q?.layer;
+  const b = s.boundaries.find(
+    (b) => b.useCase === s.focus && b.layer === layer,
   );
-  function edit(p: Partial<Boundary>) {
-    setSession((s) => {
-      const found = s.boundaries.find(
-        (b) => b.useCase === s.focus && b.layer === layer,
-      );
-      const base: Boundary = found || {
-        id: newId(),
-        useCase: s.focus,
-        layer,
-        system: "",
-        owner: "",
-        implementer: "",
-        truth: "",
-        state: "",
-        control: "",
-        status: "Proposed",
-      };
-      const next = {
-        ...base,
-        ...p,
-        ...(!("status" in p) ? { status: "Proposed" as const } : {}),
-      };
-      return {
-        ...s,
-        boundaries: found
-          ? s.boundaries.map((b) => (b.id === found.id ? next : b))
-          : [...s.boundaries, next],
-      };
-    });
-  }
-  function handoff(id: string, p: Partial<Handoff>) {
-    setSession((s) => ({
-      ...s,
-      handoffs: s.handoffs.map((h) =>
-        h.id === id
-          ? {
-              ...h,
-              ...p,
-              ...(!("status" in p) ? { status: "Proposed" as const } : {}),
-            }
-          : h,
-      ),
-    }));
-  }
-  function decision(id: string, p: Partial<Decision>) {
-    setSession((s) => ({
-      ...s,
-      decisions: s.decisions.map((d) =>
+  const h = primaryHandoff(s, s.focus);
+  const edit = (patch: Partial<Boundary>) =>
+    setSession((p) => editBoundary(p, s.focus, layer!, patch));
+  const change = (architecture: number) =>
+    setSession((p) => ({ ...p, guide: { ...p.guide, architecture } }));
+  const decision = (id: string, patch: Partial<Decision>) =>
+    setSession((p) => ({
+      ...p,
+      decisions: p.decisions.map((d) =>
         d.id === id
           ? {
               ...d,
-              ...p,
-              ...(!("status" in p) ? { status: "Proposed" as const } : {}),
+              ...patch,
+              ...(!("status" in patch) ? { status: "Proposed" as const } : {}),
             }
           : d,
       ),
     }));
-  }
   return (
-    <section className="module-panel">
+    <section className="module-panel guided-panel">
       <div className="module-heading">
-        <span className="eyebrow">
-          03 · Target architecture & operating boundaries
-        </span>
-        <h1>Connect the work.</h1>
+        <span className="eyebrow">03 · How it should work · 45 minutes</span>
+        <h1>Design the next way of working.</h1>
         <p>
-          Use the supplied architecture as a starting proposal. Assign
-          responsibility, state and controls for the selected use case.
+          Step 2 captured today. Now decide what should happen, who is
+          responsible, and what needs a decision. Work through one question at a
+          time.
         </p>
       </div>
-      <CaseFocus session={session} setSession={setSession} />
-      {focus && (
+      <CaseFocus session={s} setSession={setSession} />
+      <Navigation step={step} total={5} change={change} />
+      {q ? (
         <>
           <div className="question-banner">
-            <span className="label">Ask the room</span>
-            <h2>Who owns each part, and what passes between them?</h2>
-            <p>
-              {focus.label} · {session.assessments[focus.id].proofText}
-            </p>
+            <span className="label">Proposed way of working · {q.label}</span>
+            <h2>{q.question}</h2>
+            <p>{q.hint}</p>
           </div>
-          <div className="architecture-layout">
-            <div>
-              <div
-                className="architecture-map"
-                aria-label="Proposed capability layers"
-              >
-                {layerSeeds.map((l) => {
-                  const b = boundaries.find((b) => b.layer === l.id);
-                  return (
-                    <button
-                      key={l.id}
-                      className={`layer-node ${layer === l.id ? "selected" : ""}`}
-                      onClick={() => setLayer(l.id)}
-                      aria-pressed={layer === l.id}
-                    >
-                      <span className="label">
-                        {b?.owner || `${l.boundary} · proposed`}
-                      </span>
-                      <strong>{l.title}</strong>
-                      <small>{b?.system || l.suggestion}</small>
-                      <Badge value={b?.status || "Unknown"} />
-                    </button>
-                  );
-                })}
-              </div>
-              <p className="muted">
-                Layout groups capabilities; it does not assert data flow.
-                Explicit handoffs below define direction and payload.
-              </p>
-              <details className="reference-details">
-                <summary>View supplied architecture reference</summary>
-                <a
-                  href="/workshop-architecture.pdf"
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  Open original diagram
-                </a>
-                <img
-                  src="/workshop-architecture.png"
-                  alt="Supplied architecture: OpenAI interfaces, data lake and existing tools; Adobe capabilities; events, marketing CRM and website feeding journey measurement."
-                />
-              </details>
-            </div>
-            <div className="capture-card boundary-editor">
-              <span className="eyebrow">Define the boundary</span>
-              <h2>{seed.title}</h2>
-              <p>{seed.purpose}</p>
-              <p className="muted">
-                Starting proposal: {seed.suggestion}. Assignments below remain
-                blank until the room supplies them.
-              </p>
-              <div className="field-grid">
-                <Field
-                  label="System"
-                  value={selected?.system || ""}
-                  onChange={(v) => edit({ system: v })}
-                />
-                <Field
-                  label="Accountable owner"
-                  value={selected?.owner || ""}
-                  onChange={(v) => edit({ owner: v })}
-                  placeholder="Organization and named person"
-                />
-                <Field
-                  label="Implementation responsibility"
-                  value={selected?.implementer || ""}
-                  onChange={(v) => edit({ implementer: v })}
-                  placeholder="OpenAI / Adobe / C&T / shared"
-                />
-                <Field
-                  label="Source of truth"
-                  value={selected?.truth || ""}
-                  onChange={(v) => edit({ truth: v })}
-                />
-              </div>
+          <details className="starting-context">
+            <summary>Refer to the answers from step 2</summary>
+            <CurrentReadback session={s} />
+          </details>
+          {step < 3 ? (
+            <div className="capture-card">
               <Field
-                label="Where does state live?"
-                value={selected?.state || ""}
-                onChange={(v) => edit({ state: v })}
-                placeholder="Audience membership, draft version, approval record…"
-              />
-              <Field
-                label="Controls and approvals"
                 multiline
-                value={selected?.control || ""}
-                onChange={(v) => edit({ control: v })}
-              />
-              <StatusField
-                value={selected?.status || "Unknown"}
-                canConfirm={
-                  !!selected &&
-                  [
-                    selected.system,
-                    selected.owner,
-                    selected.implementer,
-                    selected.truth,
-                    selected.state,
-                    selected.control,
-                  ].every((v) => !!v.trim())
+                label={
+                  step === 0
+                    ? "Where should the marketer start?"
+                    : step === 1
+                      ? "Which tools supply the information, and what does each provide?"
+                      : "Which tools should do the work, and what does each do?"
                 }
-                onChange={(v) => edit({ status: v })}
+                value={b?.system || ""}
+                onChange={(system) => edit({ system })}
               />
+              {step === 1 && (
+                <Field
+                  multiline
+                  label="Which source should we trust for each type of information?"
+                  value={b?.truth || ""}
+                  onChange={(truth) => edit({ truth })}
+                />
+              )}
+              <Field
+                label={
+                  step === 1
+                    ? "Who maintains this information?"
+                    : "Who is accountable for this part?"
+                }
+                value={b?.owner || ""}
+                onChange={(owner) => edit({ owner })}
+              />
+              {step === 2 && (
+                <Field
+                  label="Who builds or connects it?"
+                  value={b?.implementer || ""}
+                  onChange={(implementer) => edit({ implementer })}
+                />
+              )}
               <details>
-                <summary>
-                  What step 2 established ({capabilities.length})
-                </summary>
-                {capabilities.length ? (
-                  capabilities.map((c) => (
-                    <p key={c.id}>
-                      <b>
-                        {c.name}: {c.fit}
-                      </b>{" "}
-                      · {c.system || "System unknown"} · {c.status}
-                      <br />
-                      {c.evidence}
-                      <br />
-                      {c.gap}
-                    </p>
-                  ))
-                ) : (
-                  <p>
-                    No current-state capabilities captured for this use case.
-                  </p>
+                <summary>Capture more detail (optional)</summary>
+                {step !== 1 && (
+                  <Field
+                    label="Which source should we trust?"
+                    value={b?.truth || ""}
+                    onChange={(truth) => edit({ truth })}
+                  />
                 )}
+                <Field
+                  label="Where are progress and decisions saved?"
+                  multiline
+                  value={b?.state || ""}
+                  onChange={(state) => edit({ state })}
+                />
+                <Field
+                  label="Who can approve, change or stop the work?"
+                  multiline
+                  value={b?.control || ""}
+                  onChange={(control) => edit({ control })}
+                />
               </details>
+              <Agreement
+                value={b?.status || "Unknown"}
+                ready={!!b?.system.trim() && !!b?.owner.trim()}
+                onChange={(status) => edit({ status })}
+              />
             </div>
-          </div>
-          <h2 className="section-title">Make the handoffs explicit</h2>
-          <div className="inline-add">
-            <Select
-              label="From"
-              value={from}
-              options={layerSeeds.map((l) => l.id)}
-              onChange={setFrom}
-            />
-            <Select
-              label="To"
-              value={to}
-              options={layerSeeds.map((l) => l.id)}
-              onChange={setTo}
-            />
+          ) : step === 3 ? (
+            <div className="capture-card">
+              {(
+                [
+                  ["payload", "What is passed on?"],
+                  ["trigger", "When is it ready?"],
+                  ["owner", "Who checks it and owns the handoff?"],
+                  ["control", "When should a person change or stop it?"],
+                ] as const
+              ).map(([key, label]) => (
+                <Field
+                  key={key}
+                  label={label}
+                  multiline
+                  value={h?.[key] || ""}
+                  onChange={(value) =>
+                    setSession((p) => editHandoff(p, s.focus, { [key]: value }))
+                  }
+                />
+              ))}
+              <Agreement
+                value={h?.status || "Unknown"}
+                ready={
+                  !!h &&
+                  [h.payload, h.trigger, h.owner, h.control].every(
+                    (v) => !!v.trim(),
+                  )
+                }
+                onChange={(status) =>
+                  setSession((p) => editHandoff(p, s.focus, { status }))
+                }
+              />
+            </div>
+          ) : (
+            <>
+              <p>
+                Open a question to capture the room’s answer. Workshop-wide
+                answers apply across use cases.
+              </p>
+              {s.decisions
+                .filter((d) => !d.useCase || d.useCase === s.focus)
+                .map((d) => (
+                  <details className="capture-card" key={d.id}>
+                    <summary>
+                      {d.title} · {agreementLabel(d.status)}
+                      {!d.useCase ? " · workshop-wide" : ""}
+                    </summary>
+                    <Field
+                      label="What did the room decide, or what is still unknown?"
+                      multiline
+                      value={d.answer}
+                      onChange={(answer) => decision(d.id, { answer })}
+                    />
+                    <Field
+                      label="Who can resolve it?"
+                      value={d.owner}
+                      onChange={(owner) => decision(d.id, { owner })}
+                    />
+                    <Field
+                      label="Needed by"
+                      value={d.due}
+                      onChange={(due) => decision(d.id, { due })}
+                    />
+                    <Agreement
+                      value={d.status}
+                      ready={!!d.answer.trim() && !!d.owner.trim()}
+                      onChange={(status) => decision(d.id, { status })}
+                    />
+                  </details>
+                ))}
+            </>
+          )}
+        </>
+      ) : (
+        <>
+          <h2>Read back the proposed way of working</h2>
+          <ArchitectureReadback session={s} />
+          <div className="guide-links">
             <button
-              disabled={from === to}
               onClick={() =>
-                setSession((s) => ({
-                  ...s,
-                  handoffs: [
-                    ...s.handoffs,
-                    {
-                      id: newId(),
-                      useCase: s.focus,
-                      from,
-                      to,
-                      payload: "",
-                      trigger: "",
-                      owner: "",
-                      control: "",
-                      status: "Proposed",
-                    },
-                  ],
+                setSession((p) => ({ ...p, architectureTab: "lab" }))
+              }
+            >
+              Try the content exercise →
+            </button>
+            <button
+              onClick={() =>
+                setSession((p) => ({
+                  ...p,
+                  stage: 3,
+                  timer: { stage: 3, remaining: 900, runningSince: null },
                 }))
               }
             >
-              Add handoff →
+              Continue to decisions & readout →
             </button>
           </div>
-          {session.handoffs
-            .filter((h) => h.useCase === session.focus)
-            .map((h) => (
-              <article key={h.id} className="capture-card">
-                <div className="card-heading">
-                  <h3>
-                    {layerSeeds.find((l) => l.id === h.from)?.title || h.from} →{" "}
-                    {layerSeeds.find((l) => l.id === h.to)?.title || h.to}
-                  </h3>
-                  <Badge value={h.status} />
-                </div>
-                <div className="field-grid">
-                  <Field
-                    label="What passes across?"
-                    value={h.payload}
-                    onChange={(v) => handoff(h.id, { payload: v })}
-                  />
-                  <Field
-                    label="When / what triggers it?"
-                    value={h.trigger}
-                    onChange={(v) => handoff(h.id, { trigger: v })}
-                  />
-                  <Field
-                    label="Who owns this handoff?"
-                    value={h.owner}
-                    onChange={(v) => handoff(h.id, { owner: v })}
-                  />
-                  <Field
-                    label="Control / failure handling"
-                    value={h.control}
-                    onChange={(v) => handoff(h.id, { control: v })}
-                  />
-                </div>
-                <StatusField
-                  value={h.status}
-                  canConfirm={[h.payload, h.trigger, h.owner, h.control].every(
-                    (v) => !!v.trim(),
-                  )}
-                  onChange={(v) => handoff(h.id, { status: v })}
-                />
-                <button
-                  className="quiet danger"
-                  onClick={() => {
-                    if (confirm("Remove this handoff?"))
-                      setSession((s) => ({
-                        ...s,
-                        handoffs: s.handoffs.filter((x) => x.id !== h.id),
-                      }));
-                  }}
-                >
-                  Remove handoff
-                </button>
-              </article>
-            ))}
         </>
       )}
-      <h2 className="section-title">Decisions to settle</h2>
-      <p>
-        The four background decisions now become working questions. Changes
-        reopen confirmation.
-      </p>
-      {session.decisions.map((d) => (
-        <article key={d.id} className="capture-card">
-          <div className="card-heading">
-            <h3>{d.title}</h3>
-            <Badge value={d.status} />
-          </div>
-          {contextDecisions.find((x) => `d${x.num}` === d.id) && (
-            <p className="muted">
-              {contextDecisions.find((x) => `d${x.num}` === d.id)?.q}
-            </p>
-          )}
-          <Field
-            label="Decision, disagreement or unanswered question"
-            multiline
-            value={d.answer}
-            onChange={(v) => decision(d.id, { answer: v })}
-          />
-          <div className="field-grid">
-            <Field
-              label="Accountable person"
-              value={d.owner}
-              onChange={(v) => decision(d.id, { owner: v })}
-            />
-            <Field
-              label="Needed by"
-              value={d.due}
-              onChange={(v) => decision(d.id, { due: v })}
-            />
-            <div className="capture-field">
-              <label htmlFor={`scope-${d.id}`}>Applies to</label>
-              <select
-                id={`scope-${d.id}`}
-                value={d.useCase}
-                onChange={(e) => decision(d.id, { useCase: e.target.value })}
-              >
-                <option value="">Workshop-wide</option>
-                {useCases.map((u) => (
-                  <option key={u.id} value={u.id}>
-                    {u.label}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <StatusField
-              value={d.status}
-              canConfirm={!!d.answer.trim() && !!d.owner.trim()}
-              onChange={(v) => decision(d.id, { status: v })}
-            />
-          </div>
-        </article>
-      ))}
-      <div className="inline-add">
-        <Field label="Another decision" value={title} onChange={setTitle} />
-        <button
-          disabled={!title.trim()}
-          onClick={() => {
-            setSession((s) => ({
-              ...s,
-              decisions: [
-                ...s.decisions,
-                {
-                  id: newId(),
-                  title: title.trim(),
-                  useCase: s.focus,
-                  answer: "",
-                  owner: "",
-                  due: "",
-                  status: "Unknown",
-                },
-              ],
-            }));
-            setTitle("");
-          }}
-        >
-          Add decision
-        </button>
-      </div>
+      <details className="reference-details">
+        <summary>View the proposed architecture diagram (optional)</summary>
+        <p>
+          This reference is a starting proposal. The answers above capture what
+          the room agrees.
+        </p>
+        <a href="/workshop-architecture.pdf" target="_blank" rel="noreferrer">
+          Open original diagram
+        </a>
+        <img
+          src="/workshop-architecture.png"
+          alt="Proposed OpenAI and Adobe architecture"
+        />
+      </details>
+      <button
+        className="quiet"
+        aria-expanded={details}
+        onClick={() => setDetails(!details)}
+      >
+        {details ? "Hide" : "Open"} detailed architecture editor (optional)
+      </button>
+      {details && <ArchitectureDetails session={s} setSession={setSession} />}
     </section>
   );
 }
