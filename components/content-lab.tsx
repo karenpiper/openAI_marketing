@@ -6,7 +6,6 @@ import {
   scenarioSummary,
   type WorkflowScenario,
 } from "../lib/workflow-simulation";
-import { Field } from "./workshop-fields";
 import SaveFooter from "./save-footer";
 const labels = {
   audiences: "Audience scale",
@@ -46,12 +45,11 @@ export default function ContentLab({
         <h2>What happens when we add complexity?</h2>
         <p>
           Start with one audience and approved material. Add segments, an event
-          follow-up or legal review. Discuss whether the resulting route would
-          work here.
+          follow-up or legal review. Explore how each choice changes the route.
         </p>
         <p>
           This is an illustrative workflow using our architecture components.
-          Routing and approval rules are proposals for the room to validate. No
+          Routing and approval rules illustrate how the workflow could work. No
           content is generated or systems connected.
         </p>
       </div>
@@ -130,29 +128,6 @@ export default function ContentLab({
           </p>
         </div>
       </div>
-      <article className="capture-card">
-        <h2>Would this work here?</h2>
-        <p>
-          Name a tool to substitute, a missing handoff or a rule we should
-          change. Your comments accompany this scenario in the architecture
-          readout.
-        </p>
-        {editable ? (
-          <>
-            <Field
-              label="Room corrections and open questions"
-              multiline
-              value={s.notes}
-              onChange={(notes) => patch({ notes })}
-            />
-            <SaveFooter />
-          </>
-        ) : (
-          <p className="preserve-lines">
-            {s.notes || "No room corrections captured yet."}
-          </p>
-        )}
-      </article>
     </section>
   );
 }
