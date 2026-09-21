@@ -372,8 +372,8 @@ export default function Workshop() {
               <p>
                 Fictional priorities and step 2 answers for all seven use cases
                 are loaded. Your real workshop is untouched. Enter the workshop,
-                then explore step 2 or jump to architecture, the live build or
-                readout.
+                then explore step 2 or jump to architecture, the workflow
+                exercise or readout.
               </p>
             </div>
             <div className="inline-actions">
@@ -620,7 +620,7 @@ export default function Workshop() {
                         setSession((s) => ({ ...s, architectureTab: "lab" }))
                       }
                     >
-                      Live build · content at scale
+                      Explore the workflow · content at scale
                     </button>
                     <small>
                       The exercise sits within the 45-minute architecture block.

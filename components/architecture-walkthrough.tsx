@@ -243,7 +243,7 @@ export default function ArchitectureWalkthrough({
               setSession?.((p) => ({ ...p, architectureTab: "lab" }))
             }
           >
-            Try the content exercise →
+            Explore the content-at-scale workflow →
           </button>
         </div>
       )}

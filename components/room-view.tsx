@@ -1,3 +1,4 @@
+import ContentLab from "./content-lab";
 import WorkshopOverview from "./workshop-overview";
 import ArchitectureWalkthrough from "./architecture-walkthrough";
 import LiveSynthesis from "./live-synthesis";
@@ -187,48 +188,7 @@ export default function RoomView({ session }: { session: Session }) {
         </section>
       )}
       {s.stage === 2 && s.architectureTab === "lab" && (
-        <section className="room-stage">
-          <span className="eyebrow">
-            Live content exercise · {s.lab.sourceStatus}
-          </span>
-          <h1>One source. Different needs.</h1>
-          <p className="room-lede">{s.lab.title}</p>
-          <div className="room-drafts">
-            {s.lab.audiences.map((a) => {
-              const d = s.lab.drafts.find((d) => d.audienceId === a.id);
-              return (
-                <article className="side-card" key={a.id}>
-                  <h2>{a.name || "Audience to define"}</h2>
-                  <p>{a.need}</p>
-                  <span className="label">Signal</span>
-                  <p>{a.signal}</p>
-                  {d ? (
-                    <>
-                      <Badge
-                        value={draftCurrent(s.lab, d) ? d.review : "Outdated"}
-                      />
-                      <span className="eyebrow">{d.mode} draft</span>
-                      <h3>{d.subject}</h3>
-                      <p className="preserve-lines">{d.body}</p>
-                      <span className="label">Landing-page headline</span>
-                      <h3>{d.headline}</h3>
-                      <p>{d.note}</p>
-                    </>
-                  ) : (
-                    <p className="muted">Draft will appear here.</p>
-                  )}
-                </article>
-              );
-            })}
-          </div>
-          <div className="question-banner">
-            <h2>Would you use this? What would you change?</h2>
-            <p>
-              {s.lab.result ||
-                "Record relevance, editing effort and what would prevent approval."}
-            </p>
-          </div>
-        </section>
+        <ContentLab session={s} room />
       )}
       {s.stage === 3 && <WorkshopReadout session={s} room />}
       <footer className="room-footer">

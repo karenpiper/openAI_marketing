@@ -1,3 +1,4 @@
+import { scenarioFlow, scenarioSummary } from "./workflow-simulation";
 import type { Content, TDocumentDefinitions } from "pdfmake/interfaces";
 import type { Session } from "./workshop";
 import { architectureOutput } from "./architecture-output";
@@ -178,6 +179,30 @@ export function architectureDocument(s: Session): TDocumentDefinitions {
         },
       );
   }
+  content.push(
+    {
+      text: "Content at scale / workflow scenario",
+      style: "caseTitle",
+      pageBreak: "before",
+    },
+    { text: scenarioSummary(s.scenario), style: "note" },
+    {
+      text: "Illustrative routing through the proposed architecture; requires room validation. No content generation or live integrations.",
+      style: "note",
+    },
+  );
+  for (const n of scenarioFlow(s.scenario))
+    content.push(
+      { text: n.title, style: "stepTitle" },
+      { text: n.components.join(" → ") },
+      { text: n.detail },
+      { text: n.branches.join(" / ") },
+      { text: `Passes forward: ${n.passes}`, style: "note" },
+    );
+  content.push({
+    text: `Room corrections and open questions: ${s.scenario.notes || "None captured"}`,
+    margin: [0, 14, 0, 0],
+  });
   content.push({
     text: "Shared decisions and open questions",
     style: "caseTitle",

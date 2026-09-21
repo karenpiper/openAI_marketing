@@ -15,6 +15,13 @@ export const DEMO_CHANNEL = "oai-workshop-room-demo";
 /** Fictional examples for exercising the UI; never evidence of actual capabilities. */
 export function createDemoSession(): Session {
   const s = createSession();
+  s.scenario = {
+    ...s.scenario,
+    audiences: "Three segments",
+    channels: "Email and event follow-up",
+    approval: "Legal review required",
+    notes: "Fictional demo: confirm who owns the event-to-audience handoff.",
+  };
   s.title = "DEMO DATA · Fictional workshop for testing";
   s.stage = 1;
   s.scene = 9;

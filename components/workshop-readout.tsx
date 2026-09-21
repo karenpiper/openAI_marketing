@@ -1,3 +1,4 @@
+import { scenarioSummary } from "../lib/workflow-simulation";
 import SaveFooter from "./save-footer";
 import ArchitectureOutput from "./architecture-output";
 import LiveSynthesis from "./live-synthesis";
@@ -293,32 +294,14 @@ export default function WorkshopReadout({
           </article>
         ))}
       </div>
-      <h2 className="section-title">Content-at-scale exercise</h2>
+      <h2 className="section-title">Content-at-scale workflow scenario</h2>
       <article className="readout-card">
-        <div className="card-heading">
-          <h3>{session.lab.title}</h3>
-          <Badge value={session.lab.status} />
-        </div>
-        <p>
-          {session.lab.sourceStatus} · {caseName(session.lab.useCase)} ·{" "}
-          {
-            session.lab.drafts.filter(
-              (d) => draftCurrent(session.lab, d) && d.review === "Usable",
-            ).length
-          }{" "}
-          of {session.lab.audiences.length} audiences with current drafts marked
-          usable
-        </p>
-        <p>
-          {session.lab.result || "The room has not recorded a conclusion yet."}
-        </p>
-        <p>
-          Baseline: {session.lab.baseline || "not captured"} minutes ·
-          Editing/review: {session.lab.editMinutes || "not captured"} minutes
+        <h3>{scenarioSummary(session.scenario)}</h3>
+        <p className="preserve-lines">
+          {session.scenario.notes || "No room corrections captured yet."}
         </p>
         <p className="muted">
-          Practice drafts are templates. “Usable” is an exercise judgment, not
-          production approval. No business lift has been established.
+          Illustrative architecture routing, subject to room validation.
         </p>
       </article>
       <h2 className="section-title">

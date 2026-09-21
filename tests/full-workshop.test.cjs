@@ -274,8 +274,8 @@ test("every stage and room scene renders with empty and populated state; intro d
   const labHtml = renderToStaticMarkup(
     React.createElement(Lab, { session: s, setSession: noop }),
   );
-  assert.match(labHtml, /Practice template/);
-  assert.match(labHtml, /human review|human reviewer/i);
+  assert.match(labHtml, /Watch the workflow adapt/);
+  assert.match(labHtml, /No content is generated/);
 });
 test("generation endpoint rejects unconfigured, unauthorized and cross-origin calls; validates mocked API output", async () => {
   const route = require("../app/api/generate/route.ts");
@@ -1025,4 +1025,80 @@ test("proposal board needs no technical forms and additions survive backup and e
       "Use our existing event platform",
     );
   }
+});
+
+test("workflow simulation adapts all 32 scenarios and persists without generation", () => {
+  const {
+    defaultScenario,
+    scenarioFlow,
+    scenarioOptions,
+  } = require("../lib/workflow-simulation.ts");
+  const Lab = require("../components/content-lab.tsx").default;
+  const { architectureDocument } = require("../lib/architecture-pdf.ts");
+  for (const audiences of scenarioOptions.audiences)
+    for (const assets of scenarioOptions.assets)
+      for (const approval of scenarioOptions.approval)
+        for (const channels of scenarioOptions.channels)
+          for (const identity of scenarioOptions.identity) {
+            const scenario = {
+              audiences,
+              assets,
+              approval,
+              channels,
+              identity,
+              notes: "Route event signals through our existing integration",
+            };
+            const flow = scenarioFlow(scenario);
+            assert.equal(
+              flow[1].branches.length,
+              audiences === "Three segments" ? 3 : 1,
+            );
+            assert.equal(
+              flow[3].components.length,
+              assets === "New content needed" ? 2 : 1,
+            );
+            assert.equal(
+              flow[4].branches.length,
+              approval === "Legal review required" ? 2 : 1,
+            );
+            assert.equal(flow[5].branches.length, channels === "Email" ? 1 : 2);
+            assert.equal(
+              flow[1].components.length,
+              identity === "Individual" ? 1 : 2,
+            );
+            const s = w.parseSession(
+              JSON.parse(JSON.stringify({ ...w.createSession(), scenario })),
+            );
+            assert.deepEqual(s.scenario, scenario);
+            for (const room of [false, true]) {
+              const html = renderToStaticMarkup(
+                React.createElement(Lab, {
+                  session: s,
+                  setSession: () => {},
+                  room,
+                }),
+              );
+              assert.match(html, /Route event signals/);
+              assert.ok(!html.includes("Generate AI drafts"));
+              assert.equal(
+                (html.match(/<button/g) || []).length,
+                room ? 0 : 10,
+              );
+            }
+            assert.match(w.readout(s), /Route event signals/);
+            assert.match(
+              JSON.stringify(architectureDocument(s)),
+              /Route event signals/,
+            );
+          }
+  assert.deepEqual(
+    w.parseSession({ ...w.createSession(), scenario: { audiences: "bad" } })
+      .scenario,
+    defaultScenario,
+  );
+  assert.ok(
+    !fs
+      .readFileSync(require.resolve("../components/content-lab.tsx"), "utf8")
+      .includes("fetch("),
+  );
 });

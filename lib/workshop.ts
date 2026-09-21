@@ -1,3 +1,9 @@
+import {
+  defaultScenario,
+  scenarioOptions,
+  scenarioSummary,
+  type WorkflowScenario,
+} from "./workflow-simulation";
 import { workflows, workflowState } from "./architecture-workflow";
 import { defaults, restore, type StateMap } from "./assessment";
 import { useCases, decisions } from "./workshop-data";
@@ -202,6 +208,7 @@ export type WorkflowReview = {
   source: string;
 };
 export type Session = {
+  scenario: WorkflowScenario;
   architectureAdditions: {
     id: string;
     useCase: string;
@@ -284,6 +291,7 @@ export function createSession(): Session {
   return {
     schema: 1,
     overview: true,
+    scenario: { ...defaultScenario },
     architectureAdditions: [],
     draftDecisionTitle: "",
     briefingPanel: 0,
@@ -420,6 +428,38 @@ export function parseSession(raw: unknown): Session {
       ? r.scene
       : 0;
   s.focus = uc(r.focus) || "s3";
+  const scenario =
+    r.scenario && typeof r.scenario === "object"
+      ? (r.scenario as Record<string, unknown>)
+      : {};
+  s.scenario = {
+    audiences: choice(
+      scenario.audiences,
+      [...scenarioOptions.audiences],
+      defaultScenario.audiences,
+    ),
+    assets: choice(
+      scenario.assets,
+      [...scenarioOptions.assets],
+      defaultScenario.assets,
+    ),
+    approval: choice(
+      scenario.approval,
+      [...scenarioOptions.approval],
+      defaultScenario.approval,
+    ),
+    channels: choice(
+      scenario.channels,
+      [...scenarioOptions.channels],
+      defaultScenario.channels,
+    ),
+    identity: choice(
+      scenario.identity,
+      [...scenarioOptions.identity],
+      defaultScenario.identity,
+    ),
+    notes: str(scenario.notes),
+  };
   s.architectureTab = choice(r.architectureTab, ["map", "lab"], "map");
   const guide = record(r.guide);
   const step = (v: unknown, max: number) =>
@@ -680,7 +720,10 @@ export function readout(s: Session): string {
       (d) =>
         `${d.status}: ${d.title}\n${d.answer || "Open"}\nOwner: ${d.owner || "Unassigned"}; needed by: ${d.due || "Not set"}; scope: ${name(d.useCase)}`,
     ),
-    "## Content exercise",
+    "## Content-at-scale workflow scenario",
+    scenarioSummary(s.scenario),
+    `Room corrections: ${s.scenario.notes || "None captured"}`,
+    "## Earlier content exercise records",
     `Use case: ${name(s.lab.useCase)}\nSource: ${s.lab.title} (${s.lab.sourceStatus})\nBaseline minutes: ${s.lab.baseline || "Not captured"}; editing minutes: ${s.lab.editMinutes || "Not captured"}\nResult (${s.lab.status}): ${s.lab.result || "Not yet assessed"}`,
     ...s.lab.drafts.map(
       (d) =>

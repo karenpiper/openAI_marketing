@@ -3098,3 +3098,121 @@ body {
   font-size: 1.8rem;
   color: #365343;
 }
+
+.simulation-layout {
+  display: grid;
+  grid-template-columns: minmax(220px, 0.7fr) minmax(0, 2fr);
+  gap: 2rem;
+  align-items: start;
+  margin: 2rem 0;
+}
+.simulation-controls {
+  position: sticky;
+  top: 1rem;
+  padding: 1.2rem;
+  background: #e8eddb;
+  color: #18382c;
+  border-radius: 16px;
+}
+.simulation-controls fieldset {
+  border: 0;
+  padding: 0;
+  margin: 1.2rem 0;
+}
+.simulation-controls legend {
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+.simulation-controls button {
+  display: block;
+  width: 100%;
+  text-align: left;
+  margin: 0.4rem 0;
+}
+.simulation-controls button[aria-pressed="true"] {
+  background: #18382c;
+  color: #fffdf7;
+  border-color: #18382c;
+}
+.simulation-summary {
+  padding: 1rem 1.5rem;
+  border-left: 4px solid #365343;
+}
+.simulation-map {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 1rem;
+}
+.simulation-node {
+  padding: 1.5rem;
+  border: 2px solid #bdcbbc;
+  border-radius: 16px;
+  background: #fffdf7;
+  transition:
+    border-color 0.25s,
+    background-color 0.25s;
+}
+.simulation-node.simulation-changed {
+  border-color: #9c6c30;
+  background: #fcf4df;
+}
+.simulation-node h3 {
+  font-size: 1.4rem;
+  margin-top: 0.5rem;
+}
+.simulation-branches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  animation: workflow-arrive 0.35s ease-out;
+}
+.simulation-branches span {
+  flex: 1;
+  min-width: 140px;
+  border-left: 3px solid #527864;
+  padding: 0.7rem;
+  background: #e8eddb;
+  color: #18382c;
+}
+.simulation-reason {
+  font-weight: 600;
+  color: #654713;
+}
+.simulation-handoff {
+  padding: 0.7rem;
+  border-top: 1px dashed #93a68f;
+  color: #18382c;
+  animation: workflow-arrive 0.35s ease-out;
+}
+.simulation-handoff span {
+  font-size: 1.5rem;
+}
+@keyframes workflow-arrive {
+  from {
+    opacity: 0.3;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .simulation-branches,
+  .simulation-handoff {
+    animation: none;
+  }
+  .simulation-node {
+    transition: none;
+  }
+}
+@media (max-width: 800px) {
+  .simulation-layout {
+    grid-template-columns: 1fr;
+  }
+  .simulation-controls {
+    position: static;
+  }
+}
