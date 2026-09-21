@@ -124,3 +124,10 @@ test('artifacts are concrete, scenario-aware examples with honest provenance',()
  s.audience='One audience';assert.equal(w.workflowArtifact(s,'s3',1).sections.length,1);
  s.source='Source material missing';const blocked=w.workflowArtifact(s,'s3',0);assert.equal(blocked.title,'Source material request');assert.equal(blocked.blocked,true);
 });
+
+test('Morgan edits survive saving and are included in exported artifacts',()=>{
+ const w=require('../lib/workflow-work.ts');const s=m.createAgentState();s.campaign={objective:'Improve account activation',instruction:'Include security review'};
+ const key=w.artifactKey(s,'s3',1);s.artifactEdits={[key]:[{name:'Security reviewer',status:'Added by Morgan',detail:'Include the approved governance guide'}]};
+ const restored=m.restoreAgentState(JSON.parse(JSON.stringify(s)));const artifact=w.workflowArtifact(restored,'s3',1);assert.equal(artifact.sections.length,1);assert.match(artifact.text,/Security reviewer/);assert.match(artifact.text,/Include security review/);assert.match(artifact.text,/Improve account activation/);
+ const signature=w.workSignature(s,'s3');s.campaign.objective='A different objective';assert.notEqual(w.workSignature(s,'s3'),signature);
+});

@@ -7,17 +7,23 @@ import {
   currentWorkStep,
   workSignature,
   workflowArtifact,
+  artifactKey,
 } from "../lib/workflow-work";
 export function WorkflowWork({
   session,
   id,
   onStep,
   onFinish,
+  onEdit,
 }: {
   session: AgentState;
   id: string;
   onStep: (n: number) => void;
   onFinish: () => void;
+  onEdit: (
+    key: string,
+    rows: { name: string; status: string; detail: string }[],
+  ) => void;
 }) {
   const stages = workStages(session, id),
     index = currentWorkStep(session, id),
@@ -26,6 +32,8 @@ export function WorkflowWork({
   const runKey = `${id}:${index}:${signature}`;
   const [run, setRun] = useState({ key: runKey, phase: 0 });
   const phase = run.key === runKey ? run.phase : 0;
+  const [editing, setEditing] = useState(false);
+  const [edited, setEdited] = useState(false);
   const [opened, setOpened] = useState<number | null>(null);
   const panel = useRef<HTMLDivElement>(null);
   const blocked = id === "s3" && session.source === "Source material missing";
@@ -68,8 +76,17 @@ export function WorkflowWork({
   useEffect(() => {
     setRun({ key: runKey, phase: 0 });
     setOpened(null);
+    setEditing(false);
+    setEdited(false);
     const timers = [1, 2, 3].map((n) =>
-      setTimeout(() => setRun(prev => ({ key: runKey, phase: prev.key === runKey ? Math.max(prev.phase, n) : n })), n * 900),
+      setTimeout(
+        () =>
+          setRun((prev) => ({
+            key: runKey,
+            phase: prev.key === runKey ? Math.max(prev.phase, n) : n,
+          })),
+        n * 900,
+      ),
     );
     return () => timers.forEach(clearTimeout);
   }, [runKey]);
@@ -199,11 +216,93 @@ export function WorkflowWork({
                   <span>Audience: {session.audience}</span>
                   <span>Channels: {session.channel}</span>
                 </div>
-                {output.sections.map((row) => (
-                  <section key={row.name}>
-                    <span>{row.status}</span>
-                    <h4>{row.name}</h4>
-                    <p>{row.detail}</p>
+                <div className="artifact-edit-toolbar">
+                  <button onClick={() => setEditing(!editing)}>
+                    {editing ? "Done editing" : "Edit this work package"}
+                  </button>
+                  <button
+                    onClick={() => {
+                      onEdit(artifactKey(session, id, opened!), [
+                        ...output.sections,
+                        {
+                          name: "New requirement",
+                          status: "Added by Morgan",
+                          detail: "Describe the additional work required.",
+                        },
+                      ]);
+                      setEditing(true);
+                      setEdited(true);
+                    }}
+                  >
+                    + Add requirement
+                  </button>
+                </div>
+                <p className="artifact-brief-note">
+                  <b>Campaign objective:</b>{" "}
+                  {session.campaign?.objective ||
+                    "Grow enterprise adoption across the buying group"}
+                  {session.campaign?.instruction && (
+                    <>
+                      <br />
+                      <b>Morgan’s instruction:</b>{" "}
+                      {session.campaign.instruction}
+                    </>
+                  )}
+                </p>
+                {edited && (
+                  <p role="status" className="artifact-change">
+                    Updated by Morgan. The downloaded artifact now includes
+                    these changes.
+                  </p>
+                )}
+                {output.sections.map((row, rowIndex) => (
+                  <section key={rowIndex}>
+                    {editing ? (
+                      <div className="artifact-edit-fields">
+                        {(["name", "status", "detail"] as const).map(
+                          (field) => (
+                            <label key={field}>
+                              {field === "name"
+                                ? "Item"
+                                : field === "status"
+                                  ? "Status / purpose"
+                                  : "Work instruction"}
+                              <textarea
+                                value={row[field]}
+                                onChange={(e) => {
+                                  onEdit(
+                                    artifactKey(session, id, opened!),
+                                    output.sections.map((r, i) =>
+                                      i === rowIndex
+                                        ? { ...r, [field]: e.target.value }
+                                        : r,
+                                    ),
+                                  );
+                                  setEdited(true);
+                                }}
+                              />
+                            </label>
+                          ),
+                        )}
+                        <button
+                          onClick={() => {
+                            onEdit(
+                              artifactKey(session, id, opened!),
+                              output.sections.filter((_, i) => i !== rowIndex),
+                            );
+                            setEdited(true);
+                          }}
+                        >
+                          Remove item
+                        </button>
+                      </div>
+                    ) : (
+                      <>
+                        <span>{row.status}</span>
+                        <h4>{row.name}</h4>
+                        <p>{row.detail}</p>
+                      </>
+                    )}
                     {id === "s3" && opened === 1 && (
                       <p className="artifact-brief-note">
                         <b>Production instruction:</b> Prepare a channel-ready

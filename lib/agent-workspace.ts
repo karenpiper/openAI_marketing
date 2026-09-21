@@ -120,6 +120,11 @@ export type Finding = {
   decision: string;
 };
 export type AgentState = {
+  campaign?: { objective: string; instruction: string };
+  artifactEdits?: Record<
+    string,
+    { name: string; status: string; detail: string }[]
+  >;
   work?: Record<string, { signature: string; step: number }>;
   northstar?: string;
   day: {
@@ -251,6 +256,28 @@ export function restoreAgentState(raw: unknown): AgentState {
         w.step <= 3
       )
         base.work[c.id] = w;
+    }
+  }
+  if (
+    r.campaign &&
+    typeof r.campaign.objective === "string" &&
+    typeof r.campaign.instruction === "string"
+  )
+    base.campaign = r.campaign;
+  if (r.artifactEdits && typeof r.artifactEdits === "object") {
+    base.artifactEdits = {};
+    for (const [key, rows] of Object.entries(r.artifactEdits)) {
+      if (
+        Array.isArray(rows) &&
+        rows.every(
+          (row) =>
+            row &&
+            typeof row.name === "string" &&
+            typeof row.status === "string" &&
+            typeof row.detail === "string",
+        )
+      )
+        base.artifactEdits[key] = rows;
     }
   }
   base.architecture = parseSession(r.architecture);

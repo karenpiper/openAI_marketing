@@ -15,13 +15,34 @@ import {
   advanceDay,
 } from "../lib/agent-workspace";
 import { WorkflowWork, WorkflowRequirements } from "./workflow-work";
+import { CampaignEditor } from "./campaign-editor";
 import { workSignature } from "../lib/workflow-work";
 import AgentBriefing, { MeetMorgan } from "./agent-briefing";
 import ArchitectureOutput from "./architecture-output";
 import { Architecture } from "./workshop-mapping";
 import { SaveContext } from "./save-footer";
 import "./agent-workspace.css";
-function MorganScreen({ children }: { children: ReactNode }) {
+function MorganScreen({
+  children,
+  workflow = false,
+}: {
+  children: ReactNode;
+  workflow?: boolean;
+}) {
+  function jump(selector: string, e: React.MouseEvent<HTMLButtonElement>) {
+    const screen = e.currentTarget.closest(".monitor-screen");
+    const target = screen?.querySelector<HTMLElement>(selector);
+    if (screen && target)
+      screen.scrollTo({
+        top:
+          target.getBoundingClientRect().top -
+          screen.getBoundingClientRect().top +
+          screen.scrollTop -
+          55,
+        behavior: "smooth",
+      });
+  }
+
   return (
     <div className="monitor-wrap">
       <div className="monitor-label">
@@ -36,7 +57,42 @@ function MorganScreen({ children }: { children: ReactNode }) {
             <span>ChatGPT · Marketing workspace</span>
             <span>Morgan</span>
           </div>
-          {children}
+          <div className="workspace-desktop">
+            <aside className="chat-sidebar">
+              <b>ChatGPT</b>
+              <span className="chat-sidebar-label">Project</span>
+              <strong>Enterprise adoption</strong>
+              <button
+                onClick={(e) =>
+                  jump(".agent-product, .day-arrival, .day-evening", e)
+                }
+              >
+                ◌ Morgan’s Tuesday
+              </button>
+              {workflow && (
+                <>
+                  <span className="chat-sidebar-label">
+                    In this conversation
+                  </span>
+                  <button onClick={(e) => jump(".campaign-editor", e)}>
+                    ▤ Campaign brief
+                  </button>
+                  <button
+                    onClick={(e) =>
+                      jump(".execution-assets, .work-artifact", e)
+                    }
+                  >
+                    ▧ Work products
+                  </button>
+                  <button onClick={(e) => jump(".agent-composer", e)}>
+                    ✎ Ask for a change
+                  </button>
+                </>
+              )}
+              <small>One campaign · shared context</small>
+            </aside>
+            <div className="workspace-thread">{children}</div>
+          </div>
         </div>
         <div className="monitor-chin" aria-hidden="true" />
       </div>
@@ -88,7 +144,43 @@ export default function AgentWorkspace() {
   >({});
   function ask(prompt: string) {
     if (!prompt.trim()) return;
-    const reply = guidedReply(chapters[chapter], prompt);
+    let reply = guidedReply(chapters[chapter], prompt);
+    const q = prompt.toLowerCase();
+    if (/website|sales follow.up|lifecycle|one audience|^objective:/.test(q)) {
+      setS((prev) => ({
+        ...prev,
+        ...(q.includes("website") ? { channel: "Email + website" } : {}),
+        ...(q.includes("sales follow")
+          ? { channel: "Email + sales follow-up" }
+          : {}),
+        ...(q.includes("lifecycle") ? { audience: "Lifecycle stages" } : {}),
+        ...(q.includes("one audience") ? { audience: "One audience" } : {}),
+        ...(q.startsWith("objective:")
+          ? {
+              campaign: {
+                objective: prompt.slice(10).trim(),
+                instruction: prev.campaign?.instruction || "",
+              },
+            }
+          : {}),
+      }));
+      reply =
+        "I’ve updated the campaign conditions from your request. The work packages will rebuild from the updated brief. You can review the changed audience, channel or objective above.";
+    } else if (
+      /^(add|include|avoid|change|update|revise|make|keep|focus)/i.test(prompt)
+    ) {
+      setS((prev) => ({
+        ...prev,
+        campaign: {
+          objective:
+            prev.campaign?.objective ||
+            "Grow enterprise adoption across the buying group",
+          instruction: prompt.trim(),
+        },
+      }));
+      reply =
+        "I’ve attached your instruction to the campaign brief and its work products. Open an artifact to review or edit the specific instructions; this prototype does not generate new marketing copy.";
+    }
     setConversation((prev) => ({
       ...prev,
       [chapters[chapter].id]: [
@@ -468,7 +560,7 @@ export default function AgentWorkspace() {
                     <h1>{c.short}</h1>
                     <p>{c.story}</p>
                   </div>
-                  <MorganScreen>
+                  <MorganScreen workflow>
                     <div className="agent-product">
                       <header>
                         <b>
@@ -551,7 +643,22 @@ export default function AgentWorkspace() {
                             </div>
                           </>
                         ) : null}
+                        <CampaignEditor
+                          session={s}
+                          onApply={(campaign) =>
+                            setS((prev) => ({ ...prev, campaign }))
+                          }
+                        />
                         <WorkflowWork
+                          onEdit={(key, rows) =>
+                            setS((prev) => ({
+                              ...prev,
+                              artifactEdits: {
+                                ...prev.artifactEdits,
+                                [key]: rows,
+                              },
+                            }))
+                          }
                           session={s}
                           id={c.id}
                           onStep={(step) =>
@@ -592,8 +699,8 @@ export default function AgentWorkspace() {
                         <div className="agent-suggestions">
                           {[
                             "Why these accounts?",
-                            "What happens next?",
-                            "What is blocked?",
+                            "Use website instead",
+                            "Focus on lifecycle stages",
                           ].map((prompt) => (
                             <button key={prompt} onClick={() => ask(prompt)}>
                               {prompt}

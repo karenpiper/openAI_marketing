@@ -344,7 +344,15 @@ export function workStages(s: AgentState, id: string): WorkStage[] {
   ];
 }
 export function workSignature(s: AgentState, id: string) {
-  return id === "s3" ? JSON.stringify([s.audience, s.channel, s.source]) : id;
+  return JSON.stringify([
+    id,
+    id === "s3" ? [s.audience, s.channel, s.source] : null,
+    s.campaign?.objective || "",
+    s.campaign?.instruction || "",
+  ]);
+}
+export function artifactKey(s: AgentState, id: string, index: number) {
+  return `${workSignature(s, id)}:${index}`;
 }
 export function currentWorkStep(s: AgentState, id: string) {
   const w = s.work?.[id];
@@ -375,11 +383,13 @@ export function workflowArtifact(s: AgentState, id: string, index: number) {
   };
   const blocked = id === "s3" && s.source === "Source material missing";
   const title = blocked ? "Source material request" : names[id][index];
-  const sections = stage.rows.map(([name, status, detail]) => ({
-    name,
-    status,
-    detail,
-  }));
-  const text = `# ${title}\n\nILLUSTRATIVE PROTOTYPE OUTPUT — no live systems queried or actions executed.\n\nCampaign: Enterprise adoption / 12 target accounts\nAudience: ${s.audience}\nChannels: ${s.channel}\n\n${stage.summary}\n\n${sections.map((r) => `## ${r.name}\nStatus: ${r.status}\n${r.detail}`).join("\n\n")}\n\n## Handoff\n${stage.output}\n\n## Required control\n${stage.control}`;
+  const sections =
+    s.artifactEdits?.[artifactKey(s, id, index)] ??
+    stage.rows.map(([name, status, detail]) => ({
+      name,
+      status,
+      detail,
+    }));
+  const text = `# ${title}\n\nILLUSTRATIVE PROTOTYPE OUTPUT — no live systems queried or actions executed.\n\nCampaign: Enterprise adoption / 12 target accounts\nObjective: ${s.campaign?.objective || "Grow enterprise adoption across the buying group"}\nMorgan’s instruction: ${s.campaign?.instruction || "None added"}\nAudience: ${s.audience}\nChannels: ${s.channel}\n\n${stage.summary}\n\n${sections.map((r) => `## ${r.name}\nStatus: ${r.status}\n${r.detail}`).join("\n\n")}\n\n## Handoff\n${stage.output}\n\n## Required control\n${stage.control}`;
   return { title, sections, text, blocked };
 }
