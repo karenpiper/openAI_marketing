@@ -2135,3 +2135,40 @@ details p {
     margin: 14mm;
   }
 }
+
+.demo-banner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  padding: 18px 30px;
+  background: #efe8fc;
+  border-bottom: 1px solid #cbbce6;
+  color: #473063;
+}
+.demo-banner strong {
+  display: block;
+  font-size: 15px;
+}
+.demo-banner p,
+.demo-banner span {
+  font-size: 13px;
+  line-height: 1.5;
+  margin: 5px 0 0;
+  max-width: 780px;
+}
+.demo-banner .inline-actions {
+  flex-shrink: 0;
+}
+@media (max-width: 1000px) {
+  .demo-banner {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 18px;
+  }
+}
+@media print {
+  .workshop-app > .demo-banner {
+    display: none !important;
+  }
+}

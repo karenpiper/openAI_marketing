@@ -18,11 +18,18 @@ import {
   type Session,
 } from "../lib/workshop";
 import { rank, restore, STORAGE_KEY } from "../lib/assessment";
+import {
+  createDemoSession,
+  DEMO_SESSION_KEY,
+  DEMO_CHANNEL,
+} from "../lib/demo-session";
 
 export default function Workshop() {
   const [session, setSession] = useState(createSession);
   const [loaded, setLoaded] = useState(false);
   const [room, setRoom] = useState(false);
+  const [demo, setDemo] = useState(false);
+  const storageKeyRef = useRef(SESSION_KEY);
   const [preview, setPreview] = useState(false);
   const [storageError, setStorageError] = useState("");
   const [message, setMessage] = useState("");
@@ -31,18 +38,24 @@ export default function Workshop() {
   const fileRef = useRef<HTMLInputElement>(null);
   const channelRef = useRef<BroadcastChannel | null>(null);
   useEffect(() => {
-    const isRoom =
-      new URLSearchParams(window.location.search).get("view") === "room";
+    const params = new URLSearchParams(window.location.search);
+    const isRoom = params.get("view") === "room";
+    const isDemo = params.get("demo") === "1";
+    const key = isDemo ? DEMO_SESSION_KEY : SESSION_KEY;
+    storageKeyRef.current = key;
     setRoom(isRoom);
+    setDemo(isDemo);
     try {
-      const raw = localStorage.getItem(SESSION_KEY);
+      const raw = localStorage.getItem(key);
       if (raw) setSession(parseSession(JSON.parse(raw)));
+      else if (isDemo) setSession(createDemoSession());
       else {
         const old = localStorage.getItem(STORAGE_KEY);
         if (old)
           setSession((s) => ({ ...s, assessments: restore(JSON.parse(old)) }));
       }
     } catch {
+      if (isDemo) setSession(createDemoSession());
       setStorageError(
         "Saved workshop data could not be read. Export this session before leaving; the unreadable saved copy has not been overwritten.",
       );
@@ -56,11 +69,13 @@ export default function Workshop() {
       }
     };
     const handler = (e: StorageEvent) => {
-      if (e.key === SESSION_KEY) receive(e.newValue);
+      if (e.key === key) receive(e.newValue);
     };
     window.addEventListener("storage", handler);
     if ("BroadcastChannel" in window) {
-      const c = new BroadcastChannel("oai-workshop-room");
+      const c = new BroadcastChannel(
+        isDemo ? DEMO_CHANNEL : "oai-workshop-room",
+      );
       channelRef.current = c;
       if (isRoom)
         c.onmessage = (e) =>
@@ -78,7 +93,7 @@ export default function Workshop() {
     channelRef.current?.postMessage(data);
     if (storageError) return;
     try {
-      localStorage.setItem(SESSION_KEY, data);
+      localStorage.setItem(storageKeyRef.current, data);
     } catch {
       setStorageError(
         "Browser storage is unavailable or full. Export a backup before leaving.",
@@ -113,7 +128,9 @@ export default function Workshop() {
   }
   function download(kind: "json" | "md") {
     const data =
-      kind === "json" ? JSON.stringify(session, null, 2) : readout(session);
+      kind === "json"
+        ? JSON.stringify(session, null, 2)
+        : `${demo ? "DEMO DATA · Fictional test records, not workshop findings.\n\n" : ""}${readout(session)}`;
     const url = URL.createObjectURL(
       new Blob([data], {
         type: kind === "json" ? "application/json" : "text/markdown",
@@ -121,7 +138,7 @@ export default function Workshop() {
     );
     const link = document.createElement("a");
     link.href = url;
-    link.download = `openai-workshop-${new Date().toISOString().slice(0, 10)}.${kind}`;
+    link.download = `${demo ? "DEMO-" : ""}openai-workshop-${new Date().toISOString().slice(0, 10)}.${kind}`;
     link.click();
     setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
@@ -146,9 +163,25 @@ export default function Workshop() {
       if (fileRef.current) fileRef.current.value = "";
     }
   }
+  function enterDemo() {
+    if (storageError) {
+      setMessage(
+        "Export your real session before switching. Browser storage must be available to keep both sessions safely.",
+      );
+      return;
+    }
+    try {
+      localStorage.setItem(SESSION_KEY, JSON.stringify(session));
+      window.location.assign(`${window.location.pathname}?demo=1`);
+    } catch {
+      setStorageError(
+        "Could not save your real workshop, so demo mode was not opened. Export a backup before leaving.",
+      );
+    }
+  }
   function openRoom() {
     window.open(
-      `${window.location.origin}${window.location.pathname}?view=room`,
+      `${window.location.origin}${window.location.pathname}?view=room${demo ? "&demo=1" : ""}`,
       "workshop-room",
       "popup,width=1440,height=900",
     );
@@ -229,6 +262,14 @@ export default function Workshop() {
             {storageError}
           </p>
         )}
+        {demo && (
+          <div className="demo-banner">
+            <strong>Demo data</strong>
+            <span>
+              Fictional records for testing. No real workshop decisions.
+            </span>
+          </div>
+        )}
         <RoomView session={session} />
       </>
     );
@@ -250,6 +291,7 @@ export default function Workshop() {
             {preview ? "Return to capture" : "Preview room view"}
           </button>
           <button onClick={openRoom}>Open projector ↗</button>
+          {!demo && <button onClick={enterDemo}>Try demo data</button>}
           <button
             aria-expanded={toolsOpen}
             onClick={() => setToolsOpen((v) => !v)}
@@ -258,6 +300,40 @@ export default function Workshop() {
           </button>
         </div>
       </header>
+      {demo && (
+        <div className="demo-banner">
+          <div>
+            <strong>Demo data · test anything here</strong>
+            <p>
+              Fictional priorities and sample answers are loaded. Your real
+              workshop is untouched. Start in step 2, or jump to architecture,
+              the live build or readout.
+            </p>
+          </div>
+          <div className="inline-actions">
+            <button
+              onClick={() => {
+                if (
+                  confirm(
+                    "Reset only the demo data and discard your demo edits?",
+                  )
+                ) {
+                  setSession(createDemoSession());
+                  setStorageError("");
+                  setPreview(false);
+                }
+              }}
+            >
+              Reset demo data
+            </button>
+            <button
+              onClick={() => window.location.assign(window.location.pathname)}
+            >
+              Return to real workshop
+            </button>
+          </div>
+        </div>
+      )}
       <nav className="agenda-tabs" aria-label="Workshop agenda">
         {stages.map((stage, i) => (
           <button
@@ -386,13 +462,13 @@ export default function Workshop() {
                     "Clear the full workshop, including scores, decisions and drafts? Export a backup first.",
                   )
                 ) {
-                  setSession(createSession());
+                  setSession(demo ? createDemoSession() : createSession());
                   setStorageError("");
                   setMessage("New workshop started.");
                 }
               }}
             >
-              Start a fresh workshop
+              {demo ? "Reset demo workshop" : "Start a fresh workshop"}
             </button>
           </div>
         </section>
@@ -496,6 +572,13 @@ export default function Workshop() {
         )}
       </footer>
       <div className="print-only">
+        {demo && (
+          <p>
+            <strong>
+              DEMO DATA · Fictional test records. Not actual workshop findings.
+            </strong>
+          </p>
+        )}
         <WorkshopReadout session={session} room />
       </div>
     </div>

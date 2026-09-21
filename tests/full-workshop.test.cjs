@@ -337,15 +337,13 @@ test("generation endpoint rejects unconfigured, unauthorized and cross-origin ca
               {
                 type: "output_text",
                 text: JSON.stringify({
-                  variants: w
-                    .practiceLab()
-                    .audiences.map((a) => ({
-                      audienceId: a.id,
-                      subject: "Subject",
-                      body: "Body",
-                      headline: "Headline",
-                      rationale: "Rationale",
-                    })),
+                  variants: w.practiceLab().audiences.map((a) => ({
+                    audienceId: a.id,
+                    subject: "Subject",
+                    body: "Body",
+                    headline: "Headline",
+                    rationale: "Rationale",
+                  })),
                 }),
               },
             ],
@@ -376,4 +374,88 @@ test("generation endpoint rejects unconfigured, unauthorized and cross-origin ca
     }
     global.fetch = saved.fetch;
   }
+});
+
+test("demo starts at step 2 with confirmed choices and complete linked examples, without changing defaults", () => {
+  const {
+    createDemoSession,
+    DEMO_SESSION_KEY,
+    DEMO_CHANNEL,
+  } = require("../lib/demo-session.ts");
+  const real = w.createSession();
+  real.assessments.s3.note = "Real room note";
+  const before = JSON.stringify(real);
+  const demo = createDemoSession();
+  assert.equal(demo.stage, 1);
+  assert.equal(demo.focus, "s3");
+  assert.ok(w.selectionConfirmed(demo));
+  assert.deepEqual(
+    w.activeCases(demo).map((u) => u.id),
+    ["s2", "s3", "s5"],
+  );
+  assert.notEqual(DEMO_SESSION_KEY, w.SESSION_KEY);
+  assert.notEqual(DEMO_CHANNEL, "oai-workshop-room");
+  assert.deepEqual(
+    new Set(
+      demo.capabilities.filter((c) => c.useCase === "s3").map((c) => c.fit),
+    ),
+    new Set(["Reuse", "Extend", "Missing", "Unknown"]),
+  );
+  assert.deepEqual(
+    new Set(demo.decisions.map((d) => d.status)),
+    new Set(["Proposed", "Confirmed", "Disputed", "Unknown"]),
+  );
+  for (const row of [
+    ...demo.capabilities,
+    ...demo.boundaries,
+    ...demo.handoffs,
+    ...demo.actions,
+  ])
+    assert.ok(demo.selected.includes(row.useCase));
+  assert.ok(demo.actions.some((a) => !a.owner));
+  assert.equal(demo.lab.drafts.length, 3);
+  for (const d of demo.lab.drafts) {
+    assert.ok(w.draftCurrent(demo.lab, d));
+    assert.equal(d.mode, "Practice");
+    assert.ok(d.previous);
+  }
+  assert.deepEqual(w.parseSession(JSON.parse(JSON.stringify(demo))), demo);
+  demo.capabilities[0].system = "My temporary edit";
+  demo.lab.drafts[0].body = "Changed";
+  assert.equal(JSON.stringify(real), before);
+  assert.notEqual(
+    createDemoSession().capabilities[0].system,
+    "My temporary edit",
+  );
+  assert.equal(w.createSession().selected.length, 0);
+});
+
+test("populated demo renders steps 2–4 and projector views with fictional readout labeling", () => {
+  const { createDemoSession } = require("../lib/demo-session.ts");
+  const demo = createDemoSession();
+  const noop = () => {};
+  const Mapping = require("../components/workshop-mapping.tsx");
+  const Lab = require("../components/content-lab.tsx").default;
+  const Readout = require("../components/workshop-readout.tsx").default;
+  const Room = require("../components/room-view.tsx").default;
+  for (const Comp of [Mapping.CurrentState, Mapping.Architecture, Lab, Readout])
+    assert.ok(
+      renderToStaticMarkup(
+        React.createElement(Comp, { session: demo, setSession: noop }),
+      ).length > 1000,
+    );
+  for (const stage of [1, 2, 3])
+    for (const architectureTab of ["map", "lab"])
+      assert.ok(
+        renderToStaticMarkup(
+          React.createElement(Room, {
+            session: { ...demo, stage, architectureTab },
+          }),
+        ).length > 1000,
+      );
+  const text = w.readout(demo);
+  assert.match(text, /DEMO DATA/);
+  assert.match(text, /Fictional test result/);
+  assert.match(text, /Needs edits/);
+  assert.match(text, /Unassigned/);
 });
