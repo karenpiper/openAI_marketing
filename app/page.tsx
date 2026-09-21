@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
+import WorkshopOverview from "../components/workshop-overview";
 import PriorityWorkshop from "../components/priority-workshop";
 import { CurrentState, Architecture } from "../components/workshop-mapping";
 import ContentLab from "../components/content-lab";
@@ -50,7 +51,27 @@ export default function Workshop() {
       const raw = localStorage.getItem(key);
       if (raw) {
         const saved = parseSession(JSON.parse(raw));
-        setSession(isDemo ? addDemoGuideExamples(saved) : saved);
+        setSession(
+          isRoom
+            ? saved
+            : {
+                ...(isDemo ? addDemoGuideExamples(saved) : saved),
+                overview: true,
+                timer: {
+                  ...saved.timer,
+                  remaining: Math.max(
+                    0,
+                    saved.timer.remaining -
+                      (saved.timer.runningSince
+                        ? Math.floor(
+                            (Date.now() - saved.timer.runningSince) / 1000,
+                          )
+                        : 0),
+                  ),
+                  runningSince: null,
+                },
+              },
+        );
       } else if (isDemo) setSession(createDemoSession());
       else {
         const old = localStorage.getItem(STORAGE_KEY);
@@ -118,6 +139,7 @@ export default function Workshop() {
     setSession((s) => ({
       ...s,
       stage,
+      overview: false,
       focus: s.focus,
       timer: {
         stage,
@@ -288,6 +310,20 @@ export default function Workshop() {
           <span className={`save-status ${storageError ? "unsaved" : ""}`}>
             {storageError ? "Not saved" : "Saved in this browser"}
           </span>
+          {!session.overview && (
+            <button
+              onClick={() => {
+                setPreview(false);
+                setSession((s) => ({
+                  ...s,
+                  overview: true,
+                  timer: { ...s.timer, remaining, runningSince: null },
+                }));
+              }}
+            >
+              00 · Workshop overview
+            </button>
+          )}
           <button onClick={() => setPreview((v) => !v)}>
             {preview ? "Return to capture" : "Preview room view"}
           </button>
@@ -307,8 +343,9 @@ export default function Workshop() {
             <strong>Demo data · test anything here</strong>
             <p>
               Fictional priorities and step 2 answers for all seven use cases
-              are loaded. Your real workshop is untouched. Start in step 2, or
-              jump to architecture, the live build or readout.
+              are loaded. Your real workshop is untouched. Enter the workshop,
+              then explore step 2 or jump to architecture, the live build or
+              readout.
             </p>
           </div>
           <div className="inline-actions">
@@ -335,76 +372,80 @@ export default function Workshop() {
           </div>
         </div>
       )}
-      <nav className="agenda-tabs" aria-label="Workshop agenda">
-        {stages.map((stage, i) => (
-          <button
-            key={stage.title}
-            aria-current={session.stage === i ? "step" : undefined}
-            className={session.stage === i ? "active" : ""}
-            onClick={() => {
-              setPreview(false);
-              navigate(i);
-            }}
-          >
-            <span className="agenda-number">0{i + 1}</span>
+      {!session.overview && (
+        <>
+          <nav className="agenda-tabs" aria-label="Workshop agenda">
+            {stages.map((stage, i) => (
+              <button
+                key={stage.title}
+                aria-current={session.stage === i ? "step" : undefined}
+                className={session.stage === i ? "active" : ""}
+                onClick={() => {
+                  setPreview(false);
+                  navigate(i);
+                }}
+              >
+                <span className="agenda-number">0{i + 1}</span>
+                <span>
+                  <strong>{stage.title}</strong>
+                  <small>{stage.subtitle}</small>
+                </span>
+                <span className="agenda-time">{stage.minutes} min</span>
+              </button>
+            ))}
+          </nav>
+          <div className="facilitator-strip">
             <span>
-              <strong>{stage.title}</strong>
-              <small>{stage.subtitle}</small>
+              {session.stage < 2
+                ? "Today · establish and correct"
+                : "Proposed future · test and agree"}{" "}
+              <b> · </b> {activeCases(session).length} selected cases <b> · </b>{" "}
+              {selectionConfirmed(session)
+                ? "Working set confirmed"
+                : "Working set not confirmed"}
             </span>
-            <span className="agenda-time">{stage.minutes} min</span>
-          </button>
-        ))}
-      </nav>
-      <div className="facilitator-strip">
-        <span>
-          {session.stage < 2
-            ? "Today · establish and correct"
-            : "Proposed future · test and agree"}{" "}
-          <b> · </b> {activeCases(session).length} selected cases <b> · </b>{" "}
-          {selectionConfirmed(session)
-            ? "Working set confirmed"
-            : "Working set not confirmed"}
-        </span>
-        <div className="timer" aria-label="Agenda timer">
-          <span aria-live="off">
-            {Math.floor(remaining / 60)
-              .toString()
-              .padStart(2, "0")}
-            :{(remaining % 60).toString().padStart(2, "0")}
-          </span>
-          <button
-            onClick={() => {
-              setClock(Date.now());
-              setSession((s) => ({
-                ...s,
-                timer: {
-                  ...s.timer,
-                  remaining: s.timer.runningSince
-                    ? remaining
-                    : s.timer.remaining,
-                  runningSince: s.timer.runningSince ? null : Date.now(),
-                },
-              }));
-            }}
-          >
-            {session.timer.runningSince ? "Pause" : "Start timer"}
-          </button>
-          <button
-            onClick={() =>
-              setSession((s) => ({
-                ...s,
-                timer: {
-                  stage: s.stage,
-                  remaining: stages[s.stage].minutes * 60,
-                  runningSince: null,
-                },
-              }))
-            }
-          >
-            Reset timer
-          </button>
-        </div>
-      </div>
+            <div className="timer" aria-label="Agenda timer">
+              <span aria-live="off">
+                {Math.floor(remaining / 60)
+                  .toString()
+                  .padStart(2, "0")}
+                :{(remaining % 60).toString().padStart(2, "0")}
+              </span>
+              <button
+                onClick={() => {
+                  setClock(Date.now());
+                  setSession((s) => ({
+                    ...s,
+                    timer: {
+                      ...s.timer,
+                      remaining: s.timer.runningSince
+                        ? remaining
+                        : s.timer.remaining,
+                      runningSince: s.timer.runningSince ? null : Date.now(),
+                    },
+                  }));
+                }}
+              >
+                {session.timer.runningSince ? "Pause" : "Start timer"}
+              </button>
+              <button
+                onClick={() =>
+                  setSession((s) => ({
+                    ...s,
+                    timer: {
+                      stage: s.stage,
+                      remaining: stages[s.stage].minutes * 60,
+                      runningSince: null,
+                    },
+                  }))
+                }
+              >
+                Reset timer
+              </button>
+            </div>
+          </div>
+        </>
+      )}
       {storageError && (
         <p className="notice error" role="alert">
           {storageError}
@@ -474,23 +515,35 @@ export default function Workshop() {
           </div>
         </section>
       )}
-      {session.stage > 0 && !selectionConfirmed(session) && (
-        <div className="notice">
-          The working set needs confirmation. You can explore these sections,
-          but the readout will show the selection as proposed.{" "}
-          <button
-            onClick={() => {
-              navigate(0);
-              setSession((s) => ({ ...s, scene: 9 }));
-            }}
-          >
-            Return to selection
-          </button>
-        </div>
-      )}
+      {!session.overview &&
+        session.stage > 0 &&
+        !selectionConfirmed(session) && (
+          <div className="notice">
+            The working set needs confirmation. You can explore these sections,
+            but the readout will show the selection as proposed.{" "}
+            <button
+              onClick={() => {
+                navigate(0);
+                setSession((s) => ({ ...s, scene: 9 }));
+              }}
+            >
+              Return to selection
+            </button>
+          </div>
+        )}
       <div className="capture-content">
         {preview ? (
           <RoomView session={session} />
+        ) : session.overview ? (
+          <WorkshopOverview
+            session={session}
+            setSession={setSession}
+            onEnter={() => {
+              navigate(0);
+              setSession((s) => ({ ...s, scene: 0 }));
+            }}
+            onResume={() => setSession((s) => ({ ...s, overview: false }))}
+          />
         ) : (
           <>
             {session.stage === 0 && (
@@ -566,7 +619,7 @@ export default function Workshop() {
       </div>
       <footer className="workshop-footer">
         <span>Capture → read back → confirm · Unknowns stay visible</span>
-        {session.stage < 3 && (
+        {!session.overview && session.stage < 3 && (
           <button onClick={() => navigate(session.stage + 1)}>
             Next: {stages[session.stage + 1].title} →
           </button>

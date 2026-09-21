@@ -1,3 +1,4 @@
+import WorkshopOverview from "./workshop-overview";
 import ArchitectureWalkthrough from "./architecture-walkthrough";
 import LiveSynthesis from "./live-synthesis";
 import { CurrentReadback, ArchitectureReadback } from "./workshop-mapping";
@@ -23,6 +24,12 @@ import { Badge } from "./workshop-fields";
 import WorkshopReadout from "./workshop-readout";
 export default function RoomView({ session }: { session: Session }) {
   const s = session;
+  if (s.overview)
+    return (
+      <div className="room-view">
+        <WorkshopOverview session={s} />
+      </div>
+    );
   const u = useCases[s.scene - 2];
   const a = u ? s.assessments[u.id] : null;
   const focus = useCases.find((u) => u.id === s.focus);

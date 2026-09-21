@@ -198,6 +198,8 @@ export type WorkflowReview = {
   source: string;
 };
 export type Session = {
+  overview: boolean;
+  attendees: string;
   workflowReviews: WorkflowReview[];
   schema: 1;
   title: string;
@@ -269,6 +271,8 @@ export function practiceLab(): Lab {
 export function createSession(): Session {
   return {
     schema: 1,
+    overview: true,
+    attendees: "",
     workflowReviews: [],
     title: "OpenAI × Adobe × Code and Theory",
     stage: 0,
@@ -376,6 +380,8 @@ export function parseSession(raw: unknown): Session {
     throw Error("This is not a supported workshop backup.");
   const s = createSession();
   s.title = str(r.title, s.title);
+  s.overview = r.overview !== false;
+  s.attendees = str(r.attendees);
   s.stage =
     typeof r.stage === "number" &&
     Number.isInteger(r.stage) &&
@@ -590,6 +596,7 @@ export function readout(s: Session): string {
       : "");
   return [
     `# Workshop readout\n${s.title}\n\nWorking set: ${selectionConfirmed(s) ? `Confirmed by ${s.selectionBy}` : "Proposed / needs confirmation"}`,
+    `Attendees: ${s.attendees || "Not recorded"}`,
     "## Priority use cases",
     ...activeCases(s).map(
       (u) =>

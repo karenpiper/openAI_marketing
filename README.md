@@ -118,3 +118,9 @@ Architecture places the relevant source answers beside each proposed workflow st
 All seven use cases have five prepared workflow steps. Content at scale moves through audience needs → approved source → variants → review → delivery and learning. PDF labels are transcribed from the supplied diagram. The workflow is our facilitation proposal, explicitly distinguished from that source. Nothing is pre-agreed in real sessions. Fresh demo sessions illustrate Keep, Change and Unresolved; use Reset demo data to load those new example decisions into an existing demo session.
 
 Workflow decisions persist in the same local session, JSON backup, projected view, printed readout and Markdown export. Existing detailed architecture records remain available and are never replaced by the walkthrough. These choices document workshop direction; they do not provision systems or execute integrations.
+
+## Step 0: workshop opening
+
+Every fresh or reloaded facilitator session opens on **00 · Before we begin**, in real and demo modes. It introduces the agenda, intended outcomes, prior conversation context, open decisions and an editable attendee list. Attendance is not prefilled. **Enter workshop** starts Morgan’s day without clearing saved answers. If there is existing work, **Resume saved progress** returns to its saved stage. The header’s **Workshop overview** button returns here and pauses the timer. Reloading also pauses the timer while retaining elapsed time and all workshop inputs.
+
+The projector follows the overview or active exercise, rather than resetting the facilitator’s current presentation. Attendees persist in JSON and appear in Markdown and printed readouts. The four agenda blocks remain numbered 1–4 and total 120 minutes; the opening does not change scoring, selections or stage data.

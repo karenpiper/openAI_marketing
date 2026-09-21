@@ -524,6 +524,7 @@ test("all guided questions and readbacks render in real, demo and projected sess
   for (const s of [w.createSession(), createDemoSession()])
     for (const c of useCases) {
       s.focus = c.id;
+      s.overview = false;
       for (const [stage, Comp, key, max] of [
         [1, CurrentState, "current", 4],
         [2, Architecture, "architecture", 5],
@@ -709,4 +710,49 @@ test("walkthrough shows current evidence, PDF boxes and room decisions in captur
       assert.match(html, /Unresolved/);
     }
   }
+});
+
+test("step zero opens real and demo sessions with agenda, attendees and entry while preserving progress", () => {
+  const Overview = require("../components/workshop-overview.tsx").default;
+  const Room = require("../components/room-view.tsx").default;
+  for (const s of [
+    w.createSession(),
+    require("../lib/demo-session.ts").createDemoSession(),
+  ]) {
+    assert.equal(s.overview, true);
+    s.attendees = "Karen — facilitator\nAlex — operations";
+    s.stage = 2;
+    s.assessments.s3.note = "Preserve this note";
+    const restored = w.parseSession(JSON.parse(JSON.stringify(s)));
+    assert.equal(restored.stage, 2);
+    assert.equal(restored.attendees, s.attendees);
+    assert.equal(restored.assessments.s3.note, "Preserve this note");
+    const html = renderToStaticMarkup(
+      React.createElement(Overview, {
+        session: s,
+        setSession: () => {},
+        onEnter: () => {},
+        onResume: () => {},
+      }),
+    );
+    for (const text of [
+      "Enter workshop",
+      "120 minutes",
+      "What we’ve heard",
+      "Attendees and roles",
+      "What we want to leave with",
+    ])
+      assert.ok(html.includes(text));
+    const projection = renderToStaticMarkup(
+      React.createElement(Room, { session: s }),
+    );
+    assert.match(projection, /Before we begin/);
+    assert.ok(!projection.includes("Enter workshop"));
+    assert.match(w.readout(s), /Karen — facilitator/);
+  }
+  const old = w.createSession();
+  delete old.overview;
+  delete old.attendees;
+  assert.equal(w.parseSession(old).overview, true);
+  assert.equal(w.parseSession(old).attendees, "");
 });
