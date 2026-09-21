@@ -3250,3 +3250,82 @@
 .variant-controls button {
   min-height: 40px;
 }
+
+.use-case-discussion {
+  padding: 24px;
+  margin: 24px 0;
+  border: 1px solid #cad5ce;
+  border-radius: 16px;
+  background: #fffefa;
+  color: #203e32;
+}
+.use-case-discussion h2 {
+  font-size: 26px;
+  margin: 8px 0 12px;
+}
+.use-case-discussion p {
+  font-size: 16px;
+  line-height: 1.55;
+  max-width: 75ch;
+}
+.discussion-question {
+  border-left: 3px solid #648473;
+  padding: 8px 18px;
+  margin: 18px 0;
+  background: #f0f4ef;
+}
+.discussion-question p {
+  margin: 6px 0;
+}
+.discussion-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+.discussion-fields label,
+.discussion-northstar {
+  display: grid;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 600;
+}
+.discussion-fields input,
+.discussion-fields select,
+.discussion-fields textarea,
+.discussion-northstar input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 12px;
+  border: 1px solid #c4cec7;
+  border-radius: 8px;
+  background: white;
+  color: #23372d;
+  font: inherit;
+}
+.discussion-fields textarea {
+  min-height: 80px;
+}
+.discussion-wide {
+  grid-column: 1 / -1;
+}
+.use-case-discussion footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px;
+  margin-top: 16px;
+}
+.use-case-discussion footer small {
+  color: #5b6a61;
+}
+.opening-discussion {
+  padding-top: 32px;
+}
+@media (max-width: 650px) {
+  .discussion-fields {
+    grid-template-columns: 1fr;
+  }
+  .use-case-discussion {
+    padding: 18px;
+  }
+}

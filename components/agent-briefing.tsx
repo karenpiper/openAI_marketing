@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import Image from "next/image";
 export const workshopAgenda = [
   {
@@ -139,7 +140,13 @@ export default function AgentBriefing({ onEnter }: { onEnter: () => void }) {
     </main>
   );
 }
-export function MeetMorgan({ onEnter }: { onEnter: () => void }) {
+export function MeetMorgan({
+  onEnter,
+  discussion,
+}: {
+  onEnter: () => void;
+  discussion: ReactNode;
+}) {
   return (
     <main className="workshop-opening">
       <section className="opening-hero">
@@ -178,7 +185,8 @@ export function MeetMorgan({ onEnter }: { onEnter: () => void }) {
           decisions that deserve her experience—and confidence that the routine
           work is being handled with care.
         </p>
-        <h2 className="morgan-clear">One opportunity runs through her day.</h2>
+        <div className="morgan-clear">{discussion}</div>
+        <h2>One opportunity runs through her day.</h2>
         <div className="opening-day">
           {[
             [

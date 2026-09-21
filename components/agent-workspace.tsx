@@ -1,4 +1,5 @@
 "use client";
+import UseCaseDiscussion from "./use-case-discussion";
 import { useEffect, useState, type ReactNode } from "react";
 import {
   AGENT_KEY,
@@ -308,6 +309,51 @@ export default function AgentWorkspace() {
           />
         ) : page === "meet" ? (
           <MeetMorgan
+            discussion={
+              <div className="opening-discussion">
+                <span className="agent-kicker">
+                  Before Tuesday · the problems worth solving
+                </span>
+                <h2>Three proposed use cases. Open to challenge.</h2>
+                <p>
+                  Discuss the need before exploring the solution. These are
+                  candidates, not agreed priorities. A missing process can be an
+                  opportunity; it does not mean the room must invent a current
+                  workflow.
+                </p>
+                <label className="discussion-northstar">
+                  Our shared Northstar
+                  <input
+                    value={s.northstar || ""}
+                    placeholder="What should this make possible for the business?"
+                    onChange={(e) =>
+                      setS((prev) => ({ ...prev, northstar: e.target.value }))
+                    }
+                  />
+                </label>
+                {chapters.map((ch) => (
+                  <UseCaseDiscussion
+                    key={ch.id}
+                    id={ch.id}
+                    finding={s.findings[ch.id]}
+                    onSave={save}
+                    onChange={(patch) =>
+                      setS((prev) => ({
+                        ...prev,
+                        findings: {
+                          ...prev.findings,
+                          [ch.id]: { ...prev.findings[ch.id], ...patch },
+                        },
+                      }))
+                    }
+                  />
+                ))}
+                <p>
+                  We’ll revisit these same questions beside each workflow.
+                  Agreement and notes stay connected throughout the workshop.
+                </p>
+              </div>
+            }
             onEnter={() => {
               setS((prev) => ({ ...prev, day: { ...prev.day, moment: 0 } }));
               setPage("workspace");
@@ -599,6 +645,12 @@ export default function AgentWorkspace() {
               ) : (
                 <>
                   <MorganStory moment={s.day.moment} />
+                  <UseCaseDiscussion
+                    id={c.id}
+                    finding={f}
+                    onChange={finding}
+                    onSave={save}
+                  />
                   <MorganScreen workflow>
                     <div className="agent-product">
                       <header>
