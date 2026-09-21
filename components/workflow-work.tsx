@@ -6,7 +6,6 @@ import {
   processState,
   type ProcessState,
 } from "../lib/process-state";
-import BackendIllustration from "./backend-illustration";
 import type { AgentState } from "../lib/agent-workspace";
 import {
   workStages,
@@ -394,17 +393,36 @@ export function WorkflowRequirements({
 }) {
   const index = currentWorkStep(session, id),
     stage = workStages(session, id)[index];
+  const components: Record<string, string[]> = {
+    s2: ["OpenAI agent", "Data lake + CDP / ABM", "Journey analytics"],
+    s3: [
+      "OpenAI agent",
+      "Content / asset system",
+      "Workfront + CRM (Marketing)",
+    ],
+    s5: ["OpenAI agent", "Workfront", "CRM (Marketing) + journey analytics"],
+  };
   return (
     <section className="work-requirements">
       <span className="agent-kicker">
-        Behind the screen · proposed technical requirements · {index + 1}
+        Alongside the prototype · proposed components · {index + 1}
       </span>
-      <h3>{stage.title}: what enables this work</h3>
-      <BackendIllustration session={session} id={id} key={`${id}-${index}`} />
+      <h3>{stage.title}: what is involved at this step</h3>
+      <div
+        className="requirement-route"
+        aria-label="Components used by this prototype step"
+      >
+        {components[id].map((component, i) => (
+          <span key={component}>
+            {i > 0 && <b aria-hidden="true">→</b>}
+            {component}
+          </span>
+        ))}
+      </div>
       <dl>
         {[
           ["INPUT", stage.input],
-          ["CONNECTION", stage.connection],
+          ["DATA + CONNECTION", stage.connection],
           ["OUTPUT", stage.output],
           ["ENABLES", stage.enables],
           ["CONTROL", stage.control],
@@ -416,8 +434,8 @@ export function WorkflowRequirements({
         ))}
       </dl>
       <p>
-        Proposed connections to validate with the room; no integration is
-        represented as already available.
+        These are the components and data movement relevant to this step—not the
+        full architecture. Proposed connections still need validation.
       </p>
     </section>
   );

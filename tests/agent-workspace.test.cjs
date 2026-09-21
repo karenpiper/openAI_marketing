@@ -310,3 +310,37 @@ test("account content covers every account and selected segmentation with differ
   assert.match(artifact.text, /ACCT-12-V3/);
   assert.match(artifact.text, /Candidate email variants/);
 });
+
+test("priority scoring preserves valid values and safely migrates older workshop sessions", () => {
+  const s = m.createAgentState();
+  assert.deepEqual(s.findings.s2.scores, {
+    frequency: 3,
+    severity: 3,
+    evidence: 3,
+    leverage: 3,
+    effort: 3,
+    opportunity: 3,
+  });
+  const old = JSON.parse(JSON.stringify(s));
+  delete old.findings.s2.scores;
+  old.findings.s3.scores = {
+    frequency: 5,
+    severity: 4,
+    evidence: 3,
+    leverage: 5,
+    effort: 2,
+    opportunity: 5,
+  };
+  old.findings.s5.scores = {
+    frequency: 9,
+    severity: 0,
+    evidence: "no",
+    leverage: 3,
+    effort: 3,
+    opportunity: 3,
+  };
+  const restored = m.restoreAgentState(old);
+  assert.equal(restored.findings.s2.scores.effort, 3);
+  assert.equal(restored.findings.s3.scores.opportunity, 5);
+  assert.equal(restored.findings.s5.scores.frequency, 3);
+});

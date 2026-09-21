@@ -120,6 +120,14 @@ export type Finding = {
   proof: string;
   owner: string;
   decision: string;
+  scores: {
+    frequency: number;
+    severity: number;
+    evidence: number;
+    leverage: number;
+    effort: number;
+    opportunity: number;
+  };
 };
 export type AgentState = {
   learning?: { choice: string; reason: string; applied: boolean };
@@ -157,6 +165,14 @@ export function createAgentState(): AgentState {
           proof: c.proof,
           owner: "",
           decision: "",
+          scores: {
+            frequency: 3,
+            severity: 3,
+            evidence: 3,
+            leverage: 3,
+            effort: 3,
+            opportunity: 3,
+          },
         },
       ]),
     ),
@@ -208,6 +224,44 @@ export function restoreAgentState(raw: unknown): AgentState {
       proof: f.proof,
       owner: f.owner,
       decision: f.decision,
+      scores: {
+        frequency:
+          Number.isInteger(f.scores?.frequency) &&
+          f.scores.frequency >= 1 &&
+          f.scores.frequency <= 5
+            ? f.scores.frequency
+            : 3,
+        severity:
+          Number.isInteger(f.scores?.severity) &&
+          f.scores.severity >= 1 &&
+          f.scores.severity <= 5
+            ? f.scores.severity
+            : 3,
+        evidence:
+          Number.isInteger(f.scores?.evidence) &&
+          f.scores.evidence >= 1 &&
+          f.scores.evidence <= 5
+            ? f.scores.evidence
+            : 3,
+        leverage:
+          Number.isInteger(f.scores?.leverage) &&
+          f.scores.leverage >= 1 &&
+          f.scores.leverage <= 5
+            ? f.scores.leverage
+            : 3,
+        effort:
+          Number.isInteger(f.scores?.effort) &&
+          f.scores.effort >= 1 &&
+          f.scores.effort <= 5
+            ? f.scores.effort
+            : 3,
+        opportunity:
+          Number.isInteger(f.scores?.opportunity) &&
+          f.scores.opportunity >= 1 &&
+          f.scores.opportunity <= 5
+            ? f.scores.opportunity
+            : 3,
+      },
       ...(typeof f.businessOutcome === "string"
         ? { businessOutcome: f.businessOutcome }
         : {}),
