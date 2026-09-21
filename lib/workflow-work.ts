@@ -388,7 +388,7 @@ export function workflowArtifact(s: AgentState, id: string, index: number) {
     stage.rows.map(([name, status, detail]) => ({
       name,
       status,
-      detail,
+      detail: deliveredDetail(s, id, index, name, detail),
     }));
   const sources = workflowSources(s, id, index);
   const text = `# ${title}\n\nILLUSTRATIVE PROTOTYPE OUTPUT — no live systems queried or actions executed.\n\nCampaign: Enterprise adoption / 12 target accounts\nObjective: ${s.campaign?.objective || "Grow enterprise adoption across the buying group"}\nMorgan’s instruction: ${s.campaign?.instruction || "None added"}\nAudience: ${s.audience}\nChannels: ${s.channel}\n\n${stage.summary}\n\n${sections.map((r) => `## ${r.name}\nStatus: ${r.status}\n${r.detail}`).join("\n\n")}\n\n## Illustrative sources used\n${sources.map((source) => `- ${source.name}: ${source.purpose} | System: ${source.system} | Connection: ${source.connection}`).join("\n")}\n\n## Handoff\n${stage.output}\n\n## Required control\n${stage.control}`;
@@ -625,4 +625,49 @@ export function workflowActivity(
     ],
   };
   return steps[id]?.[index] || [];
+}
+
+function deliveredDetail(
+  s: AgentState,
+  id: string,
+  index: number,
+  name: string,
+  fallback: string,
+): string {
+  if (id === "s3" && index === 1) {
+    const technical = /technical|exploring|eligible/i.test(name),
+      business = /business|evaluating/i.test(name);
+    const need = technical
+      ? "Understand how to evaluate and adopt the product safely"
+      : business
+        ? "Build an internal case for enterprise adoption"
+        : "Resolve governance and purchasing questions";
+    const emphasis = technical
+      ? "Practical evaluation steps and an approved adoption path"
+      : business
+        ? "Business outcomes, team readiness and the adoption plan"
+        : "Approved governance information and the procurement process";
+    const cta = technical
+      ? "Review the evaluation guide"
+      : business
+        ? "Discuss an adoption plan with the account team"
+        : "Request a governance discussion";
+    const channel = s.channel.includes("event")
+      ? "Prepare an invitation for non-attendees and a follow-up for attendees; suppress duplicate invitations"
+      : s.channel.includes("sales")
+        ? "Prepare an email brief and a sales handoff using the same account context"
+        : "Prepare an email brief and a matching website experience brief";
+    return `Audience need: ${need}.\nMessage emphasis: ${emphasis}.\nProposed next action: ${cta}.\nProduction order: ${channel}.\nSource: Enterprise adoption guide v3 (illustrative approved asset). Preserve source claims; do not add unsupported ROI or security assertions.\nAcceptance criteria: Source references attached, audience eligibility checked, channel versions consistent, brand and required legal reviews complete.`;
+  }
+  if (id === "s2" && index === 2)
+    return name === "Objective"
+      ? `Campaign: Enterprise adoption.\nObjective: ${s.campaign?.objective || "Bring business sponsors and procurement into the evaluation alongside active technical users"}.\nSuccess to validate: broader buying-role engagement followed by a qualified account conversation.`
+      : name === "Scope"
+        ? "Audience: 12 illustrative target accounts with growing product interest.\nPrioritize technical evaluators, business sponsors and procurement by engagement gap.\nExclude contacts without resolved identity or valid permissions."
+        : "Deliver to content planning: the 12-account cohort, buying-role needs, signal references and Morgan’s direction.\nPrepare one approved-source content plan across the selected channels.\nDo not release until content review and eligibility gates pass.";
+  if (id === "s3" && index === 3)
+    return `${fallback}\nCampaign reference: Enterprise adoption / 12 target accounts.\nAudience selection: ${s.audience}.\nChannel plan: ${s.channel}.\nRelease status: STAGED — not sent.\nRequired before release: approved content version, resolved consent, completed brand / legal review and channel configuration check.\nMeasurement handoff: campaign ID, audience role, channel and response event.`;
+  if (id === "s5" && index === 1)
+    return `${fallback}\nCase: CONSENT-001 (fictional).\nAction: Hold the affected contact; do not infer permission from engagement.\nAssigned role: data / consent owner, individual to be confirmed.\nResolution evidence: authoritative consent record and suppression status.\nRe-entry condition: eligibility rechecked before any activation.`;
+  return fallback;
 }

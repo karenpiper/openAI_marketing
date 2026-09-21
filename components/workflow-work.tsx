@@ -56,6 +56,9 @@ export function WorkflowWork({
     );
     return () => timers.forEach(clearTimeout);
   }, [runKey]);
+  useEffect(() => {
+    if (phase === 3) showArtifact(index);
+  }, [phase, runKey]);
   function showArtifact(n: number) {
     setOpened(n);
     requestAnimationFrame(() => {
@@ -270,7 +273,9 @@ export function WorkflowWork({
                       <>
                         <span>{row.status}</span>
                         <h4>{row.name}</h4>
-                        <p>{row.detail}</p>
+                        <p className="artifact-deliverable-text">
+                          {row.detail}
+                        </p>
                       </>
                     )}
                     {id === "s3" && opened === 1 && (

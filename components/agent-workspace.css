@@ -2349,3 +2349,20 @@
   margin-right: 0;
   min-width: 13px;
 }
+.artifact-deliverable-text {
+  white-space: pre-line;
+  line-height: 1.95 !important;
+  color: #3f4a52 !important;
+}
+.artifact-preview {
+  border-top: 4px solid #668c79;
+}
+.artifact-preview h3 {
+  font-size: 25px;
+}
+.execution-assets {
+  grid-template-columns: 1fr;
+}
+.artifact-preview > header .agent-kicker {
+  color: #557763;
+}
