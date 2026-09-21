@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import {
   AGENT_KEY,
   chapters,
@@ -12,18 +12,51 @@ import {
   agentReadout,
   type Finding,
   guidedReply,
+  advanceDay,
 } from "../lib/agent-workspace";
 import ArchitectureOutput from "./architecture-output";
 import { Architecture } from "./workshop-mapping";
 import { SaveContext } from "./save-footer";
 import "./agent-workspace.css";
+function MorganScreen({ children }: { children: ReactNode }) {
+  return (
+    <div className="monitor-wrap">
+      <div className="monitor-label">
+        <b>MORGAN’S COMPUTER</b>
+        <span>Proposed experience · fictional data · no live actions</span>
+      </div>
+      <div className="monitor-bezel">
+        <div className="monitor-camera" aria-hidden="true" />
+        <div className="monitor-screen">
+          <div className="monitor-toolbar">
+            <span aria-hidden="true">● ● ●</span>
+            <span>ChatGPT · Marketing workspace</span>
+            <span>Morgan</span>
+          </div>
+          {children}
+        </div>
+        <div className="monitor-chin" aria-hidden="true" />
+      </div>
+    </div>
+  );
+}
 export default function AgentWorkspace() {
   const [s, setS] = useState(createAgentState);
   const [ready, setReady] = useState(false);
   const [error, setError] = useState("");
   const [saved, setSaved] = useState("");
   const [page, setPage] = useState("intro");
-  const [chapter, setChapter] = useState(1);
+  const chapter = Math.max(0, Math.min(2, s.day.moment - 1));
+  function setChapter(index: number) {
+    setS((prev) => ({ ...prev, day: { ...prev.day, moment: index + 1 } }));
+  }
+  function scrollThread() {
+    requestAnimationFrame(() =>
+      document
+        .getElementById("morgan-day")
+        ?.scrollIntoView({ block: "start", behavior: "smooth" }),
+    );
+  }
   const [capture, setCapture] = useState(false);
   const [demo, setDemo] = useState(false);
   const [draft, setDraft] = useState("");
@@ -160,6 +193,15 @@ export default function AgentWorkspace() {
               Together, we explore what it would take to make that real.
             </p>
             <div className="agent-intro-grid">
+              <button
+                className={s.day.moment === 0 ? "active" : ""}
+                onClick={() =>
+                  setS((prev) => ({ ...prev, day: { ...prev.day, moment: 0 } }))
+                }
+              >
+                <span>08:45</span>
+                <strong>Morning briefing</strong>
+              </button>
               {chapters.map((ch, i) => (
                 <button
                   key={ch.id}
@@ -210,25 +252,36 @@ export default function AgentWorkspace() {
               <div className="agent-workspace-name">
                 <span className="agent-avatar">M</span>
                 <div>
-                  <b>Morgan</b>
-                  <small>Marketing workspace</small>
+                  <b>Follow Morgan’s day</b>
+                  <small>Workshop navigation</small>
                 </div>
               </div>
-              <span className="agent-kicker">Today’s conversations</span>
+              <span className="agent-kicker">
+                Tuesday · one connected workflow
+              </span>
               {chapters.map((ch, i) => (
                 <button
                   key={ch.id}
-                  className={chapter === i ? "active" : ""}
+                  className={s.day.moment === i + 1 ? "active" : ""}
                   onClick={() => {
                     setChapter(i);
                     setCapture(false);
                   }}
                 >
                   <span>{ch.time}</span>
-                  <strong>{ch.title}</strong>
+                  <strong>{ch.short}</strong>
                   <small>{s.findings[ch.id].priority}</small>
                 </button>
               ))}
+              <button
+                className={s.day.moment === 4 ? "active" : ""}
+                onClick={() =>
+                  setS((prev) => ({ ...prev, day: { ...prev.day, moment: 4 } }))
+                }
+              >
+                <span>17:30</span>
+                <strong>What moved today</strong>
+              </button>
               <div className="agent-sidebar-foot">
                 <b>Workshop notes</b>
                 <br />
@@ -236,380 +289,529 @@ export default function AgentWorkspace() {
                 below the conversation.
               </div>
             </aside>
-            <section className="agent-stage">
-              <div className="agent-story">
-                <span className="agent-kicker">
-                  {c.time} / {c.short}
-                </span>
-                <h1>{c.title}</h1>
-                <p>{c.story}</p>
+            <section className="agent-stage" id="morgan-day">
+              <div className="day-context">
+                <span>✳ Morgan’s Tuesday</span>
+                <span>Enterprise adoption / 12 target accounts</span>
               </div>
-              <div className="agent-product">
-                <header>
-                  <b>
-                    Marketing agent <span aria-hidden="true">⌄</span>
-                  </b>
-                  <span>Prototype · guided conversation</span>
-                </header>
-                <div className="agent-conversation">
-                  <div className="agent-prompt">{c.prompt}</div>
-                  <div className="agent-reply">
-                    <span className="agent-orb">✳</span>
-                    <div>
-                      <b>Marketing agent</b>
-                      <p>{c.response}</p>
+              {s.day.moment === 0 ? (
+                <MorganScreen>
+                  <div className="day-arrival">
+                    <span className="agent-kicker">08:45 · Morgan arrives</span>
+                    <h1>Good morning, Morgan.</h1>
+                    <p className="agent-lede">
+                      I’ve pulled together what changed overnight. There’s one
+                      opportunity I think is worth your attention.
+                    </p>
+                    <div className="day-brief">
+                      <span className="agent-kicker">Recommended focus</span>
+                      <h2>
+                        Technical interest is growing.
+                        <br />
+                        Bring the rest of the buying group along.
+                      </h2>
+                      <p>
+                        12 target accounts show growing product engagement.
+                        Website visits and recent event activity add context—but
+                        business sponsors and procurement are not yet part of
+                        the conversation.
+                      </p>
+                      <div className="day-stats">
+                        <div>
+                          <b>12</b>
+                          <span>target accounts</span>
+                        </div>
+                        <div>
+                          <b>3</b>
+                          <span>buying roles to engage</span>
+                        </div>
+                        <div>
+                          <b>1</b>
+                          <span>coordinated campaign</span>
+                        </div>
+                      </div>
+                      <button
+                        className="agent-primary"
+                        onClick={() => {
+                          setChapter(0);
+                          scrollThread();
+                        }}
+                      >
+                        Show me the opportunity →
+                      </button>
                     </div>
+                    <div className="day-agenda">
+                      <h3>While you focus on this</h3>
+                      <p>
+                        I’ll prepare a content plan when you choose the
+                        direction, bring approvals back to you, and surface only
+                        the operational exceptions that need judgment.
+                      </p>
+                    </div>
+                    <p className="agent-disclaimer">
+                      Illustrative end state · All signals, counts and actions
+                      are fictional.
+                    </p>
                   </div>
-                  {chapter === 1 ? (
-                    <>
-                      <div className="agent-conditions">
-                        {[
-                          [
-                            "Audience",
-                            s.audience,
-                            [
-                              "Buying roles",
-                              "Lifecycle stages",
-                              "One audience",
-                            ],
-                            "audience",
-                          ],
-                          [
-                            "Channel",
-                            s.channel,
-                            [
-                              "Email + event follow-up",
-                              "Email + website",
-                              "Email + sales follow-up",
-                            ],
-                            "channel",
-                          ],
-                          [
-                            "Source",
-                            s.source,
-                            [
-                              "Approved source available",
-                              "Source material missing",
-                            ],
-                            "source",
-                          ],
-                        ].map(([label, value, options, field]) => (
-                          <label key={label as string}>
-                            {label as string}
+                </MorganScreen>
+              ) : s.day.moment === 4 ? (
+                <>
+                  <MorganScreen>
+                    <div className="day-evening">
+                      <span className="agent-kicker">
+                        17:30 · Back in the same workspace
+                      </span>
+                      <h1>Here’s what moved today.</h1>
+                      <p>
+                        Here is the adoption campaign we worked on today, and
+                        the decisions you made along the way.
+                      </p>
+                      {s.day.history.length ? (
+                        s.day.history.map((h) => (
+                          <article key={h.id} className="day-history">
+                            <span>{h.time}</span>
+                            <p>{h.text}</p>
+                          </article>
+                        ))
+                      ) : (
+                        <p>
+                          No decisions have been made yet. Return to the morning
+                          briefing to run through the day.
+                        </p>
+                      )}
+                      <div className="day-brief">
+                        <h2>Ready for the next handoff.</h2>
+                        <p>
+                          {s.day.history.some((h) => h.id === "s3")
+                            ? "Your approved plan is queued for required reviews. Release remains gated on approvals and audience eligibility."
+                            : "The campaign plan still needs your review before I can prepare the next handoff."}
+                        </p>
+                        <p>
+                          {s.day.history.some((h) => h.id === "s5")
+                            ? "The consent exception is held for the data owner. I’ll bring it back when the records agree."
+                            : "The consent conflict remains open. I need your direction before moving that contact forward."}
+                        </p>
+                      </div>
+                    </div>
+                  </MorganScreen>
+                  <section className="agent-requirements">
+                    <span className="agent-kicker">
+                      Facilitator discussion · outside Morgan’s screen
+                    </span>
+                    <h2>What would enable this day?</h2>
+                    <p>
+                      Now examine the inputs, connectors, controls and ownership
+                      needed to make the proposed experience real.
+                    </p>
+                    <button onClick={() => setPage("architecture")}>
+                      Explore the supporting architecture →
+                    </button>
+                  </section>
+                </>
+              ) : (
+                <>
+                  <div className="agent-story">
+                    <span className="agent-kicker">
+                      {c.time} / {c.short}
+                    </span>
+                    <h1>{c.short}</h1>
+                    <p>{c.story}</p>
+                  </div>
+                  <MorganScreen>
+                    <div className="agent-product">
+                      <header>
+                        <b>
+                          Marketing agent <span aria-hidden="true">⌄</span>
+                        </b>
+                        <span>Enterprise adoption campaign</span>
+                      </header>
+                      <div className="agent-conversation">
+                        {s.day.history
+                          .filter(
+                            (h) =>
+                              chapters.findIndex((ch) => ch.id === h.id) <
+                              chapter,
+                          )
+                          .map((h) => (
+                            <article className="day-history" key={h.id}>
+                              <span>{h.time} · Earlier in this thread</span>
+                              <p>{h.text}</p>
+                            </article>
+                          ))}
+
+                        <div className="agent-prompt">{c.prompt}</div>
+                        <div className="agent-reply">
+                          <span className="agent-orb">✳</span>
+                          <div>
+                            <b>Marketing agent</b>
+                            <p>{c.response}</p>
+                          </div>
+                        </div>
+                        {chapter === 1 ? (
+                          <>
+                            <div className="agent-conditions">
+                              {[
+                                [
+                                  "Audience",
+                                  s.audience,
+                                  [
+                                    "Buying roles",
+                                    "Lifecycle stages",
+                                    "One audience",
+                                  ],
+                                  "audience",
+                                ],
+                                [
+                                  "Channel",
+                                  s.channel,
+                                  [
+                                    "Email + event follow-up",
+                                    "Email + website",
+                                    "Email + sales follow-up",
+                                  ],
+                                  "channel",
+                                ],
+                                [
+                                  "Source",
+                                  s.source,
+                                  [
+                                    "Approved source available",
+                                    "Source material missing",
+                                  ],
+                                  "source",
+                                ],
+                              ].map(([label, value, options, field]) => (
+                                <label key={label as string}>
+                                  {label as string}
+                                  <select
+                                    value={value as string}
+                                    onChange={(e) =>
+                                      condition({
+                                        [field as string]: e.target.value,
+                                      })
+                                    }
+                                  >
+                                    {(options as string[]).map((o) => (
+                                      <option key={o}>{o}</option>
+                                    ))}
+                                  </select>
+                                </label>
+                              ))}
+                            </div>
+                            <div className="agent-plan">
+                              {planRows(s).map((r, i) => (
+                                <article key={r.label}>
+                                  <span>
+                                    0{i + 1} / {r.label}
+                                  </span>
+                                  <h3>{r.value}</h3>
+                                  <p>{r.detail}</p>
+                                </article>
+                              ))}
+                            </div>
+                          </>
+                        ) : chapter === 0 ? (
+                          <div className="agent-signal">
+                            <div>
+                              <span className="agent-kicker">
+                                Illustrative opportunity
+                              </span>
+                              <h2>
+                                Interest is growing.
+                                <br />
+                                The buying group is incomplete.
+                              </h2>
+                              <p>
+                                Product engagement is present, but the proposed
+                                journey view suggests business sponsors have not
+                                engaged.
+                              </p>
+                            </div>
+                            <ul>
+                              <li>
+                                <b>Observed in this scenario</b> Product usage +
+                                website interest
+                              </li>
+                              <li>
+                                <b>Needs confirmation</b> Account identity +
+                                buying roles
+                              </li>
+                              <li>
+                                <b>Proposed action</b> Share a business-value
+                                brief; invite relevant roles to an event
+                              </li>
+                            </ul>
+                          </div>
+                        ) : (
+                          <div className="agent-queue">
+                            {[
+                              [
+                                "Link validation",
+                                "Agent can check against approved destinations",
+                                "Routine · proposed",
+                              ],
+                              [
+                                "Campaign setup check",
+                                "Agent can compare setup with a published checklist",
+                                "Routine · proposed",
+                              ],
+                              [
+                                "Audience consent conflict",
+                                "Hold the request and escalate to a person",
+                                "Human review required",
+                              ],
+                            ].map(([title, body, status]) => (
+                              <article key={title}>
+                                <div>
+                                  <h3>{title}</h3>
+                                  <p>{body}</p>
+                                </div>
+                                <span>{status}</span>
+                              </article>
+                            ))}
+                          </div>
+                        )}
+
+                        <div className="agent-action">
+                          <button
+                            className="agent-primary"
+                            disabled={
+                              chapter === 1 &&
+                              s.source === "Source material missing"
+                            }
+                            onClick={() => {
+                              setS((prev) => advanceDay(prev, chapter));
+                              setCapture(false);
+                              scrollThread();
+                            }}
+                          >
+                            {c.action} →
+                          </button>
+                          <button
+                            onClick={() =>
+                              setS((prev) => ({
+                                ...prev,
+                                outcomes: {
+                                  ...prev.outcomes,
+                                  [c.id]:
+                                    "Revision requested. The agent would pause and return a revised proposal for human review.",
+                                },
+                              }))
+                            }
+                          >
+                            Request a revision
+                          </button>
+                        </div>
+                        <p role="status" className="agent-result">
+                          {s.outcomes[c.id] ||
+                            (chapter === 1 &&
+                            s.source === "Source material missing"
+                              ? "Approval is paused until source material is available."
+                              : "Explore safely. The campaign remains in preparation until you approve the next step.")}
+                        </p>
+                        {(conversation[c.id] || []).map((turn, i) => (
+                          <div key={i} className="agent-followup">
+                            <div className="agent-prompt">{turn.prompt}</div>
+                            <div className="agent-reply">
+                              <span className="agent-orb">✳</span>
+                              <div>
+                                <b>Marketing agent</b>
+                                <p>{turn.reply}</p>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                        <div className="agent-suggestions">
+                          {[
+                            "Why these accounts?",
+                            "What happens next?",
+                            "What is blocked?",
+                          ].map((prompt) => (
+                            <button key={prompt} onClick={() => ask(prompt)}>
+                              {prompt}
+                            </button>
+                          ))}
+                        </div>
+                        <form
+                          className="agent-composer"
+                          onSubmit={(e) => {
+                            e.preventDefault();
+                            ask(draft);
+                          }}
+                        >
+                          <label className="sr-only" htmlFor="agent-message">
+                            Ask about this workflow
+                          </label>
+                          <textarea
+                            id="agent-message"
+                            rows={2}
+                            value={draft}
+                            onChange={(e) => setDraft(e.target.value)}
+                            onKeyDown={(e) => {
+                              if (
+                                e.key === "Enter" &&
+                                !e.shiftKey &&
+                                !e.nativeEvent.isComposing
+                              ) {
+                                e.preventDefault();
+                                ask(draft);
+                              }
+                            }}
+                            placeholder="Ask about this workflow"
+                          />
+                          <div>
+                            <span>Guided prototype · no live tools</span>
+                            <button
+                              aria-label="Send message"
+                              disabled={!draft.trim()}
+                              type="submit"
+                            >
+                              ↑
+                            </button>
+                          </div>
+                        </form>
+                      </div>
+                    </div>
+                  </MorganScreen>
+                  <section className="agent-requirements">
+                    <div>
+                      <div className="agent-boundary">
+                        <span>HUMAN + AGENT</span>
+                        <p>{c.human}</p>
+                      </div>
+                      <span className="agent-kicker">
+                        Facilitator discussion · outside Morgan’s screen
+                      </span>
+                      <h2>What would make it possible?</h2>
+                      <p>
+                        Available now, feasible soon, or a gap? A process does
+                        not have to exist for a capability to be available.
+                      </p>
+                    </div>
+                    <div className="agent-inputs">
+                      {c.inputs.map(([label, detail]) => (
+                        <article key={label}>
+                          <h3>{label}</h3>
+                          <p>{detail}</p>
+                          <label>
+                            <span className="sr-only">
+                              {label} availability
+                            </span>
                             <select
-                              value={value as string}
+                              value={f.capabilities[label] || "Unknown"}
                               onChange={(e) =>
-                                condition({ [field as string]: e.target.value })
+                                finding({
+                                  capabilities: {
+                                    ...f.capabilities,
+                                    [label]: e.target.value,
+                                  },
+                                })
                               }
                             >
-                              {(options as string[]).map((o) => (
-                                <option key={o}>{o}</option>
+                              {availability.map((a) => (
+                                <option key={a}>{a}</option>
                               ))}
                             </select>
                           </label>
-                        ))}
-                      </div>
-                      <div className="agent-plan">
-                        {planRows(s).map((r, i) => (
-                          <article key={r.label}>
-                            <span>
-                              0{i + 1} / {r.label}
-                            </span>
-                            <h3>{r.value}</h3>
-                            <p>{r.detail}</p>
-                          </article>
-                        ))}
-                      </div>
-                    </>
-                  ) : chapter === 0 ? (
-                    <div className="agent-signal">
-                      <div>
-                        <span className="agent-kicker">
-                          Illustrative opportunity
-                        </span>
-                        <h2>
-                          Interest is growing.
-                          <br />
-                          The buying group is incomplete.
-                        </h2>
-                        <p>
-                          Product engagement is present, but the proposed
-                          journey view suggests business sponsors have not
-                          engaged.
-                        </p>
-                      </div>
-                      <ul>
-                        <li>
-                          <b>Observed in this scenario</b> Product usage +
-                          website interest
-                        </li>
-                        <li>
-                          <b>Needs confirmation</b> Account identity + buying
-                          roles
-                        </li>
-                        <li>
-                          <b>Proposed action</b> Share a business-value brief;
-                          invite relevant roles to an event
-                        </li>
-                      </ul>
-                    </div>
-                  ) : (
-                    <div className="agent-queue">
-                      {[
-                        [
-                          "Link validation",
-                          "Agent can check against approved destinations",
-                          "Routine · proposed",
-                        ],
-                        [
-                          "Campaign setup check",
-                          "Agent can compare setup with a published checklist",
-                          "Routine · proposed",
-                        ],
-                        [
-                          "Audience consent conflict",
-                          "Hold the request and escalate to a person",
-                          "Human review required",
-                        ],
-                      ].map(([title, body, status]) => (
-                        <article key={title}>
-                          <div>
-                            <h3>{title}</h3>
-                            <p>{body}</p>
-                          </div>
-                          <span>{status}</span>
                         </article>
                       ))}
                     </div>
-                  )}
-                  <div className="agent-boundary">
-                    <span>HUMAN + AGENT</span>
-                    <p>{c.human}</p>
-                  </div>
-                  <div className="agent-action">
+                    <p className="agent-output">
+                      <b>Output →</b> {c.output}
+                    </p>
                     <button
-                      className="agent-primary"
-                      disabled={
-                        chapter === 1 && s.source === "Source material missing"
-                      }
-                      onClick={() =>
-                        setS((prev) => ({
-                          ...prev,
-                          outcomes: {
-                            ...prev.outcomes,
-                            [c.id]:
-                              chapter === 0
-                                ? "Recommendation reviewed. Next: prepare an audience-specific plan."
-                                : "Simulation approved. The proposed handoff is ready; nothing was sent or executed.",
-                          },
-                        }))
-                      }
+                      className="agent-capture-toggle"
+                      aria-expanded={capture}
+                      onClick={() => setCapture(!capture)}
                     >
-                      {c.action} →
+                      {capture ? "Close room notes" : "Capture the room’s view"}{" "}
+                      <span>{f.priority}</span>
                     </button>
-                    <button
-                      onClick={() =>
-                        setS((prev) => ({
-                          ...prev,
-                          outcomes: {
-                            ...prev.outcomes,
-                            [c.id]:
-                              "Revision requested. The agent would pause and return a revised proposal for human review.",
-                          },
-                        }))
-                      }
-                    >
-                      Request a revision
-                    </button>
-                  </div>
-                  <p role="status" className="agent-result">
-                    {s.outcomes[c.id] ||
-                      (chapter === 1 && s.source === "Source material missing"
-                        ? "Approval is paused until source material is available."
-                        : "Explore safely. These controls only change the demonstration.")}
-                  </p>
-                  {(conversation[c.id] || []).map((turn, i) => (
-                    <div key={i} className="agent-followup">
-                      <div className="agent-prompt">{turn.prompt}</div>
-                      <div className="agent-reply">
-                        <span className="agent-orb">✳</span>
-                        <div>
-                          <b>Marketing agent</b>
-                          <p>{turn.reply}</p>
-                        </div>
+                    {capture && (
+                      <div className="agent-capture">
+                        <label>
+                          Does this belong in the priority set?
+                          <select
+                            value={f.priority}
+                            onChange={(e) =>
+                              finding({ priority: e.target.value })
+                            }
+                          >
+                            {priorities.map((p) => (
+                              <option key={p}>{p}</option>
+                            ))}
+                          </select>
+                        </label>
+                        <label>
+                          How does this happen today?
+                          <select
+                            value={f.process}
+                            onChange={(e) =>
+                              finding({ process: e.target.value })
+                            }
+                          >
+                            {[
+                              "Unknown",
+                              "Established process",
+                              "Informal workaround",
+                              "Not done today",
+                            ].map((p) => (
+                              <option key={p}>{p}</option>
+                            ))}
+                          </select>
+                        </label>
+                        <label className="wide">
+                          What exists or needs to change? Include tools if
+                          known.
+                          <textarea
+                            value={f.note}
+                            onChange={(e) => finding({ note: e.target.value })}
+                          />
+                        </label>
+                        <label className="wide">
+                          What must we prove first?
+                          <textarea
+                            value={f.proof}
+                            onChange={(e) => finding({ proof: e.target.value })}
+                          />
+                        </label>
+                        <label>
+                          Decision or dependency
+                          <textarea
+                            value={f.decision}
+                            onChange={(e) =>
+                              finding({ decision: e.target.value })
+                            }
+                          />
+                        </label>
+                        <label>
+                          Owner, if agreed
+                          <input
+                            value={f.owner}
+                            onChange={(e) => finding({ owner: e.target.value })}
+                          />
+                        </label>
+                        <button onClick={save}>Save room notes</button>
                       </div>
-                    </div>
-                  ))}
-                  <div className="agent-suggestions">
-                    {[
-                      "What do you need?",
-                      "What stays with Morgan?",
-                      "What should we prove?",
-                    ].map((prompt) => (
-                      <button key={prompt} onClick={() => ask(prompt)}>
-                        {prompt}
-                      </button>
-                    ))}
-                  </div>
-                  <form
-                    className="agent-composer"
-                    onSubmit={(e) => {
-                      e.preventDefault();
-                      ask(draft);
-                    }}
-                  >
-                    <label className="sr-only" htmlFor="agent-message">
-                      Ask about this workflow
-                    </label>
-                    <textarea
-                      id="agent-message"
-                      rows={2}
-                      value={draft}
-                      onChange={(e) => setDraft(e.target.value)}
-                      onKeyDown={(e) => {
-                        if (
-                          e.key === "Enter" &&
-                          !e.shiftKey &&
-                          !e.nativeEvent.isComposing
-                        ) {
-                          e.preventDefault();
-                          ask(draft);
-                        }
+                    )}
+                  </section>
+                  <div className="agent-next">
+                    <button
+                      onClick={() => {
+                        if (chapter < 2) {
+                          setChapter(chapter + 1);
+                          setCapture(false);
+                        } else setPage("architecture");
                       }}
-                      placeholder="Ask about this workflow"
-                    />
-                    <div>
-                      <span>Guided prototype · no live tools</span>
-                      <button
-                        aria-label="Send message"
-                        disabled={!draft.trim()}
-                        type="submit"
-                      >
-                        ↑
-                      </button>
-                    </div>
-                  </form>
-                </div>
-              </div>
-              <section className="agent-requirements">
-                <div>
-                  <span className="agent-kicker">Behind this interaction</span>
-                  <h2>What would make it possible?</h2>
-                  <p>
-                    Available now, feasible soon, or a gap? A process does not
-                    have to exist for a capability to be available.
-                  </p>
-                </div>
-                <div className="agent-inputs">
-                  {c.inputs.map(([label, detail]) => (
-                    <article key={label}>
-                      <h3>{label}</h3>
-                      <p>{detail}</p>
-                      <label>
-                        <span className="sr-only">{label} availability</span>
-                        <select
-                          value={f.capabilities[label] || "Unknown"}
-                          onChange={(e) =>
-                            finding({
-                              capabilities: {
-                                ...f.capabilities,
-                                [label]: e.target.value,
-                              },
-                            })
-                          }
-                        >
-                          {availability.map((a) => (
-                            <option key={a}>{a}</option>
-                          ))}
-                        </select>
-                      </label>
-                    </article>
-                  ))}
-                </div>
-                <p className="agent-output">
-                  <b>Output →</b> {c.output}
-                </p>
-                <button
-                  className="agent-capture-toggle"
-                  aria-expanded={capture}
-                  onClick={() => setCapture(!capture)}
-                >
-                  {capture ? "Close room notes" : "Capture the room’s view"}{" "}
-                  <span>{f.priority}</span>
-                </button>
-                {capture && (
-                  <div className="agent-capture">
-                    <label>
-                      Does this belong in the priority set?
-                      <select
-                        value={f.priority}
-                        onChange={(e) => finding({ priority: e.target.value })}
-                      >
-                        {priorities.map((p) => (
-                          <option key={p}>{p}</option>
-                        ))}
-                      </select>
-                    </label>
-                    <label>
-                      How does this happen today?
-                      <select
-                        value={f.process}
-                        onChange={(e) => finding({ process: e.target.value })}
-                      >
-                        {[
-                          "Unknown",
-                          "Established process",
-                          "Informal workaround",
-                          "Not done today",
-                        ].map((p) => (
-                          <option key={p}>{p}</option>
-                        ))}
-                      </select>
-                    </label>
-                    <label className="wide">
-                      What exists or needs to change? Include tools if known.
-                      <textarea
-                        value={f.note}
-                        onChange={(e) => finding({ note: e.target.value })}
-                      />
-                    </label>
-                    <label className="wide">
-                      What must we prove first?
-                      <textarea
-                        value={f.proof}
-                        onChange={(e) => finding({ proof: e.target.value })}
-                      />
-                    </label>
-                    <label>
-                      Decision or dependency
-                      <textarea
-                        value={f.decision}
-                        onChange={(e) => finding({ decision: e.target.value })}
-                      />
-                    </label>
-                    <label>
-                      Owner, if agreed
-                      <input
-                        value={f.owner}
-                        onChange={(e) => finding({ owner: e.target.value })}
-                      />
-                    </label>
-                    <button onClick={save}>Save room notes</button>
+                    >
+                      {chapter < 2
+                        ? "Preview next moment without approving"
+                        : "Explore the architecture"}{" "}
+                      →
+                    </button>
                   </div>
-                )}
-              </section>
-              <div className="agent-next">
-                <button
-                  onClick={() => {
-                    if (chapter < 2) {
-                      setChapter(chapter + 1);
-                      setCapture(false);
-                    } else setPage("architecture");
-                  }}
-                >
-                  {chapter < 2 ? "Next moment" : "Explore the architecture"} →
-                </button>
-              </div>
+                </>
+              )}
             </section>
           </main>
         ) : page === "architecture" ? (

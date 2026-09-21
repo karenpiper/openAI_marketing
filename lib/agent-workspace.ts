@@ -15,14 +15,14 @@ export const priorities = [
 export const chapters = [
   {
     id: "s2",
-    time: "09:30",
+    time: "09:15",
     title: "Signal to action",
-    short: "Find the opportunity",
+    short: "An opportunity worth acting on",
     prompt: "Where should we focus today?",
     story:
-      "Morgan opens her workspace. The agent has found an audience worth considering. Before she acts, she needs to know why this recommendation is credible.",
+      "Morgan opens the opportunity from her morning briefing. Technical users are engaged at 12 target accounts, but the broader buying group has not joined the conversation. She needs to decide whether to act.",
     response:
-      "I found a possible gap between product interest and buying-group engagement. Here is an action to review, with the evidence it would require.",
+      "Usage is growing across 12 target accounts. Recent website and event activity reinforces technical interest, but business sponsors are underrepresented. I recommend a coordinated adoption campaign, with a different next step for each buying role.",
     inputs: [
       [
         "Product signals",
@@ -37,7 +37,7 @@ export const chapters = [
         "Explain why this audience, why this action and why now.",
       ],
     ],
-    action: "Review audience recommendation",
+    action: "Build a plan for these accounts",
     human:
       "Morgan checks the rationale and sets the objective. The agent assembles evidence and proposes the next action.",
     output: "An audience definition and a defensible action brief.",
@@ -48,12 +48,12 @@ export const chapters = [
     id: "s3",
     time: "11:00",
     title: "Content at scale",
-    short: "Make it relevant",
+    short: "One brief. Three buying roles.",
     prompt: "Turn this opportunity into an audience-specific plan.",
     story:
-      "Morgan wants to reach different people with a relevant message. The agent prepares a coordinated plan using approved material, and brings the choices that need judgment back to her.",
+      "The same account opportunity now has a brief. Morgan comes back to a proposed plan that carries the audience and objective forward, without asking her to start again.",
     response:
-      "I can prepare a plan for each audience, check approved source material and route the work for review. Choose the conditions below to see the plan adapt.",
+      "For the 12-account opportunity, I have prepared a technical evaluation path, a business-value path and a procurement-readiness path. They share one approved adoption guide. Review the plan below; I will coordinate asset preparation, approvals and channel handoffs.",
     inputs: [
       [
         "Audience context",
@@ -68,7 +68,7 @@ export const chapters = [
         "Content operations, approval routing and channel handoffs.",
       ],
     ],
-    action: "Approve simulated plan",
+    action: "Approve the plan and continue the day",
     human:
       "The agent prepares the brief and routes the work. Morgan reviews the audience promise and approves the proposed plan; required legal and brand reviews still apply.",
     output:
@@ -80,12 +80,12 @@ export const chapters = [
     id: "s5",
     time: "15:00",
     title: "Routine marketing operations",
-    short: "Keep work moving",
+    short: "The plan meets an exception",
     prompt: "What needs my attention, and what can you handle?",
     story:
-      "Morgan returns to an exception queue. Routine requests have a proposed resolution; ambiguous or higher-risk cases need a person. The room decides where that boundary belongs.",
+      "Later, Morgan returns to the same campaign. Routine checks can follow the agreed rules, but one consent conflict needs a decision before that contact moves forward.",
     response:
-      "I have prepared resolutions for routine requests and isolated one exception. Nothing has been executed. Review the proposed boundary before allowing the agent to act.",
+      "For the adoption campaign, I have prepared link and setup checks. One contact has conflicting consent records. My recommendation: hold that contact, route the conflict to the data owner and let eligible contacts continue only after their required approvals. Release remains gated on review and eligibility.",
     inputs: [
       [
         "Request and campaign context",
@@ -100,7 +100,7 @@ export const chapters = [
         "An action record, failure handling and a named escalation path.",
       ],
     ],
-    action: "Approve simulated routing",
+    action: "Hold the contact and review the day",
     human:
       "The agent handles only explicitly permitted routine actions. Morgan resolves exceptions and changes policy; ambiguous permission stays with a person.",
     output:
@@ -119,6 +119,10 @@ export type Finding = {
   decision: string;
 };
 export type AgentState = {
+  day: {
+    moment: number;
+    history: { id: string; time: string; text: string }[];
+  };
   findings: Record<string, Finding>;
   audience: string;
   channel: string;
@@ -148,6 +152,7 @@ export function createAgentState(): AgentState {
     channel: "Email + event follow-up",
     source: "Approved source available",
     outcomes: {},
+    day: { moment: 0, history: [] },
     architecture,
   };
 }
@@ -211,6 +216,22 @@ export function restoreAgentState(raw: unknown): AgentState {
   for (const c of chapters)
     if (typeof r.outcomes?.[c.id] === "string")
       base.outcomes[c.id] = r.outcomes[c.id];
+  if (r.day) {
+    if (
+      !Number.isInteger(r.day.moment) ||
+      r.day.moment < 0 ||
+      r.day.moment > 4 ||
+      !Array.isArray(r.day.history) ||
+      r.day.history.some(
+        (h) =>
+          !chapters.some((c) => c.id === h.id) ||
+          typeof h.time !== "string" ||
+          typeof h.text !== "string",
+      )
+    )
+      throw Error("Invalid day");
+    base.day = r.day;
+  }
   base.architecture = parseSession(r.architecture);
   return base;
 }
@@ -296,6 +317,19 @@ export function guidedReply(
   prompt: string,
 ): string {
   const q = prompt.toLowerCase();
+  if (/why these|why.*account/.test(q))
+    return "These 12 accounts combine growing product engagement with website and event interest. Technical evaluators are active; business sponsors and procurement are less engaged. The proposed campaign closes that buying-group gap.";
+  if (/happens next/.test(q))
+    return chapter.id === "s2"
+      ? "I’ll carry the account audience and adoption objective into one coordinated content plan. You review the message and channel mix before I route the work."
+      : chapter.id === "s3"
+        ? "After you approve the plan, I’ll prepare the asset and channel handoffs. Required reviews and eligibility checks still gate release."
+        : "I’ll hold the affected contact for the data owner and keep approved work moving for eligible contacts. The unresolved exception stays visible.";
+  if (/blocked/.test(q))
+    return chapter.id === "s5"
+      ? "One contact has conflicting consent records. That contact stays on hold until the data owner resolves the conflict."
+      : "Release requires approved source material, completed reviews and eligible audiences. The plan can be prepared while these checks are pending.";
+
   if (/prove|proof|test|validat/.test(q)) return chapter.proof;
   if (/morgan|human|approv|person|judgment/.test(q)) return chapter.human;
   if (/need|input|tool|connect|capabilit|data/.test(q))
@@ -305,4 +339,29 @@ export function guidedReply(
     );
   if (/output|handoff|deliver/.test(q)) return chapter.output;
   return "This guided prototype can explain the required inputs, Morgan’s role, the handoff, or what we should prove. Use the plan controls to explore other audiences and channels; open-ended agent execution is not connected.";
+}
+
+export function advanceDay(s: AgentState, chapterIndex: number): AgentState {
+  const c = chapters[chapterIndex];
+  if (!c || (chapterIndex === 1 && s.source === "Source material missing"))
+    return s;
+  const text =
+    chapterIndex === 0
+      ? "Morgan chose the 12-account adoption opportunity. The agent will prepare an audience-specific plan."
+      : chapterIndex === 1
+        ? `Morgan approved the proposed plan: ${s.audience}; ${s.channel}; ${s.source}. Required reviews still precede release.`
+        : "Morgan chose to hold the contact with conflicting consent and escalate to the data owner. Eligible contacts still require release approval.";
+  return {
+    ...s,
+    outcomes: { ...s.outcomes, [c.id]: text },
+    day: {
+      moment: chapterIndex + 2,
+      history: [
+        ...s.day.history.filter(
+          (h) => chapters.findIndex((ch) => ch.id === h.id) < chapterIndex,
+        ),
+        { id: c.id, time: c.time, text },
+      ],
+    },
+  };
 }

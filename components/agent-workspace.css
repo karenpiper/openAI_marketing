@@ -1218,3 +1218,271 @@
     display: none;
   }
 }
+#morgan-day {
+  scroll-margin-top: 85px;
+}
+.day-context {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 4px 0 22px;
+  border-bottom: 1px solid #eee;
+  color: #777;
+  font-size: 11px;
+  margin-bottom: 26px;
+}
+.day-context > span:first-child {
+  font-weight: 600;
+  color: #333;
+}
+.day-arrival h1,
+.day-evening h1 {
+  font-size: 38px;
+  font-weight: 500;
+  letter-spacing: -0.05em;
+  margin-top: 18px;
+}
+.day-arrival .agent-lede {
+  font-size: 17px;
+  line-height: 1.7;
+}
+.day-brief {
+  background: #fafafa;
+  border: 1px solid #e6e6e6;
+  border-radius: 16px;
+  padding: 30px;
+  margin: 30px 0;
+}
+.day-brief h2 {
+  font-size: 27px;
+  font-weight: 500;
+  line-height: 1.25;
+  margin-top: 16px;
+}
+.day-brief p,
+.day-agenda p,
+.day-evening > p {
+  color: #707070;
+  font-size: 14px;
+  line-height: 1.8;
+}
+.day-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  margin: 25px 0 30px;
+  padding: 22px 0;
+  border-top: 1px solid #e6e6e6;
+  border-bottom: 1px solid #e6e6e6;
+}
+.day-stats b {
+  display: block;
+  font-size: 30px;
+  font-weight: 500;
+}
+.day-stats span {
+  font-size: 11px;
+  color: #888;
+  display: block;
+  margin-top: 8px;
+}
+.day-agenda {
+  padding: 10px 2px;
+}
+.day-agenda h3 {
+  font-size: 15px;
+  font-weight: 500;
+}
+.day-history {
+  border-left: 2px solid #ddd;
+  padding: 5px 18px;
+  margin: 0 0 25px;
+}
+.day-history > span {
+  font-size: 10px;
+  color: #999;
+}
+.day-history p {
+  color: #666;
+  font-size: 13px;
+  line-height: 1.65;
+  margin: 8px 0;
+}
+.day-evening .day-history {
+  margin-top: 25px;
+}
+@media (max-width: 700px) {
+  .day-context {
+    flex-direction: column;
+  }
+  .day-arrival h1,
+  .day-evening h1 {
+    font-size: 30px;
+  }
+  .day-brief {
+    padding: 20px;
+  }
+  .day-brief h2 {
+    font-size: 23px;
+  }
+  .day-stats {
+    gap: 10px;
+  }
+}
+/* Physical screen boundary separates the solution from facilitation. */
+.agent-main {
+  background: #eef0f3;
+}
+.agent-sidebar {
+  background: #e7ebef;
+  border-right: 1px solid #d8dfe4;
+}
+.agent-stage {
+  max-width: 1200px;
+  padding: 30px 36px;
+}
+.agent-sidebar > button.active {
+  background: #d7e0e8;
+}
+.monitor-wrap {
+  margin: 24px 0 38px;
+  min-width: 0;
+}
+.monitor-label {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  margin: 0 3px 12px;
+  font-size: 10px;
+  color: #637387;
+  letter-spacing: 0.03em;
+}
+.monitor-label b {
+  letter-spacing: 0.12em;
+  color: #364b63;
+}
+.monitor-bezel {
+  background: #30343a;
+  padding: 13px 10px 0;
+  border-radius: 22px;
+  box-shadow: 0 14px 35px #1c28351c;
+  border: 1px solid #20252b;
+}
+.monitor-camera {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #101217;
+  margin: 0 auto 9px;
+  box-shadow: 0 0 0 2px #41464e;
+}
+.monitor-screen {
+  background: #fff;
+  border-radius: 10px;
+  overflow: hidden;
+}
+.monitor-toolbar {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 11px 16px;
+  background: #f5f5f5;
+  border-bottom: 1px solid #e6e6e6;
+  color: #888;
+  font-size: 10px;
+}
+.monitor-toolbar > span:first-child {
+  letter-spacing: 3px;
+  color: #bbb;
+  font-size: 8px;
+}
+.monitor-chin {
+  height: 22px;
+}
+.monitor-wrap .agent-product {
+  padding: 12px 28px 24px;
+  margin: 0;
+}
+.monitor-wrap .day-arrival,
+.monitor-wrap .day-evening {
+  padding: 34px;
+}
+.monitor-wrap .agent-conversation {
+  padding-top: 12px;
+}
+.agent-story > p {
+  color: #526273;
+}
+.day-context {
+  color: #667b8e;
+  border-color: #d8dfe5;
+}
+.agent-requirements {
+  background: #f5f8fb;
+  border: 1px solid #ccd7e1;
+  border-left: 4px solid #7893ab;
+  padding: 25px;
+}
+.agent-requirements > .agent-kicker,
+.agent-requirements > div > .agent-kicker {
+  color: #506a81;
+  font-weight: 600;
+}
+.agent-requirements h2 {
+  color: #334e65;
+}
+.agent-requirements .agent-boundary {
+  border-color: #9baebd;
+}
+.agent-story h1 {
+  color: #30475c;
+}
+.day-context > span:first-child {
+  color: #39536c;
+}
+.agent-sidebar-foot {
+  color: #637387;
+}
+.monitor-wrap .day-brief {
+  background: #fafafa;
+}
+.monitor-wrap .day-history {
+  background: #fff;
+}
+.monitor-wrap .agent-lede {
+  color: #666;
+}
+@media (min-width: 1400px) {
+  .agent-stage {
+    max-width: 1200px;
+    padding-left: 45px;
+    padding-right: 45px;
+  }
+}
+@media (max-width: 700px) {
+  .agent-stage {
+    padding: 20px 12px;
+  }
+  .monitor-label {
+    flex-direction: column;
+    gap: 5px;
+  }
+  .monitor-bezel {
+    padding: 10px 5px 0;
+    border-radius: 15px;
+  }
+  .monitor-wrap .agent-product {
+    padding: 12px 16px;
+  }
+  .monitor-wrap .day-arrival,
+  .monitor-wrap .day-evening {
+    padding: 22px 16px;
+  }
+  .monitor-toolbar {
+    font-size: 8px;
+    padding: 10px;
+  }
+  .monitor-chin {
+    height: 16px;
+  }
+}
