@@ -43,7 +43,7 @@ export const useCases = [
       "None of the four — this is reasoning inside tools OpenAI already owns outright.",
     noRegretDefault: "yes",
     proofPrompt:
-      "Prove that a recommendation is useful enough for a marketer to act on, and explainable enough to trust.",
+      "Prove that a marketer can move from an identified cohort to a defensible recommended action.",
   },
   {
     id: "s3",
@@ -65,7 +65,7 @@ export const useCases = [
       "Mostly none — building the library doesn't need to wait, though Decision 2 (who owns content governance long-term) could still shift where it lives.",
     noRegretDefault: "yes",
     proofPrompt:
-      "Prove that the team can quickly determine what approved content exists, what is reusable, and what is genuinely missing.",
+      "Prove that the system can determine whether approved content exists for the recommended action.",
   },
   {
     id: "s4",
@@ -108,7 +108,7 @@ export const useCases = [
       "None of the four — this is explicitly the work already underway that Matt asked us to harden first.",
     noRegretDefault: "yes",
     proofPrompt:
-      "Prove that a routine request can move from intake to completion with materially fewer specialist touches.",
+      "Prove that routine MOPS requests can be resolved without specialist intervention.",
   },
   {
     id: "s6",

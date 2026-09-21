@@ -1006,68 +1006,20 @@ footer button {
   }
 }
 
-.event-context {
+.journey-note {
   margin: 24px 0;
-  padding: 22px 24px;
+  padding: 18px 22px;
   border-left: 3px solid var(--violet);
-  border-radius: 0 14px 14px 0;
   background: var(--violet-soft);
+  border-radius: 0 12px 12px 0;
 }
-.event-context h3 {
-  margin: 12px 0;
-  font-size: 25px;
-  letter-spacing: -0.025em;
-}
-.event-context p,
-.segment-example > p,
-.event-proof {
-  font-size: 15px;
+.journey-note p {
+  margin: 10px 0 0;
   line-height: 1.6;
-}
-.event-context p:last-child {
-  margin-bottom: 0;
-}
-.segment-example {
-  margin: 28px 0;
-}
-.segment-example > h3 {
-  font-size: 26px;
-  letter-spacing: -0.025em;
-}
-.segment-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 12px;
-}
-.segment-grid h4 {
-  margin: 0 0 20px;
-  font-size: 19px;
-}
-.segment-grid p {
-  font-size: 13px;
-  line-height: 1.5;
-}
-.segment-grid .side-card {
-  padding: 18px;
-}
-.recap-event summary {
-  cursor: pointer;
-  font-weight: 650;
-  line-height: 1.4;
-}
-.event-proof {
-  margin-top: 0;
-}
-@media (max-width: 1100px) {
-  .segment-grid {
-    grid-template-columns: 1fr;
-  }
+  font-size: 15px;
 }
 @media print {
-  .event-context {
+  .journey-note {
     background: white;
-  }
-  .recap-event > * {
-    display: block !important;
   }
 }

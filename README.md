@@ -47,6 +47,10 @@ Validated inputs persist locally under `oai-adobe-morgan-workshop-v2`. The forme
 - `lib/assessment.ts`: score calculation, ranking and validated storage restoration.
 - `tests/workshop.test.cjs`: content fidelity and behavioral checks.
 
-## Event journey extension
+## Agenda item 1 boundary
 
-The original scene text and attributed feedback remain intact. `lib/event-context.ts` adds an explicitly illustrative webinar thread across the seven stops: connect engagement across the journey, form behavioral audiences, match approved messages, deliver at scale, and compare outcomes. Stop 2 shows three audience/message/measurement examples. Each stop offers an event-specific proof prompt alongside the existing editable proof field; saved workshop notes and proof statements are preserved. The recap has an optional candidate experiment, clearly distinguished from the room’s agreed ranking. No analytics product is named or represented as the execution system.
+Each stop has one editable “What do we need to prove?” field. Saved proof statements remain intact; the revised starting prompts apply to new or reset sessions. The recap carries proof statements for the top-ranked problems into the next conversation.
+
+Morgan’s day covers the broader marketing workload. Events remain a natural touchpoint, including the original webinar request at 1:30 PM. Brief illustrative notes at stops 2, 3 and 7 connect website, content, event and sales signals to audience segmentation, relevant messaging at scale and learning across the journey. These examples do not change the original attributed evidence or prescribe a tool.
+
+V1 does not implement capability mapping, target architecture, ownership assignment or the Colin readout builder. Its prioritized use cases are the input to those later exercises. The four open decisions remain dependency context only.
