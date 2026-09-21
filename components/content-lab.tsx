@@ -250,7 +250,7 @@ export default function ContentLab({
                 )}
               {activeCases(session).map((u) => (
                 <option value={u.id} key={u.id}>
-                  {u.title}
+                  {u.label}
                 </option>
               ))}
             </select>

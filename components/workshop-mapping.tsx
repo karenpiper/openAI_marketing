@@ -28,7 +28,7 @@ export function CaseFocus({ session, setSession }: Props) {
             className={session.focus === c.id ? "selected" : ""}
             onClick={() => setSession((s) => ({ ...s, focus: c.id }))}
           >
-            {c.title}
+            {c.label}
           </button>
         ))}
       </div>
@@ -331,7 +331,7 @@ export function Architecture({ session, setSession }: Props) {
             <span className="label">Ask the room</span>
             <h2>Who owns each part, and what passes between them?</h2>
             <p>
-              {focus.title} · {session.assessments[focus.id].proofText}
+              {focus.label} · {session.assessments[focus.id].proofText}
             </p>
           </div>
           <div className="architecture-layout">
@@ -600,7 +600,7 @@ export function Architecture({ session, setSession }: Props) {
                 <option value="">Workshop-wide</option>
                 {useCases.map((u) => (
                   <option key={u.id} value={u.id}>
-                    {u.title}
+                    {u.label}
                   </option>
                 ))}
               </select>

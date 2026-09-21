@@ -210,7 +210,7 @@ export default function Workshop() {
             }
           />
           <span>
-            <strong>{u.title}</strong>
+            <strong>{u.label}</strong>
             <small>{session.assessments[u.id].proofText}</small>
           </span>
         </label>

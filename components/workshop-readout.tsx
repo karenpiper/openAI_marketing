@@ -21,7 +21,7 @@ export default function WorkshopReadout({
 }) {
   const cases = activeCases(session);
   const caseName = (id: string) =>
-    (useCases.find((u) => u.id === id)?.title || "Workshop-wide") +
+    (useCases.find((u) => u.id === id)?.label || "Workshop-wide") +
     (id && !cases.some((u) => u.id === id)
       ? " (outside current working set)"
       : "");
@@ -93,7 +93,7 @@ export default function WorkshopReadout({
       {cases.map((u) => (
         <article className="readout-card" key={u.id}>
           <div className="card-heading">
-            <h3>{u.title}</h3>
+            <h3>{u.label}</h3>
             <Badge
               value={
                 session.assessments[u.id].noRegret === "yes"
@@ -298,7 +298,7 @@ export default function WorkshopReadout({
                     <option value="">Workshop-wide</option>
                     {useCases.map((u) => (
                       <option key={u.id} value={u.id}>
-                        {u.title}
+                        {u.label}
                       </option>
                     ))}
                   </select>
@@ -401,7 +401,7 @@ export default function WorkshopReadout({
         .filter((u) => session.assessments[u.id].veto)
         .map((u) => (
           <p key={u.id}>
-            <b>{u.title}</b> ·{" "}
+            <b>{u.label}</b> ·{" "}
             {session.assessments[u.id].note || "No note captured"}
           </p>
         ))}

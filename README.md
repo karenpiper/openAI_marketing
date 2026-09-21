@@ -99,3 +99,7 @@ Import `karenpiper/openAI_marketing`, choose Next.js, root directory `.`, Node.j
 Click **Try demo data** in the header, or add `?demo=1` to the workshop URL. It starts at step 2 with three selected and confirmed use cases. Sample records include reuse/extend/missing/unknown capabilities, proposed/confirmed/disputed decisions, architecture boundaries, directional handoffs, three editable practice drafts with previous versions, and sequenced next actions. Every example and named owner is fictional.
 
 Demo mode saves to `oai-full-workshop-demo-v1`, separately from the real workshop, and uses a separate projector channel. Demo edits survive refresh. **Reset demo data** restores the sample. **Return to real workshop** reopens the untouched real session. The entry button checkpoints the real session before switching and stays put if it cannot save. Demo exports have a `DEMO-` filename prefix; printed and Markdown readouts identify test data. The demo projector uses `?view=room&demo=1`.
+
+## Use-case labels
+
+Selection, navigation, mapping and readouts use clear functional names: Buying-group engagement, Signal to action, Content at scale, Campaign launch & approvals, Routine marketing operations, Human oversight, and Measurement & learning. The original narrative headlines remain on Morgan’s scenes. Stable case IDs preserve existing notes, selections and demo records.

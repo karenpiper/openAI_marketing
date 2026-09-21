@@ -1,8 +1,10 @@
-// Verbatim content extracted from reference/claude-workshop.html. Proof prompts are the V1 addition.
+// Original narrative content from reference/claude-workshop.html.
+// Labels clarify navigation; proof prompts support the workshop discussion.
 export type NoRegret = "yes" | "unsure" | "no";
 export const useCases = [
   {
     id: "s1",
+    label: "Buying-group engagement",
     time: "8:15 AM",
     frac: 0.06,
     chapter: "Stop 1",
@@ -25,6 +27,7 @@ export const useCases = [
   },
   {
     id: "s2",
+    label: "Signal to action",
     time: "9:30 AM",
     frac: 0.18,
     chapter: "Stop 2",
@@ -47,6 +50,7 @@ export const useCases = [
   },
   {
     id: "s3",
+    label: "Content at scale",
     time: "10:30 AM",
     frac: 0.3,
     chapter: "Stop 3",
@@ -69,6 +73,7 @@ export const useCases = [
   },
   {
     id: "s4",
+    label: "Campaign launch & approvals",
     time: "12:00 PM",
     frac: 0.42,
     chapter: "Stop 4",
@@ -91,6 +96,7 @@ export const useCases = [
   },
   {
     id: "s5",
+    label: "Routine marketing operations",
     time: "1:30 PM",
     frac: 0.55,
     chapter: "Stop 5",
@@ -112,6 +118,7 @@ export const useCases = [
   },
   {
     id: "s6",
+    label: "Human oversight",
     time: "3:30 PM",
     frac: 0.72,
     chapter: "Stop 6",
@@ -134,6 +141,7 @@ export const useCases = [
   },
   {
     id: "s7",
+    label: "Measurement & learning",
     time: "6:00 PM",
     frac: 0.9,
     chapter: "Stop 7",

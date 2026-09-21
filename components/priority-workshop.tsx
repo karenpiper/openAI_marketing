@@ -42,7 +42,7 @@ export default function PriorityWorkshop({
   const labels = [
     "Meet Morgan",
     "What we heard",
-    ...useCases.map((s) => s.title),
+    ...useCases.map((s) => s.label),
     "End-of-day recap",
   ];
   const status = (v: NoRegret) =>
@@ -178,7 +178,9 @@ export default function PriorityWorkshop({
           {current && a && (
             <>
               <div className="scene-topline">
-                <span>{current.chapter}</span>
+                <span>
+                  {current.chapter} · {current.label}
+                </span>
                 <strong>{current.time}</strong>
               </div>
               <div className="day-progress" aria-hidden="true">
@@ -373,7 +375,7 @@ export default function PriorityWorkshop({
                       className="text-button"
                       onClick={() => go(useCases.indexOf(s) + 2)}
                     >
-                      {s.title}
+                      {s.label}
                     </button>
                     <p>{s.kpiGrowth}</p>
                     <small>
@@ -398,7 +400,7 @@ export default function PriorityWorkshop({
               ) : (
                 vetoed.map((s) => (
                   <p key={s.id}>
-                    <b>{s.title}</b>
+                    <b>{s.label}</b>
                     {state[s.id].note && ` — “${state[s.id].note}”`}
                   </p>
                 ))
@@ -416,7 +418,7 @@ export default function PriorityWorkshop({
                       .filter((s) => state[s.id].noRegret === v)
                       .map((s) => (
                         <div key={s.id}>
-                          <h4>{s.title}</h4>
+                          <h4>{s.label}</h4>
                           <p>{s.dependsOn}</p>
                         </div>
                       ))}
@@ -429,7 +431,7 @@ export default function PriorityWorkshop({
               {!ranked.length && <p>No active problems to prioritize.</p>}
               {ranked.slice(0, 3).map((s) => (
                 <article className="readout-card" key={s.id}>
-                  <h3>{s.title}</h3>
+                  <h3>{s.label}</h3>
                   <dl>
                     <div>
                       <dt>Growth KPI</dt>

@@ -495,7 +495,7 @@ export function parseSession(raw: unknown): Session {
 }
 export function readout(s: Session): string {
   const name = (id: string) =>
-    (useCases.find((u) => u.id === id)?.title || "Workshop-wide") +
+    (useCases.find((u) => u.id === id)?.label || "Workshop-wide") +
     (id && !activeCases(s).some((u) => u.id === id)
       ? " (outside current working set)"
       : "");
@@ -504,12 +504,12 @@ export function readout(s: Session): string {
     "## Priority use cases",
     ...activeCases(s).map(
       (u) =>
-        `### ${u.title}\nGrowth: ${u.kpiGrowth}\nProductivity: ${u.kpiProd}\nProve: ${s.assessments[u.id].proofText}\nCan move now: ${s.assessments[u.id].noRegret}\nDependency: ${u.dependsOn}\nRoom notes: ${s.assessments[u.id].note || "None captured"}`,
+        `### ${u.label}\nGrowth: ${u.kpiGrowth}\nProductivity: ${u.kpiProd}\nProve: ${s.assessments[u.id].proofText}\nCan move now: ${s.assessments[u.id].noRegret}\nDependency: ${u.dependsOn}\nRoom notes: ${s.assessments[u.id].note || "None captured"}`,
     ),
     "## Ruled out",
     ...useCases
       .filter((u) => s.assessments[u.id].veto)
-      .map((u) => `${u.title}: ${s.assessments[u.id].note || "No note"}`),
+      .map((u) => `${u.label}: ${s.assessments[u.id].note || "No note"}`),
     "## Current capabilities",
     ...s.capabilities.map(
       (c) =>

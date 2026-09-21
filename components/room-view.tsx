@@ -75,7 +75,7 @@ export default function RoomView({ session }: { session: Session }) {
                 <article className="room-rank" key={c.id}>
                   <span>{i + 1}</span>
                   <div>
-                    <h2>{c.title}</h2>
+                    <h2>{c.label}</h2>
                     <p>{s.assessments[c.id].proofText}</p>
                   </div>
                   <strong>{composite(s.assessments[c.id]).toFixed(1)}</strong>
@@ -88,7 +88,7 @@ export default function RoomView({ session }: { session: Session }) {
           ) : u && a ? (
             <>
               <span className="eyebrow">
-                {u.chapter} · {u.time} · Current-state hypothesis
+                {u.chapter} · {u.time} · {u.label} · Current-state hypothesis
               </span>
               <h1>{u.title}</h1>
               <p className="room-lede">{u.narrative}</p>
@@ -147,7 +147,7 @@ export default function RoomView({ session }: { session: Session }) {
       )}
       {s.stage === 1 && (
         <section className="room-stage">
-          <span className="eyebrow">Current state · {focus?.title}</span>
+          <span className="eyebrow">Current state · {focus?.label}</span>
           <h1>What can we build on?</h1>
           <p className="room-lede">
             {focus && s.assessments[focus.id].proofText}
@@ -182,7 +182,7 @@ export default function RoomView({ session }: { session: Session }) {
       {s.stage === 2 && s.architectureTab === "map" && (
         <section className="room-stage">
           <span className="eyebrow">
-            Proposed operating model · {focus?.title}
+            Proposed operating model · {focus?.label}
           </span>
           <h1>Who owns the work?</h1>
           <div className="room-map">
