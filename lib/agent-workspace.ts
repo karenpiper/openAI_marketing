@@ -120,6 +120,7 @@ export type Finding = {
   decision: string;
 };
 export type AgentState = {
+  work?: Record<string, { signature: string; step: number }>;
   northstar?: string;
   day: {
     moment: number;
@@ -238,6 +239,20 @@ export function restoreAgentState(raw: unknown): AgentState {
     base.day = r.day;
   }
   if (typeof r.northstar === "string") base.northstar = r.northstar;
+  if (r.work && typeof r.work === "object") {
+    base.work = {};
+    for (const c of chapters) {
+      const w = r.work[c.id];
+      if (
+        w &&
+        typeof w.signature === "string" &&
+        Number.isInteger(w.step) &&
+        w.step >= 0 &&
+        w.step <= 3
+      )
+        base.work[c.id] = w;
+    }
+  }
   base.architecture = parseSession(r.architecture);
   return base;
 }

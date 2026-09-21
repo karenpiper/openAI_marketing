@@ -14,6 +14,8 @@ import {
   guidedReply,
   advanceDay,
 } from "../lib/agent-workspace";
+import { WorkflowWork, WorkflowRequirements } from "./workflow-work";
+import { workSignature } from "../lib/workflow-work";
 import AgentBriefing, { MeetMorgan } from "./agent-briefing";
 import ArchitectureOutput from "./architecture-output";
 import { Architecture } from "./workshop-mapping";
@@ -528,117 +530,29 @@ export default function AgentWorkspace() {
                                 </label>
                               ))}
                             </div>
-                            <div className="agent-plan">
-                              {planRows(s).map((r, i) => (
-                                <article key={r.label}>
-                                  <span>
-                                    0{i + 1} / {r.label}
-                                  </span>
-                                  <h3>{r.value}</h3>
-                                  <p>{r.detail}</p>
-                                </article>
-                              ))}
-                            </div>
                           </>
-                        ) : chapter === 0 ? (
-                          <div className="agent-signal">
-                            <div>
-                              <span className="agent-kicker">
-                                Illustrative opportunity
-                              </span>
-                              <h2>
-                                Interest is growing.
-                                <br />
-                                The buying group is incomplete.
-                              </h2>
-                              <p>
-                                Product engagement is present, but the proposed
-                                journey view suggests business sponsors have not
-                                engaged.
-                              </p>
-                            </div>
-                            <ul>
-                              <li>
-                                <b>Observed in this scenario</b> Product usage +
-                                website interest
-                              </li>
-                              <li>
-                                <b>Needs confirmation</b> Account identity +
-                                buying roles
-                              </li>
-                              <li>
-                                <b>Proposed action</b> Share a business-value
-                                brief; invite relevant roles to an event
-                              </li>
-                            </ul>
-                          </div>
-                        ) : (
-                          <div className="agent-queue">
-                            {[
-                              [
-                                "Link validation",
-                                "Agent can check against approved destinations",
-                                "Routine · proposed",
-                              ],
-                              [
-                                "Campaign setup check",
-                                "Agent can compare setup with a published checklist",
-                                "Routine · proposed",
-                              ],
-                              [
-                                "Audience consent conflict",
-                                "Hold the request and escalate to a person",
-                                "Human review required",
-                              ],
-                            ].map(([title, body, status]) => (
-                              <article key={title}>
-                                <div>
-                                  <h3>{title}</h3>
-                                  <p>{body}</p>
-                                </div>
-                                <span>{status}</span>
-                              </article>
-                            ))}
-                          </div>
-                        )}
-
-                        <div className="agent-action">
-                          <button
-                            className="agent-primary"
-                            disabled={
-                              chapter === 1 &&
-                              s.source === "Source material missing"
-                            }
-                            onClick={() => {
-                              setS((prev) => advanceDay(prev, chapter));
-                              setCapture(false);
-                              scrollThread();
-                            }}
-                          >
-                            {c.action} →
-                          </button>
-                          <button
-                            onClick={() =>
-                              setS((prev) => ({
-                                ...prev,
-                                outcomes: {
-                                  ...prev.outcomes,
-                                  [c.id]:
-                                    "Revision requested. The agent would pause and return a revised proposal for human review.",
+                        ) : null}
+                        <WorkflowWork
+                          session={s}
+                          id={c.id}
+                          onStep={(step) =>
+                            setS((prev) => ({
+                              ...prev,
+                              work: {
+                                ...prev.work,
+                                [c.id]: {
+                                  signature: workSignature(prev, c.id),
+                                  step,
                                 },
-                              }))
-                            }
-                          >
-                            Request a revision
-                          </button>
-                        </div>
-                        <p role="status" className="agent-result">
-                          {s.outcomes[c.id] ||
-                            (chapter === 1 &&
-                            s.source === "Source material missing"
-                              ? "Approval is paused until source material is available."
-                              : "Explore safely. The campaign remains in preparation until you approve the next step.")}
-                        </p>
+                              },
+                            }))
+                          }
+                          onFinish={() => {
+                            setS((prev) => advanceDay(prev, chapter));
+                            setCapture(false);
+                            scrollThread();
+                          }}
+                        />
                         {(conversation[c.id] || []).map((turn, i) => (
                           <div key={i} className="agent-followup">
                             <div className="agent-prompt">{turn.prompt}</div>
@@ -703,6 +617,7 @@ export default function AgentWorkspace() {
                       </div>
                     </div>
                   </MorganScreen>
+                  <WorkflowRequirements session={s} id={c.id} />
                   <section className="agent-requirements">
                     <div>
                       <div className="agent-boundary">

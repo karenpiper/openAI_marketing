@@ -105,3 +105,15 @@ test('agenda outcomes and Colin asks survive restore and reach the readout',()=>
  assert.equal(restored.findings.s3.businessOutcome,s.findings.s3.businessOutcome);
  for(const phrase of [s.northstar,s.findings.s3.businessOutcome,s.architecture.closing.sequence,s.architecture.closing.colin])assert.ok(m.agentReadout(restored).includes(phrase));
 });
+
+test('work packages carry audience and channel context and invalidate when conditions change',()=>{
+ const work=require('../lib/workflow-work.ts');const s=m.createAgentState();
+ assert.equal(work.workStages(s,'s3').length,4);
+ assert.equal(work.workStages(s,'s3')[1].rows.length,3);
+ s.work={s3:{signature:work.workSignature(s,'s3'),step:2}};
+ assert.equal(work.currentWorkStep(s,'s3'),2);
+ assert.equal(work.currentWorkStep(m.restoreAgentState(JSON.parse(JSON.stringify(s))),'s3'),2);
+ s.audience='One audience';assert.equal(work.currentWorkStep(s,'s3'),0);assert.equal(work.workStages(s,'s3')[1].rows.length,1);
+ s.source='Source material missing';assert.match(work.workStages(s,'s3')[0].summary,/on hold/);
+ for(const id of ['s2','s3','s5'])for(const step of work.workStages(s,id))for(const key of ['input','output','connection','enables','control'])assert.ok(step[key].length>20);
+});
