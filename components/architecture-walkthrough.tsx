@@ -2,7 +2,6 @@ import { useState, type Dispatch, type SetStateAction } from "react";
 import { type Session, type WorkflowReview } from "../lib/workshop";
 import {
   workflows,
-  pdfBoxes,
   workflowState,
   reviewWorkflow,
 } from "../lib/architecture-workflow";
@@ -42,9 +41,15 @@ export function WorkflowSummary({ session: s }: { session: Session }) {
             <p>
               <b>Next decision or action:</b> {r?.next || "Not captured"}
             </p>
-            <small>
-              PDF reference: {step.boxes.map((b) => pdfBoxes[b]).join(" · ")}
-            </small>
+            <p>
+              <b>Systems:</b> {r?.systems || "Not decided"}
+            </p>
+            <p>
+              <b>Handoff:</b> {r?.handoff || "Not captured"}
+            </p>
+            <p>
+              <b>Review / controls:</b> {r?.controls || "Not captured"}
+            </p>
           </article>
         );
       })}
@@ -77,8 +82,9 @@ export default function ArchitectureWalkthrough({
       <p>
         Walk through the proposed process together. At each stop, compare
         today’s evidence with the proposal and choose Keep, Change or
-        Unresolved. The PDF supplies system boxes; the workflow and assignments
-        below are workshop proposals to validate.
+        Unresolved. This is our suggested way of working. The systems,
+        responsibilities and handoffs you agree here will shape the architecture
+        we generate at the end.
       </p>
       {!room && (
         <nav className="guide-navigation" aria-label="Proposed workflow">
@@ -135,28 +141,17 @@ export default function ArchitectureWalkthrough({
               })}
             </article>
             <article className="capture-card">
-              <span className="eyebrow">
-                Relevant boxes in the supplied PDF
-              </span>
-              {step.boxes.map((b) => (
-                <p className="pdf-box" key={b}>
-                  {pdfBoxes[b]}
-                </p>
-              ))}
+              <span className="eyebrow">What this step needs to deliver</span>
+              <h3>{step.output}</h3>
               <p>
-                These boxes are reference points, not confirmed integrations or
-                ownership assignments.
+                Use your existing tools where they fit. Name what should do the
+                work, who is responsible and what needs to pass to the next
+                step.
               </p>
               <p>
-                <b>Proposed output to the next step:</b> {step.output}
+                No system is assigned until the room names it. “Not decided” is
+                a useful answer.
               </p>
-              <a
-                href="/workshop-architecture.pdf"
-                target="_blank"
-                rel="noreferrer"
-              >
-                Open supplied diagram ↗
-              </a>
             </article>
           </div>
           <article className="capture-card">
@@ -198,6 +193,32 @@ export default function ArchitectureWalkthrough({
                   }
                 />
                 <Field
+                  label="Which systems or tools should do this work?"
+                  multiline
+                  value={r?.systems || ""}
+                  placeholder="Name each tool and its role, or record what is not decided."
+                  onChange={(systems) =>
+                    update({ systems, choice: "Not reviewed" })
+                  }
+                />
+                <Field
+                  label="What passes to the next step, and where does it go?"
+                  multiline
+                  value={r?.handoff || ""}
+                  placeholder={step.output}
+                  onChange={(handoff) =>
+                    update({ handoff, choice: "Not reviewed" })
+                  }
+                />
+                <Field
+                  label="Who reviews it, or can change or stop it?"
+                  multiline
+                  value={r?.controls || ""}
+                  onChange={(controls) =>
+                    update({ controls, choice: "Not reviewed" })
+                  }
+                />
+                <Field
                   label="Who owns this step or can resolve the question?"
                   value={r?.owner || ""}
                   onChange={(owner) =>
@@ -218,6 +239,9 @@ export default function ArchitectureWalkthrough({
             ) : (
               <>
                 <p>{r?.change}</p>
+                <p>Systems: {r?.systems || "Not decided"}</p>
+                <p>Handoff: {r?.handoff || "Not captured"}</p>
+                <p>Controls: {r?.controls || "Not captured"}</p>
                 <p>Owner: {r?.owner || "Not assigned"}</p>
                 <p>Next: {r?.next || "Not captured"}</p>
               </>
@@ -228,12 +252,14 @@ export default function ArchitectureWalkthrough({
         <>
           <h2>Here is the proposed way of working</h2>
           <WorkflowSummary session={s} />
+
           {setSession && !room && (
             <>
               <p>
-                Unresolved items remain visible in the readout. Review
-                workshop-wide decisions in the detailed editor if they affect
-                several cases.
+                The readout assembles this conversation into an architecture
+                view and downloadable PDF. Unresolved items remain visible.
+                Review workshop-wide decisions in the detailed editor if they
+                affect several cases.
               </p>
               <button
                 onClick={() =>
@@ -259,13 +285,6 @@ export default function ArchitectureWalkthrough({
       )}
       {!room && (
         <>
-          <details className="reference-details">
-            <summary>See the whole proposed architecture</summary>
-            <img
-              src="/workshop-architecture.png"
-              alt="Supplied proposed architecture: OpenAI infrastructure and Adobe systems connected to marketing touchpoints"
-            />
-          </details>
           <button aria-expanded={details} onClick={() => setDetails(!details)}>
             {details ? "Hide" : "Open"} detailed architecture and shared
             decisions (optional)

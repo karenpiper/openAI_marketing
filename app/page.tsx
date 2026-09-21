@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
+import WorkshopChapter from "../components/workshop-chapter";
 import WorkshopOverview from "../components/workshop-overview";
 import PriorityWorkshop from "../components/priority-workshop";
 import { CurrentState, Architecture } from "../components/workshop-mapping";
@@ -57,6 +58,7 @@ export default function Workshop() {
             : {
                 ...(isDemo ? addDemoGuideExamples(saved) : saved),
                 overview: true,
+                briefingPanel: 0,
                 timer: {
                   ...saved.timer,
                   remaining: Math.max(
@@ -317,6 +319,7 @@ export default function Workshop() {
                 setSession((s) => ({
                   ...s,
                   overview: true,
+                  briefingPanel: 0,
                   timer: { ...s.timer, remaining, runningSince: null },
                 }));
               }}
@@ -531,6 +534,9 @@ export default function Workshop() {
             </button>
           </div>
         )}
+      {!session.overview && !preview && (
+        <WorkshopChapter stage={session.stage} />
+      )}
       <div className="capture-content">
         {preview ? (
           <RoomView session={session} />

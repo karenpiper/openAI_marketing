@@ -19,7 +19,7 @@ Use **one capture tab** on the facilitator’s computer. Click **Open projector*
 
 1. **Use cases — 30 min.** Walk Morgan’s current-state day. Correct the hypotheses, record notes and proof, score or veto. In the recap, explicitly select the working set and confirm who agreed. Ranking does not automatically select or confirm anything.
 2. **Current state — 30 min.** Choose any of the seven cases from the dropdown. Ask the four prepared questions one at a time. Capture one recent example, the place or tool used for that specific task, people, and what works or is missing. Each of the 28 questions has its own tool prompt. One known tool, a manual process or “not sure” is enough; additional tools are optional. Mark the answer Agreed, Needs checking, Disputed or Still unknown. Read the four answers back together. No capability entry or picker is required. Participants describe a recent example; the tool offers a plain-language capability name immediately, and the room corrects and confirms the interpretation. Exploring a case does not add it to the working set.
-3. **Architecture — 45 min.** Walk through five proposed workflow steps tailored to the selected case. Each shows the proposal, related current-state answers, relevant boxes from the supplied PDF, and the output to the next step. Choose Keep, Change or Unresolved, capture corrections, owner and next decision/test, then read back the workflow. The PDF provides reference boxes; the workflow and system assignments are proposals, not claims that the diagram specifies those integrations. The detailed architecture editor retains earlier boundaries, handoffs and shared decisions as optional supporting detail. Editing a decision reopens review; changing its source answers marks it for recheck.
+3. **Architecture — 45 min.** Walk through our suggested workflow for each use case. Compare it with today’s answers; capture the systems, owner, handoff and controls the room chooses. Choose Keep, Change or Unresolved after editing. No internal reference diagram is presented to participants. Changes to source answers require a recheck. The readout assembles the captured conversation into an architecture view and PDF download.
 4. **Readout — 15 min.** Review the selected cases, capability findings, boundaries, decisions and live-build result. Capture next actions, owners, timing, blockers and asks for Colin. Move actions earlier/later to agree the sequence.
 
 The agenda timer is manual and resets when changing stages. Allocate approximately 15 minutes of the architecture block to the optional content exercise; it is not an additional fifth agenda block. Session tools include a parking lot, JSON backup/restore, Markdown readout and print/PDF. Printing always renders the readout, whichever stage is open.
@@ -58,7 +58,7 @@ Implementation reference: [OpenAI Structured Outputs](https://developers.openai.
 
 Frequency, Severity, Evidence and Leverage each use 1–5 with the original anchors. Composite = `(frequency × severity × evidence × leverage) ** 0.25`. Default scores remain 3 and are labeled undiscussed. Ties retain day order. Veto excludes a case from ranking and selection. No / Not sure / Yes move-now status never changes the score.
 
-`public/workshop-architecture.pdf` is the supplied workshop diagram; the accompanying PNG is its display preview. Its boxes are starting context, not proof of current capabilities. The architecture editor leaves room assignments blank until captured.
+`reference/internal/initial-architecture.pdf` and its PNG are internal starting material, retained outside the public web assets. They inform the preparation; they are never shown or exported as the room’s architecture.
 
 ## Persistence and export
 
@@ -115,7 +115,7 @@ Architecture places the relevant source answers beside each proposed workflow st
 
 ## Step 3 proposal walkthrough
 
-All seven use cases have five prepared workflow steps. Content at scale moves through audience needs → approved source → variants → review → delivery and learning. PDF labels are transcribed from the supplied diagram. The workflow is our facilitation proposal, explicitly distinguished from that source. Nothing is pre-agreed in real sessions. Fresh demo sessions illustrate Keep, Change and Unresolved; use Reset demo data to load those new example decisions into an existing demo session.
+All seven use cases have five prepared workflow steps. Content at scale moves through audience needs → approved source → variants → review → delivery and learning. The workflow is our facilitation proposal. Systems and responsibilities come from the room’s captured answers. Nothing is pre-agreed in real sessions. Fresh demo sessions illustrate Keep, Change and Unresolved; use Reset demo data to load those new example decisions into an existing demo session.
 
 Workflow decisions persist in the same local session, JSON backup, projected view, printed readout and Markdown export. Existing detailed architecture records remain available and are never replaced by the walkthrough. These choices document workshop direction; they do not provision systems or execute integrations.
 
@@ -125,4 +125,13 @@ Every fresh or reloaded facilitator session opens on **00 · Before we begin**, 
 
 The projector follows the overview or active exercise, rather than resetting the facilitator’s current presentation. Attendees persist in JSON and appear in Markdown and printed readouts. The four agenda blocks remain numbered 1–4 and total 120 minutes; the opening does not change scoring, selections or stage data.
 
-Step 0 is the sole home of **What we heard** and the four background decision summaries. It presents concise takeaways with expandable original statements, an agenda with outputs, and the attendee list. Morgan’s navigation now goes directly from her introduction to the first timed scene. Existing scene IDs and saved assessments are unchanged; the retired context scene (1) displays Morgan’s introduction for backward compatibility.
+Step 0 is the sole home of **What we heard** and the four background decision summaries. It presents five visible story panels with scroll/arrow navigation, original statements, an agenda with outputs, open decisions and the attendee list. Nothing requires expansion. Morgan’s navigation now goes directly from her introduction to the first timed scene. Existing scene IDs and saved assessments are unchanged; the retired context scene (1) displays Morgan’s introduction for backward compatibility.
+
+
+## Generated architecture and visual workshop
+
+The readout’s **Download architecture PDF** builds a fresh document locally in the browser from current workshop data. No server upload, API key or print dialog is required. It includes selected and discussed workflows (unselected cases are marked), captured systems and roles, handoffs, controls, additional architecture notes and shared decisions. Agreed requires an explicit Keep/Change decision plus captured systems, owner, handoff and controls; incomplete choices remain unresolved, untouched steps remain proposed, and changed source evidence requires rechecking. A Change without a replacement is unresolved. The on-screen view uses the same model. This is the architecture discussed, not a claim of implemented integrations.
+
+The PDF library and embedded Roboto fonts load only when requested. Automated tests generate and inspect a real PDF; the demo output has also been rendered for pagination review. Existing backups without new fields import with blank architecture details rather than inferred systems.
+
+Step 0 is a scrolling visual story with five chapters, directional navigation and no collapsed content. The current chapter follows to the projector. An original generated collage anchors the opening; local SVG activity drawings and paper-style capture cards extend the visual language across the workshop. Reduced-motion preferences are respected. Generated asset: `public/images/workshop-collage.png`; the pre-existing `workshop-team.jpg` is not used or modified.

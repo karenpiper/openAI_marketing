@@ -1,7 +1,45 @@
-import type { Dispatch, SetStateAction } from "react";
+import WorkshopGlyph from "./workshop-glyph";
+import { useEffect, type Dispatch, type SetStateAction } from "react";
 import { type Session, stages } from "../lib/workshop";
 import { heard, decisions } from "../lib/workshop-data";
 import { Field } from "./workshop-fields";
+const chapters = [
+  "Why we’re here",
+  "The agenda",
+  "What we heard",
+  "Open decisions",
+  "Who’s here",
+];
+function StoryNav({ index }: { index: number }) {
+  return (
+    <nav
+      className="briefing-story-nav"
+      aria-label={`${chapters[index]} navigation`}
+    >
+      <span>
+        {index + 1} / {chapters.length} · {chapters[index]}
+      </span>
+      <div>
+        {index > 0 && (
+          <a
+            href={`#briefing-${index - 1}`}
+            aria-label={`Previous: ${chapters[index - 1]}`}
+          >
+            ← Previous
+          </a>
+        )}
+        {index < chapters.length - 1 && (
+          <a
+            href={`#briefing-${index + 1}`}
+            aria-label={`Next: ${chapters[index + 1]}`}
+          >
+            Next →
+          </a>
+        )}
+      </div>
+    </nav>
+  );
+}
 export default function WorkshopOverview({
   session: s,
   setSession,
@@ -13,73 +51,106 @@ export default function WorkshopOverview({
   onEnter?: () => void;
   onResume?: () => void;
 }) {
+  useEffect(() => {
+    if (!setSession) {
+      document
+        .getElementById(`briefing-${s.briefingPanel}`)
+        ?.scrollIntoView({ behavior: "instant", block: "start" });
+      return;
+    }
+    let frame = 0;
+    const update = () => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() => {
+        let panel = 0;
+        for (let i = 0; i < chapters.length; i++) {
+          const el = document.getElementById(`briefing-${i}`);
+          if (el && el.getBoundingClientRect().top < window.innerHeight * 0.4)
+            panel = i;
+        }
+        setSession((p) =>
+          p.briefingPanel === panel ? p : { ...p, briefingPanel: panel },
+        );
+      });
+    };
+    window.addEventListener("scroll", update, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", update);
+      cancelAnimationFrame(frame);
+    };
+  }, [setSession, s.briefingPanel]);
   const hasProgress =
     Object.values(s.assessments).some((a) => a.discussed) ||
     s.capabilities.length > 0 ||
     s.workflowReviews.length > 0;
   const takeaways = [
-    [
-      "Build on what works",
-      "Finding and reaching a single buyer already works. Test what changes for a buying group.",
-    ],
-    [
-      "Turn signals into action",
-      "Knowing whom to target is only the start. The next action needs a defensible rationale.",
-    ],
-    [
-      "Make relevant content available",
-      "First-touch content is a gap. Finding approved material and creating variants both matter.",
-    ],
-    [
-      "Measure time as well as growth",
-      "Track production effort and time to market alongside business outcomes.",
-    ],
-    [
-      "Separate priority from readiness",
-      "Agree what matters, then distinguish what can start now from what depends on decisions.",
-    ],
+    "Build on what works",
+    "Turn signals into action",
+    "Make relevant content available",
+    "Measure time as well as growth",
+    "Separate priority from readiness",
   ];
   return (
-    <section className="briefing-page">
-      <header className="briefing-hero">
-        <div>
-          <span className="eyebrow">00 / Workshop briefing</span>
-          <h1>
-            One working session.
-            <br />
-            <em>A shared plan.</em>
-          </h1>
-          <p>
-            Agree the marketing problems worth solving—and the first steps to
-            solve them.
-          </p>
-          <div className="briefing-meta">
-            <span>120 minutes</span>
-            <span>4 working blocks</span>
-            <span>One shared readout</span>
+    <section className="briefing-page briefing-story">
+      <nav className="briefing-chapters" aria-label="Opening story">
+        {chapters.map((name, i) => (
+          <a key={name} href={`#briefing-${i}`}>
+            0{i + 1} {name}
+          </a>
+        ))}
+      </nav>
+      <section id="briefing-0" className="briefing-frame">
+        <figure className="briefing-cover">
+          <img
+            src="/images/workshop-collage.png"
+            alt="Illustration of people bringing ideas, content and audience journeys together around a workshop table"
+            fetchPriority="high"
+          />
+          <figcaption>Bring the work into the room.</figcaption>
+          <span className="cover-tag">
+            A working session / OpenAI × Adobe × Code and Theory
+          </span>
+        </figure>
+        <header className="briefing-hero">
+          <div>
+            <span className="eyebrow">00 / Workshop briefing</span>
+            <h1>
+              One working session.
+              <br />
+              <em>A shared plan.</em>
+            </h1>
+            <p>
+              Agree the marketing problems worth solving—and the first steps to
+              solve them.
+            </p>
+            <div className="briefing-meta">
+              <span>120 minutes</span>
+              <span>4 working blocks</span>
+              <span>One shared readout</span>
+            </div>
           </div>
-        </div>
-        <aside className="briefing-start">
-          <span className="eyebrow">OpenAI × Adobe × Code and Theory</span>
-          <h2>Start with the work.</h2>
-          <p>
-            We’ll follow Morgan’s day, examine today’s process, then test a
-            proposed way forward.
-          </p>
-          {onEnter && (
-            <button className="overview-enter" onClick={onEnter}>
-              Enter workshop →
-            </button>
-          )}
-          {onResume && hasProgress && (
-            <button className="briefing-resume" onClick={onResume}>
-              Resume saved progress · {stages[s.stage].title} →
-            </button>
-          )}
-          <small>Capture → read back → agree</small>
-        </aside>
-      </header>
-      <section className="briefing-section">
+          <aside className="briefing-start">
+            <span className="eyebrow">OpenAI × Adobe × Code and Theory</span>
+            <h2>Start with the work.</h2>
+            <p>
+              First, follow Morgan’s day. Then understand today’s process, shape
+              the next workflow and agree the first test.
+            </p>
+            <strong>Our output: priorities → architecture → action.</strong>
+            {onResume && hasProgress && (
+              <button className="briefing-resume" onClick={onResume}>
+                Resume saved progress · {stages[s.stage].title} →
+              </button>
+            )}
+            <small>
+              Use the arrows or scroll to walk through this briefing. Everything
+              is already visible.
+            </small>
+          </aside>
+        </header>
+        <StoryNav index={0} />
+      </section>
+      <section id="briefing-1" className="briefing-frame">
         <div className="briefing-section-title">
           <span className="eyebrow">The route</span>
           <h2>Four conversations. Four outputs.</h2>
@@ -91,13 +162,14 @@ export default function WorkshopOverview({
                 <span>0{i + 1}</span>
                 <b>{stage.minutes} min</b>
               </div>
+              <WorkshopGlyph kind={i} />
               <h3>{stage.title}</h3>
               <p>
                 {
                   [
                     "Walk Morgan’s day and score the problems.",
                     "Explore a recent example for each priority.",
-                    "Keep, change or question the proposed workflow.",
+                    "Keep, change or question a suggested way of working.",
                     "Agree the first tests, owners and next actions.",
                   ][i]
                 }
@@ -109,7 +181,7 @@ export default function WorkshopOverview({
                     [
                       "Priority use cases + outcomes",
                       "Existing tools + gaps",
-                      "Proposed workflows + decisions",
+                      "Architecture shaped by the room",
                       "Action plan + asks for Colin",
                     ][i]
                   }
@@ -125,89 +197,98 @@ export default function WorkshopOverview({
             ready; approved source asset still to choose.
           </span>
         </div>
+        <StoryNav index={1} />
       </section>
-      <section className="briefing-section">
+      <section id="briefing-2" className="briefing-frame">
         <div className="briefing-section-title">
           <span className="eyebrow">Starting context</span>
           <h2>What we’ve heard</h2>
           <p>
-            From earlier conversations. Please correct these starting
-            assumptions in the room.
+            Original statements from earlier conversations. Please correct these
+            starting assumptions in the room.
           </p>
         </div>
         <div className="briefing-insights">
-          {takeaways.map(([title, body], i) => (
-            <article key={title}>
+          {heard.map((h, i) => (
+            <article key={h.q}>
               <span className="briefing-index">0{i + 1}</span>
               <div>
-                <h3>{title}</h3>
-                <p>{body}</p>
+                <h3>{takeaways[i]}</h3>
+                <p>“{h.q}”</p>
               </div>
             </article>
           ))}
         </div>
-        <details className="briefing-source">
-          <summary>Read the original statements</summary>
-          {heard.map((h) => (
-            <blockquote key={h.q}>{h.q}</blockquote>
-          ))}
-        </details>
+        <StoryNav index={2} />
       </section>
-      <div className="briefing-bottom">
-        <section className="briefing-section">
-          <span className="eyebrow">Participants</span>
-          <h2>Who’s in the room</h2>
-          <div className="briefing-orgs">
-            <span>OpenAI</span>
-            <span>Adobe</span>
-            <span>Code and Theory</span>
-          </div>
-          {setSession ? (
-            <Field
-              label="Attendees and roles"
-              multiline
-              value={s.attendees}
-              placeholder="Name · team · role in this discussion"
-              onChange={(attendees) => setSession((p) => ({ ...p, attendees }))}
-            />
-          ) : (
-            <p className="preserve-lines">
-              {s.attendees || "Attendees to be confirmed."}
-            </p>
-          )}
-        </section>
-        <section className="briefing-section">
+      <section id="briefing-3" className="briefing-frame">
+        <div className="briefing-section-title">
           <span className="eyebrow">Questions to carry</span>
-          <h2>Four open decisions</h2>
+          <h2>We don’t need every answer to begin.</h2>
           <p>
-            The architecture is a proposal. These questions stay visible as we
-            assess what can move now.
-          </p>
-          {decisions.map((d) => (
-            <details className="briefing-decision" key={d.num}>
-              <summary>{d.t}</summary>
-              <p>{d.q}</p>
-              <span className="label">Starting position</span>
-              <p>{d.known}</p>
-              <span className="label">Still open</span>
-              <p>{d.open}</p>
-            </details>
-          ))}
-        </section>
-      </div>
-      <footer className="briefing-footer">
-        <div>
-          <h2>Ready to meet Morgan?</h2>
-          <p>
-            Seven moments in her day. Which problems deserve attention first?
+            These four decisions help distinguish what can move now from what
+            needs agreement.
           </p>
         </div>
-        {onEnter && (
-          <button className="overview-enter" onClick={onEnter}>
-            Enter workshop →
-          </button>
+        <div className="briefing-decision-grid">
+          {decisions.map((d) => (
+            <article key={d.num}>
+              <span className="briefing-index">0{d.num}</span>
+              <h3>{d.t}</h3>
+              <p>{d.q}</p>
+              <div className="briefing-position">
+                <span className="label">Starting position</span>
+                <p>{d.known}</p>
+                <span className="label">Still open</span>
+                <p>{d.open}</p>
+              </div>
+            </article>
+          ))}
+        </div>
+        <StoryNav index={3} />
+      </section>
+      <section id="briefing-4" className="briefing-frame">
+        <div className="briefing-section-title">
+          <span className="eyebrow">Participants</span>
+          <h2>Who’s in the room</h2>
+          <p>
+            Bring your experience of the work. You don’t need an exhaustive view
+            of the systems.
+          </p>
+        </div>
+        <div className="briefing-orgs">
+          <span>OpenAI</span>
+          <span>Adobe</span>
+          <span>Code and Theory</span>
+        </div>
+        {setSession ? (
+          <Field
+            label="Attendees and roles"
+            multiline
+            value={s.attendees}
+            placeholder="Name · team · role in this discussion"
+            onChange={(attendees) => setSession((p) => ({ ...p, attendees }))}
+          />
+        ) : (
+          <p className="preserve-lines">
+            {s.attendees || "Attendees to be confirmed."}
+          </p>
         )}
-      </footer>
+        <footer className="briefing-footer">
+          <div>
+            <h2>Ready to meet Morgan?</h2>
+            <p>
+              Seven moments in her day. Which problems deserve attention first?
+            </p>
+          </div>
+          {onEnter && (
+            <button className="overview-enter" onClick={onEnter}>
+              Enter workshop →
+            </button>
+          )}
+        </footer>
+        <StoryNav index={4} />
+      </section>
     </section>
   );
 }

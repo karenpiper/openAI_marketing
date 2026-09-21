@@ -693,7 +693,7 @@ test("proposed workflows cover seven cases, cite real diagram boxes and carry de
   assert.deepEqual(w.parseSession(legacy).workflowReviews, []);
 });
 
-test("walkthrough shows current evidence, PDF boxes and room decisions in capture and projection", () => {
+test("walkthrough shows current evidence and room decisions without internal PDF references", () => {
   const Walk = require("../components/architecture-walkthrough.tsx").default;
   const s = require("../lib/demo-session.ts").createDemoSession();
   s.guide.architecture = 1;
@@ -702,7 +702,8 @@ test("walkthrough shows current evidence, PDF boxes and room decisions in captur
       React.createElement(Walk, { session: s, setSession: () => {}, room }),
     );
     assert.match(html, /Find the right approved content/);
-    assert.match(html, /Adobe CSC/);
+    assert.ok(!html.includes("supplied PDF"));
+    assert.ok(!html.includes("Adobe CSC"));
     assert.match(html, /Sample approved asset library/);
     assert.match(html, /Use the existing approved library/);
     if (!room) {
@@ -766,7 +767,18 @@ test("prior context lives only on step zero and Morgan skips the retired scene w
     React.createElement(Overview, { session: s, onEnter: () => {} }),
   );
   assert.match(front, /What we’ve heard/);
-  assert.match(front, /Read the original statements/);
+  assert.match(front, /Original statements/);
+  assert.ok(!front.includes("<details"));
+  assert.ok(front.includes("#briefing-4"));
+  assert.ok(front.includes("workshop-collage.png"));
+  assert.ok(
+    fs.existsSync(
+      require("node:path").join(
+        __dirname,
+        "../public/images/workshop-collage.png",
+      ),
+    ),
+  );
   for (let step = 0; step < 10; step++) {
     const html = renderToStaticMarkup(
       React.createElement(Priority, {
@@ -790,4 +802,61 @@ test("prior context lives only on step zero and Morgan skips the retired scene w
     );
     assert.ok(!room.includes("What we heard"));
   }
+});
+
+test("architecture output uses room systems, preserves revisions and flags incomplete or stale agreements", () => {
+  const { architectureOutput } = require("../lib/architecture-output.ts");
+  const { reviewWorkflow } = require("../lib/architecture-workflow.ts");
+  const guide = require("../lib/workshop-guide.ts");
+  let s = w.createSession();
+  assert.equal(architectureOutput(s).cases.length, 0);
+  s.selected = ["s3"];
+  let nodes = architectureOutput(s).cases[0].nodes;
+  assert.equal(nodes[0].status, "Proposed");
+  assert.equal(nodes[0].systems, "Not decided");
+  assert.ok(!JSON.stringify(nodes).includes("Adobe CSC"));
+  s = reviewWorkflow(s, "s3", 0, { choice: "Keep" });
+  assert.equal(architectureOutput(s).cases[0].nodes[0].status, "Unresolved");
+  s = reviewWorkflow(s, "s3", 0, {
+    choice: "Change",
+    change: "The room’s revised workflow",
+    systems: "Our warehouse\nOur CRM",
+    owner: "Alex",
+    handoff: "Brief to content team",
+    controls: "Alex checks permission",
+  });
+  nodes = architectureOutput(s).cases[0].nodes;
+  assert.equal(nodes[0].status, "Agreed");
+  assert.equal(nodes[0].approach, "The room’s revised workflow");
+  assert.equal(nodes[0].systems, "Our warehouse\nOur CRM");
+  assert.deepEqual(w.parseSession(JSON.parse(JSON.stringify(s))), s);
+  s = guide.editAnswer(s, "s3", guide.currentQuestions.s3[1], {
+    evidence: "New audience evidence",
+  });
+  assert.equal(architectureOutput(s).cases[0].nodes[0].status, "Needs recheck");
+  s.selected = [];
+  assert.equal(architectureOutput(s).cases[0].selected, false);
+});
+
+test("generated architecture PDF includes captured systems and open decisions, and produces a real PDF", async () => {
+  const {
+    architectureDocument,
+    architecturePdf,
+  } = require("../lib/architecture-pdf.ts");
+  const s = require("../lib/demo-session.ts").createDemoSession();
+  s.attendees = "Zoë — facilitator";
+  const def = architectureDocument(s);
+  const text = JSON.stringify(def);
+  assert.match(text, /Sample analytics workspace/);
+  assert.match(text, /Use the existing approved library/);
+  assert.match(text, /AGREED/);
+  assert.match(text, /UNRESOLVED/);
+  assert.match(text, /PROPOSED/);
+  assert.match(text, /Shared decisions and open questions/);
+  assert.ok(!text.includes("Adobe CDP"));
+  const pdf = await architecturePdf(s);
+  const bytes = await new Promise((resolve) => pdf.getBuffer(resolve));
+  assert.equal(Buffer.from(bytes).subarray(0, 5).toString(), "%PDF-");
+  assert.ok(bytes.length > 10000);
+  fs.writeFileSync("/tmp/workshop-architecture-demo.pdf", bytes);
 });

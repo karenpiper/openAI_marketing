@@ -347,6 +347,11 @@ export function createDemoSession(): Session {
   });
   demo = reviewWorkflow(demo, "s3", 0, {
     choice: "Keep",
+    systems:
+      "Sample analytics workspace — compare activity\nSample audience brief — record the need",
+    handoff: "Audience brief with source signals goes to the content lead.",
+    controls:
+      "The audience lead checks signal coverage and contact permissions.",
     owner: "Demo audience lead",
     next: "Verify available audience signals before the pilot.",
   });
@@ -354,6 +359,10 @@ export function createDemoSession(): Session {
     choice: "Change",
     change:
       "Use the existing approved library first; verify whether the proposed asset system is needed.",
+    systems:
+      "Sample approved library — source and version\nSample review log — approval record",
+    handoff: "Approved source and permitted claims pass to the writer.",
+    controls: "The content lead verifies the version before drafting.",
     owner: "Demo content lead",
     next: "Bring an approved source and its version record.",
   });

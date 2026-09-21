@@ -95,8 +95,8 @@ export default function ArchitectureDetails({ session, setSession }: Props) {
         </span>
         <h1>Connect the work.</h1>
         <p>
-          Use the supplied architecture as a starting proposal. Assign
-          responsibility, state and controls for the selected use case.
+          Capture the room’s proposed architecture. Assign responsibility, state
+          and controls for the selected use case.
         </p>
       </div>
 
@@ -138,20 +138,6 @@ export default function ArchitectureDetails({ session, setSession }: Props) {
                 Layout groups capabilities; it does not assert data flow.
                 Explicit handoffs below define direction and payload.
               </p>
-              <details className="reference-details">
-                <summary>View supplied architecture reference</summary>
-                <a
-                  href="/workshop-architecture.pdf"
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  Open original diagram
-                </a>
-                <img
-                  src="/workshop-architecture.png"
-                  alt="Supplied architecture: OpenAI interfaces, data lake and existing tools; Adobe capabilities; events, marketing CRM and website feeding journey measurement."
-                />
-              </details>
             </div>
             <div className="capture-card boundary-editor">
               <span className="eyebrow">Define the boundary</span>

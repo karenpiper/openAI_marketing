@@ -189,6 +189,9 @@ export type Lab = {
   status: Status;
 };
 export type WorkflowReview = {
+  systems: string;
+  handoff: string;
+  controls: string;
   useCase: string;
   step: number;
   choice: "Not reviewed" | "Keep" | "Change" | "Unresolved";
@@ -198,6 +201,7 @@ export type WorkflowReview = {
   source: string;
 };
 export type Session = {
+  briefingPanel: number;
   overview: boolean;
   attendees: string;
   workflowReviews: WorkflowReview[];
@@ -272,6 +276,7 @@ export function createSession(): Session {
   return {
     schema: 1,
     overview: true,
+    briefingPanel: 0,
     attendees: "",
     workflowReviews: [],
     title: "OpenAI × Adobe × Code and Theory",
@@ -381,6 +386,13 @@ export function parseSession(raw: unknown): Session {
   const s = createSession();
   s.title = str(r.title, s.title);
   s.overview = r.overview !== false;
+  s.briefingPanel =
+    typeof r.briefingPanel === "number" &&
+    Number.isInteger(r.briefingPanel) &&
+    r.briefingPanel >= 0 &&
+    r.briefingPanel < 5
+      ? r.briefingPanel
+      : 0;
   s.attendees = str(r.attendees);
   s.stage =
     typeof r.stage === "number" &&
@@ -467,6 +479,9 @@ export function parseSession(raw: unknown): Session {
       ["Not reviewed", "Keep", "Change", "Unresolved"],
       "Not reviewed",
     ) as WorkflowReview["choice"],
+    systems: str(x.systems),
+    handoff: str(x.handoff),
+    controls: str(x.controls),
     change: str(x.change),
     owner: str(x.owner),
     next: str(x.next),
@@ -623,7 +638,7 @@ export function readout(s: Session): string {
       .filter((r) => workflows[r.useCase]?.[r.step])
       .map(
         (r) =>
-          `${name(r.useCase)} | ${workflows[r.useCase][r.step].title} | ${workflowState(s, r.useCase, r.step).stale ? "Evidence changed — recheck" : r.choice}\nProposal: ${workflows[r.useCase][r.step].proposal}\nCorrection: ${r.change || "None captured"}\nOwner: ${r.owner || "Unassigned"}\nNext decision or action: ${r.next || "Not captured"}`,
+          `${name(r.useCase)} | ${workflows[r.useCase][r.step].title} | ${workflowState(s, r.useCase, r.step).stale ? "Evidence changed — recheck" : r.choice}\nProposal: ${workflows[r.useCase][r.step].proposal}\nCorrection: ${r.change || "None captured"}\nSystems: ${r.systems || "Not captured"}\nHandoff: ${r.handoff || "Not captured"}\nControls: ${r.controls || "Not captured"}\nOwner: ${r.owner || "Unassigned"}\nNext decision or action: ${r.next || "Not captured"}`,
       ),
     "## Architecture boundaries",
     ...s.boundaries.map(
