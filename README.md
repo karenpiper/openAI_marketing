@@ -1,56 +1,95 @@
-# Morgan’s Tuesday — priority workshop
+# Enterprise marketing working session
 
-A Next.js workshop for OpenAI × Adobe × Code and Theory, scoped to **agenda item 1: priority use cases and outcomes (30 minutes)**.
+A Next.js workshop for OpenAI × Adobe × Code and Theory. Four agenda stages share one record of use cases, capabilities, operating boundaries, decisions and next actions. A content-at-scale workbench sits within the architecture block.
 
-## Source of truth
-
-`reference/claude-workshop.html` is the original Claude workshop, extracted from the supplied `day_in_the_life.html.rtf`. The source scenes, feedback, four background decisions, rubric wording, KPI labels, questions and dependency notes are preserved verbatim in `lib/workshop-data.ts`. Automated tests compare every original field against this reference. The four architecture decisions are context only; resolving them belongs to later agenda items. The scope note clarifies that distinction within the same workshop.
-
-Flow: Meet Morgan → What we heard and four background decisions → seven timed scenes (8:15 AM through 6:00 PM) → end-of-day recap. Editable proof statements supplement the original content to capture what should be proven first.
-
-## Scoring and facilitation
-
-Frequency, Severity, Evidence and Leverage each use 1–5 ratings with the original anchors. Composite = `(frequency × severity × evidence × leverage) ** 0.25`. All four default to 3, as in the original. Equal scores retain day order. Undiscussed defaults are explicitly labeled in the recap.
-
-“We don’t actually have this problem” excludes a scene from ranking, move-now buckets and the top-three productivity story. It remains visible under Ruled out and can be restored by unchecking the veto. The separate No / Not sure / Yes move-now status never affects the composite. Original suggested statuses are retained until changed by the room.
-
-The recap includes every active priority, ruled-out problems, all three move-now buckets, dependencies, and the productivity story and proof statements for the top three. Print/save PDF and JSON export are available there.
-
-## Local development and validation
+## Run locally
 
 Use Node.js 24 (`nvm use` if available):
 
 ```sh
 npm ci
 npm run dev
+```
+
+Open http://localhost:3000. The entire workshop and practice content exercise work without credentials.
+
+## Facilitation
+
+Use **one capture tab** on the facilitator’s computer. Click **Open projector** and move that read-only window to the room screen. Both windows must share the same browser profile and origin. The room view follows the active agenda stage and Morgan scene, including changes to captured answers. It uses local storage events plus BroadcastChannel; it is not a cross-device collaboration service. **Preview room view** shows the same presentation in the capture tab.
+
+1. **Use cases — 30 min.** Walk Morgan’s current-state day. Correct the hypotheses, record notes and proof, score or veto. In the recap, explicitly select the working set and confirm who agreed. Ranking does not automatically select or confirm anything.
+2. **Current state — 30 min.** For each selected case, capture capabilities, systems, evidence, verifier, gaps and whether to reuse, extend or build. Unknowns stay visible. Read the live summary back to the room.
+3. **Architecture — 45 min.** Use the supplied diagram as a starting proposal. Assign an accountable owner, implementation responsibility, source of truth, state and controls by capability. Record directional handoffs with payloads, triggers and failure handling. Resolve or preserve the four open decisions and add new ones as needed.
+4. **Readout — 15 min.** Review the selected cases, capability findings, boundaries, decisions and live-build result. Capture next actions, owners, timing, blockers and asks for Colin. Move actions earlier/later to agree the sequence.
+
+The agenda timer is manual and resets when changing stages. Allocate approximately 15 minutes of the architecture block to the optional content exercise; it is not an additional fifth agenda block. Session tools include a parking lot, JSON backup/restore, Markdown readout and print/PDF. Printing always renders the readout, whichever stage is open.
+
+**Proposed / Confirmed / Disputed / Unknown** are explicit room states. Editing a captured answer reopens its confirmation. Changes to a selected case’s scores, proof, notes or veto invalidate working-set confirmation. Vetoed cases cannot be selected. Retained records for deselected cases are labeled outside the current working set in the readout, so earlier work is not silently deleted.
+
+## Content-at-scale exercise
+
+No real approved asset has been supplied yet. A fictional practice brief is provided, with three editable audiences across website/content and event engagement. It makes no OpenAI product claims.
+
+- Choose the associated use case; paste the source; record its status and approver.
+- Define fixed claims, exact wording, exclusions, tone and what may change.
+- Define up to six audiences with observed signals, needs and calls to action.
+- **Practice mode** assembles local, editable templates from the entered text. It is explicitly labeled and does not claim to be AI generation. Fixed wording is copied as a review aid; a writer must apply guidance and polish it.
+- **AI mode**, when configured, drafts one email and one landing-page headline per audience. Source and audience text are sent only when the facilitator requests AI drafting and checks the disclosure box. The private workshop code is held only in component memory, not in backups or local storage.
+- Change a source or audience and regenerate all or one audience. The immediately previous version remains available for comparison. Source changes mark all existing drafts outdated; audience changes mark that audience’s draft outdated. Outdated drafts cannot be marked usable. Editing draft copy resets its review.
+- Review each draft as pending, usable, needs edits or rejected, and capture why. Record baseline production time, observed editing/review time, and the room’s conclusion. This is an exercise judgment, not production approval or evidence of business lift.
+
+## Optional AI connection
+
+Create `.env.local` locally, or configure these environment variables in Vercel:
+
+```text
+OPENAI_API_KEY=<server-side API key>
+OPENAI_MODEL=<Responses API model with Structured Outputs available to your account>
+WORKSHOP_ACCESS_CODE=<private facilitator code>
+```
+
+All three are required to enable AI drafting. The code protects the paid endpoint from anonymous use. Keep it private and configure API project usage limits appropriate to the workshop. The endpoint enforces input size, bounded audience counts, a timeout, same-origin requests and response validation. It uses `store: false`; this is not a guarantee of zero data retention. Only use source material authorized for this service. Drafting does not publish or send marketing content.
+
+Implementation reference: [OpenAI Structured Outputs](https://developers.openai.com/api/docs/guides/structured-outputs). No default model or credentials are bundled. Errors preserve existing drafts and offer practice mode. Live API generation must be rehearsed with your configured credentials before the workshop; automated checks use a mocked API response.
+
+## Source fidelity and scope
+
+`reference/claude-workshop.html` preserves the supplied Claude workshop. The original seven scenes, evidence, KPI labels, questions, dependency notes and four-axis scoring remain intact. The introduction is corrected to describe a working hypothesis of **today**, not a future state. Short illustrative notes connect audience understanding, relevant messaging and learning across the journey; events are one touchpoint, not the organizing story.
+
+Frequency, Severity, Evidence and Leverage each use 1–5 with the original anchors. Composite = `(frequency × severity × evidence × leverage) ** 0.25`. Default scores remain 3 and are labeled undiscussed. Ties retain day order. Veto excludes a case from ranking and selection. No / Not sure / Yes move-now status never changes the score.
+
+`public/workshop-architecture.pdf` is the supplied workshop diagram; the accompanying PNG is its display preview. Its boxes are starting context, not proof of current capabilities. The architecture editor leaves room assignments blank until captured.
+
+## Persistence and export
+
+The full session is browser-local under `oai-full-workshop-v1`. On first use it imports the previous four-axis assessments from `oai-adobe-morgan-workshop-v2`, retaining notes and proof statements. Older three-axis scores are not reinterpreted. Existing storage keys are left intact. Reload preserves inputs; clearing browser site data removes them.
+
+JSON backup includes all assessments, current-state findings, architecture records, decisions, audiences, draft versions/reviews and next actions. Restore validates the format and asks before replacing the current session. Markdown and print readouts include the cross-stage conclusions. A visible notice appears if local saving fails; export before leaving. A malformed saved record is not overwritten automatically.
+
+Use a single capture tab: concurrent facilitator edits in multiple tabs are not merged. No shared database, account system or automatic transcription is included.
+
+## Verify
+
+```sh
 npm test
 npm run typecheck
 npm run build
 npm start
 ```
 
-No API keys, environment variables, database or external services are required. The lockfile makes installs reproducible.
+Tests cover original source fidelity, exact scoring/veto behavior, selection confirmation, session round-tripping, malformed imports, draft freshness, content input/output validation, all stage render paths and generation endpoint authorization/failure handling with a mocked upstream response.
 
-## Vercel
+## Deploy to Vercel
 
-Import `karenpiper/openAI_marketing`, choose Next.js, root directory `.`, Node.js 24.x, install command `npm ci`, build command `npm run build`, and the default framework output directory. A repository update does not itself create a Vercel project.
+Import `karenpiper/openAI_marketing`, choose Next.js, root directory `.`, Node.js 24.x, install `npm ci`, build `npm run build`, and the default framework output directory. No environment variables are required for practice mode. Add the three server variables above to enable AI drafting. The generation route has a 60-second maximum duration and a 45-second upstream timeout; confirm the deployment plan supports that duration. Use deployment access controls appropriate to the workshop materials. A repository push does not itself create a Vercel project.
 
-## Persistence
+## Main files
 
-Validated inputs persist locally under `oai-adobe-morgan-workshop-v2`. The former three-score model is deliberately not mapped onto the four original dimensions; its old storage key is left untouched. Notes are not shared across browsers, devices or URLs. Storage errors show a visible notice; export before leaving if persistence is unavailable. Reset requires confirmation. JSON export preserves all seven assessments and notes, including ruled-out scenes.
-
-## Structure
-
-- `app/page.tsx`: narrative flow, scoring controls and recap.
-- `app/globals.css`: responsive day-to-evening visual treatment and print layout.
-- `lib/workshop-data.ts`: original workshop copy plus proof prompts.
-- `lib/assessment.ts`: score calculation, ranking and validated storage restoration.
-- `tests/workshop.test.cjs`: content fidelity and behavioral checks.
-
-## Agenda item 1 boundary
-
-Each stop has one editable “What do we need to prove?” field. Saved proof statements remain intact; the revised starting prompts apply to new or reset sessions. The recap carries proof statements for the top-ranked problems into the next conversation.
-
-Morgan’s day covers the broader marketing workload. Events remain a natural touchpoint, including the original webinar request at 1:30 PM. Brief illustrative notes at stops 2, 3 and 7 connect website, content, event and sales signals to audience segmentation, relevant messaging at scale and learning across the journey. These examples do not change the original attributed evidence or prescribe a tool.
-
-V1 does not implement capability mapping, target architecture, ownership assignment or the Colin readout builder. Its prioritized use cases are the input to those later exercises. The four open decisions remain dependency context only.
+- `app/page.tsx`: agenda, persistence, import/export, timer and projector synchronization.
+- `components/priority-workshop.tsx`: Morgan’s day, scoring and selection handoff.
+- `components/workshop-mapping.tsx`: capability capture, architecture boundaries, handoffs and decisions.
+- `components/content-lab.tsx`: source, audiences, drafting and review.
+- `components/workshop-readout.tsx`: consolidated output and sequencing.
+- `components/room-view.tsx`: read-only projection view.
+- `lib/workshop.ts`: session model, validation, confirmation and export.
+- `lib/generation.ts` and `app/api/generate/route.ts`: bounded AI drafting interface.
