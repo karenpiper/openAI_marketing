@@ -3638,16 +3638,72 @@
   font-size: 12px;
   line-height: 1.35;
 }
-.scoring-table select {
-  min-width: 54px;
-  padding: 7px;
-  border: 1px solid #cad3cb;
-  border-radius: 6px;
-  background: white;
-  font: inherit;
+.score-picker {
+  display: flex;
+  gap: 3px;
 }
-.scoring-table td:last-child select {
-  min-width: 118px;
+.score-picker button {
+  display: grid;
+  place-items: center;
+  width: 23px;
+  height: 23px;
+  padding: 0;
+  border: 1px solid #ccd7cf;
+  border-radius: 50%;
+  background: #fff;
+  color: #65776b;
+  font-size: 10px;
+  font-weight: 700;
+}
+.score-picker button:hover {
+  border-color: #4d8464;
+  color: #1e5c3b;
+}
+.score-picker button.selected {
+  border-color: #1d6744;
+  background: #1d6744;
+  color: #fff;
+  box-shadow: 0 0 0 2px #d8eadc;
+}
+.priority-picker {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+  min-width: 128px;
+}
+.priority-picker button {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  justify-content: flex-start;
+  padding: 5px 7px;
+  border: 1px solid #d6ded7;
+  border-radius: 6px;
+  background: #fff;
+  color: #66766b;
+  font-size: 10px;
+  line-height: 1;
+}
+.priority-picker button span {
+  display: inline;
+  margin: 0;
+  font-size: 12px;
+}
+.priority-picker button.selected {
+  border-color: #477a59;
+  background: #e9f4eb;
+  color: #164b2f;
+  font-weight: 700;
+}
+.priority-picker button.selected.later {
+  border-color: #9b8150;
+  background: #fbf3e4;
+  color: #74551c;
+}
+.priority-picker button.selected.not-needed {
+  border-color: #aa716d;
+  background: #f9ebe9;
+  color: #7b3933;
 }
 .table-signal {
   display: grid;

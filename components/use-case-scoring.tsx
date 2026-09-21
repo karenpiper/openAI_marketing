@@ -54,13 +54,6 @@ export default function UseCaseScoring({
           Frequency, severity, evidence, leverage and estimated opportunity
           raise the signal. LOE lowers it.
         </span>
-        <span>
-          The room—not the calculation—chooses the final priority set.
-        </span>
-        <span>
-          Sub-use cases make each parent use case concrete. Score the parent,
-          not every prompt individually.
-        </span>
       </div>
       <div className="scoring-table-wrap">
         <table className="scoring-table">
@@ -98,24 +91,30 @@ export default function UseCaseScoring({
                   </td>
                   {axes.map(([key]) => (
                     <td key={key}>
-                      <select
+                      <div
+                        className="score-picker"
+                        role="radiogroup"
                         aria-label={`${candidate.title}: ${key}`}
-                        value={assessment.scores[key]}
-                        onChange={(e) =>
-                          onChange(candidate.id, {
-                            scores: {
-                              ...assessment.scores,
-                              [key]: Number(e.target.value),
-                            },
-                          })
-                        }
                       >
                         {[1, 2, 3, 4, 5].map((n) => (
-                          <option key={n} value={n}>
+                          <button
+                            type="button"
+                            key={n}
+                            aria-checked={assessment.scores[key] === n}
+                            className={
+                              assessment.scores[key] === n ? "selected" : ""
+                            }
+                            title={`${n} of 5`}
+                            onClick={() =>
+                              onChange(candidate.id, {
+                                scores: { ...assessment.scores, [key]: n },
+                              })
+                            }
+                          >
                             {n}
-                          </option>
+                          </button>
                         ))}
-                      </select>
+                      </div>
                     </td>
                   ))}
                   <td>
@@ -124,18 +123,35 @@ export default function UseCaseScoring({
                     </strong>
                   </td>
                   <td>
-                    <select
+                    <div
+                      className="priority-picker"
+                      role="group"
                       aria-label={`${candidate.title}: room decision`}
-                      value={assessment.priority}
-                      onChange={(e) =>
-                        onChange(candidate.id, { priority: e.target.value })
-                      }
                     >
-                      <option>To discuss</option>
-                      <option>Priority</option>
-                      <option>Later</option>
-                      <option>Not needed</option>
-                    </select>
+                      {[
+                        ["To discuss", "?", "Discuss"],
+                        ["Priority", "✓", "Priority"],
+                        ["Later", "→", "Later"],
+                        ["Not needed", "×", "Not needed"],
+                      ].map(([value, symbol, label]) => (
+                        <button
+                          type="button"
+                          key={value}
+                          title={label}
+                          className={
+                            assessment.priority === value
+                              ? `selected ${value.toLowerCase().replaceAll(" ", "-")}`
+                              : ""
+                          }
+                          onClick={() =>
+                            onChange(candidate.id, { priority: value })
+                          }
+                        >
+                          <span>{symbol}</span>
+                          {label}
+                        </button>
+                      ))}
+                    </div>
                   </td>
                 </tr>
               );
