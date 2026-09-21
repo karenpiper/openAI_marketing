@@ -290,3 +290,19 @@ export function agentReadout(s: AgentState) {
       .join("\n\n")
   );
 }
+
+export function guidedReply(
+  chapter: (typeof chapters)[number],
+  prompt: string,
+): string {
+  const q = prompt.toLowerCase();
+  if (/prove|proof|test|validat/.test(q)) return chapter.proof;
+  if (/morgan|human|approv|person|judgment/.test(q)) return chapter.human;
+  if (/need|input|tool|connect|capabilit|data/.test(q))
+    return (
+      chapter.inputs.map(([name, detail]) => `${name}: ${detail}`).join(" ") +
+      " These are requirements to confirm, not connected tools."
+    );
+  if (/output|handoff|deliver/.test(q)) return chapter.output;
+  return "This guided prototype can explain the required inputs, Morgan’s role, the handoff, or what we should prove. Use the plan controls to explore other audiences and channels; open-ended agent execution is not connected.";
+}

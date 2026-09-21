@@ -11,6 +11,7 @@ import {
   architectureSession,
   agentReadout,
   type Finding,
+  guidedReply,
 } from "../lib/agent-workspace";
 import ArchitectureOutput from "./architecture-output";
 import { Architecture } from "./workshop-mapping";
@@ -25,6 +26,22 @@ export default function AgentWorkspace() {
   const [chapter, setChapter] = useState(1);
   const [capture, setCapture] = useState(false);
   const [demo, setDemo] = useState(false);
+  const [draft, setDraft] = useState("");
+  const [conversation, setConversation] = useState<
+    Record<string, { prompt: string; reply: string }[]>
+  >({});
+  function ask(prompt: string) {
+    if (!prompt.trim()) return;
+    const reply = guidedReply(chapters[chapter], prompt);
+    setConversation((prev) => ({
+      ...prev,
+      [chapters[chapter].id]: [
+        ...(prev[chapters[chapter].id] || []),
+        { prompt: prompt.trim(), reply },
+      ],
+    }));
+    setDraft("");
+  }
   const c = chapters[chapter],
     f = s.findings[c.id],
     key = AGENT_KEY + (demo ? "-demo" : "");
@@ -190,16 +207,14 @@ export default function AgentWorkspace() {
         ) : page === "workspace" ? (
           <main className="agent-main">
             <aside className="agent-sidebar">
-              <span className="agent-kicker">Morgan’s Tuesday</span>
-              <h2>
-                One day.
-                <br />
-                Three possibilities.
-              </h2>
-              <p>
-                A proposed experience for a growth & ABM lead. Use it to test
-                what matters and what is possible.
-              </p>
+              <div className="agent-workspace-name">
+                <span className="agent-avatar">M</span>
+                <div>
+                  <b>Morgan</b>
+                  <small>Marketing workspace</small>
+                </div>
+              </div>
+              <span className="agent-kicker">Today’s conversations</span>
               {chapters.map((ch, i) => (
                 <button
                   key={ch.id}
@@ -215,9 +230,10 @@ export default function AgentWorkspace() {
                 </button>
               ))}
               <div className="agent-sidebar-foot">
-                The story is illustrative.
+                <b>Workshop notes</b>
                 <br />
-                The room’s findings are captured separately.
+                Explore the agent above. Capture capabilities and decisions
+                below the conversation.
               </div>
             </aside>
             <section className="agent-stage">
@@ -230,9 +246,10 @@ export default function AgentWorkspace() {
               </div>
               <div className="agent-product">
                 <header>
-                  <span className="agent-orb">✳</span>
-                  <b>Morgan’s workspace</b>
-                  <span>Simulated agent</span>
+                  <b>
+                    Marketing agent <span aria-hidden="true">⌄</span>
+                  </b>
+                  <span>Prototype · guided conversation</span>
                 </header>
                 <div className="agent-conversation">
                   <div className="agent-prompt">{c.prompt}</div>
@@ -411,6 +428,67 @@ export default function AgentWorkspace() {
                         ? "Approval is paused until source material is available."
                         : "Explore safely. These controls only change the demonstration.")}
                   </p>
+                  {(conversation[c.id] || []).map((turn, i) => (
+                    <div key={i} className="agent-followup">
+                      <div className="agent-prompt">{turn.prompt}</div>
+                      <div className="agent-reply">
+                        <span className="agent-orb">✳</span>
+                        <div>
+                          <b>Marketing agent</b>
+                          <p>{turn.reply}</p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                  <div className="agent-suggestions">
+                    {[
+                      "What do you need?",
+                      "What stays with Morgan?",
+                      "What should we prove?",
+                    ].map((prompt) => (
+                      <button key={prompt} onClick={() => ask(prompt)}>
+                        {prompt}
+                      </button>
+                    ))}
+                  </div>
+                  <form
+                    className="agent-composer"
+                    onSubmit={(e) => {
+                      e.preventDefault();
+                      ask(draft);
+                    }}
+                  >
+                    <label className="sr-only" htmlFor="agent-message">
+                      Ask about this workflow
+                    </label>
+                    <textarea
+                      id="agent-message"
+                      rows={2}
+                      value={draft}
+                      onChange={(e) => setDraft(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (
+                          e.key === "Enter" &&
+                          !e.shiftKey &&
+                          !e.nativeEvent.isComposing
+                        ) {
+                          e.preventDefault();
+                          ask(draft);
+                        }
+                      }}
+                      placeholder="Ask about this workflow"
+                    />
+                    <div>
+                      <span>Guided prototype · no live tools</span>
+                      <button
+                        aria-label="Send message"
+                        disabled={!draft.trim()}
+                        type="submit"
+                      >
+                        ↑
+                      </button>
+                    </div>
+                  </form>
                 </div>
               </div>
               <section className="agent-requirements">

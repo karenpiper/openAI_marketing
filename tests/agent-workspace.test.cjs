@@ -61,3 +61,11 @@ test("malformed backups cannot inject incompatible form values", () => {
   s.findings.s3.capabilities["Approved material"] = "invented";
   assert.throws(() => m.restoreAgentState(s));
 });
+
+test('guided conversation exposes requirements and boundaries without claiming live execution', () => {
+ const c=m.chapters[1];
+ assert.match(m.guidedReply(c,'What do you need?'),/Approved material/);
+ assert.match(m.guidedReply(c,'What stays with Morgan?'),/Morgan reviews/);
+ assert.equal(m.guidedReply(c,'What should we prove?'),c.proof);
+ assert.match(m.guidedReply(c,'Send a campaign right now'),/not connected/);
+});
