@@ -26,12 +26,16 @@ export default function ArchitectureOutput({
   download = true,
   compact = false,
   explorer = false,
+  explorerCases,
+  workflow,
   setSession,
 }: {
   session: Session;
   download?: boolean;
   compact?: boolean;
   explorer?: boolean;
+  explorerCases?: { id: string; label: string }[];
+  workflow?: string;
   setSession?: Dispatch<SetStateAction<Session>>;
 }) {
   const [busy, setBusy] = useState(false);
@@ -41,11 +45,29 @@ export default function ArchitectureOutput({
   const [explorerComponent, setExplorerComponent] = useState("");
   const [playing, setPlaying] = useState(false);
   const model = architectureOutput(s);
+  const requestedWorkflow =
+    workflow && workflows[workflow]
+      ? {
+          id: workflow,
+          label:
+            useCaseCandidates.find((candidate) => candidate.id === workflow)
+              ?.title || workflow,
+        }
+      : undefined;
   const cases = explorer
-    ? useCaseCandidates.map((candidate) => ({
-        id: candidate.id,
-        label: candidate.title,
-      }))
+    ? [
+        ...(explorerCases ||
+          useCaseCandidates.map((candidate) => ({
+            id: candidate.id,
+            label: candidate.title,
+          }))),
+        ...((requestedWorkflow &&
+          !(explorerCases || []).some(
+            (candidate) => candidate.id === requestedWorkflow.id,
+          )
+          ? [requestedWorkflow]
+          : []) as { id: string; label: string }[]),
+      ]
     : activeCases(s);
   const caseId = cases.some((u) => u.id === s.readoutFlow.caseId)
     ? s.readoutFlow.caseId
@@ -66,6 +88,10 @@ export default function ArchitectureOutput({
     }, 1800);
     return () => window.clearTimeout(timer);
   }, [explorerCase, explorerStep, playing]);
+
+  useEffect(() => {
+    if (requestedWorkflow) chooseExplorerCase(requestedWorkflow.id);
+  }, [workflow]);
 
   function chooseExplorerCase(id: string) {
     setExplorerCase(id);

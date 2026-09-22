@@ -354,6 +354,7 @@ export default function AgentWorkspace() {
   const [s, setS] = useState(createAgentState);
   const [ready, setReady] = useState(false);
   const [error, setError] = useState("");
+  const [architectureWorkflow, setArchitectureWorkflow] = useState("");
   const [saved, setSaved] = useState("");
   const [page, setPage] = useState("intro");
   const [showStepContext, setShowStepContext] = useState(false);
@@ -523,6 +524,7 @@ export default function AgentWorkspace() {
     const day = params.get("day");
     if (day !== null && /^[0-4]$/.test(day))
       setS((prev) => ({ ...prev, day: { ...prev.day, moment: Number(day) } }));
+    setArchitectureWorkflow(params.get("workflow") || "");
     setReady(true);
   }, []);
   useEffect(() => {
@@ -1376,6 +1378,16 @@ export default function AgentWorkspace() {
             <ArchitectureOutput
               session={arch}
               explorer
+              explorerCases={useCaseCandidates
+                .filter(
+                  (candidate) =>
+                    s.useCases[candidate.id].priority === "Priority",
+                )
+                .map((candidate) => ({
+                  id: candidate.id,
+                  label: candidate.title,
+                }))}
+              workflow={architectureWorkflow}
               setSession={(action) =>
                 setS((prev) => ({
                   ...prev,
