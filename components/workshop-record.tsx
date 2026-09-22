@@ -311,7 +311,7 @@ export default function WorkshopRecord({
           </article>
         ))}
       </div>
-      <h2 className="section-title">Content-at-scale workflow scenario</h2>
+      <h2 className="section-title">Engagement-at-scale workflow scenario</h2>
       <article className="readout-card">
         <h3>{scenarioSummary(session.scenario)}</h3>
         <p className="preserve-lines">

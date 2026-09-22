@@ -189,7 +189,7 @@ export default function WorkshopOverview({
           ))}
         </div>
         <div className="briefing-note">
-          <b>Explore the workflow · Content at scale</b>
+          <b>Explore the workflow · Engagement at scale</b>
           <span>
             Optional, within the workflow architecture block. Change audiences, channels
             and approvals to see how the proposed workflow adapts. No content

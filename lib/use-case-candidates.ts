@@ -28,13 +28,13 @@ export const useCaseCandidates = [
   {
     id: "s3",
     time: "10:30 AM",
-    title: "Content at scale",
+    title: "Engagement at scale",
     short:
-      "Adapt approved material for different audiences, accounts and channels.",
+      "Turn the best marketing or sales next action into coordinated, account-specific engagement.",
     subUseCases: [
-      "Find approved material for a specific need",
-      "Adapt a core story by buying role",
-      "Create coordinated social, executive and sales versions",
+      "Recommend the next action for an account and buying role",
+      "Adapt the engagement plan across marketing and sales channels",
+      "Execute the approved action with the right controls",
     ],
     source: "Original Morgan’s Tuesday",
   },

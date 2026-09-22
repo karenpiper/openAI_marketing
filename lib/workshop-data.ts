@@ -50,26 +50,26 @@ export const useCases = [
   },
   {
     id: "s3",
-    label: "Content at scale",
+    label: "Engagement at scale",
     time: "10:30 AM",
     frac: 0.3,
     chapter: "Stop 3",
-    title: "Do you even have something to send?",
+    title: "Can the right action happen at scale?",
     narrative:
-      "Say Morgan knows what to do: reach the security team. Does she already have something good to send them? For a familiar topic, probably. For the very first message to a brand-new type of contact, probably not.",
+      "Say Morgan knows what to do: bring the security team into the evaluation. The question is whether marketing and sales can execute that next action across the account, with relevant materials and the right controls, without rebuilding the plan by hand.",
     problem:
-      "Even with the right move identified, something worth sending often doesn't exist yet — especially for a first message to someone new.",
+      "Even with the right move identified, teams still need to turn it into coordinated engagement across people, channels and sales follow-up.",
     evidence:
-      "OpenAI said this directly: the content doesn't exist yet, especially for first-touch outreach.",
-    kpiGrowth: "New pipeline from first contact",
-    kpiProd: "Campaigns per marketer, without new hires",
+      "The working team identified the execution gap: the next best action needs to become a governed, repeatable motion rather than a one-off handoff.",
+    kpiGrowth: "AAR created and advanced from qualified pipeline",
+    kpiProd: "Time from recommended action to coordinated execution",
     question:
-      "When this breaks down, is it because nothing exists — or because it exists and nobody can find it?",
+      "Where does the next-best-action motion break down today: deciding, preparing, routing or following through?",
     dependsOn:
-      "Mostly none — building the library doesn't need to wait, though Decision 2 (who owns content governance long-term) could still shift where it lives.",
+      "Mostly none — the core question is how decisioning, execution and governance connect across the current systems.",
     noRegretDefault: "yes",
     proofPrompt:
-      "Prove that the system can determine whether approved content exists for the recommended action.",
+      "Prove that a recommended marketing or sales action can become a governed, account-specific engagement motion.",
   },
   {
     id: "s4",

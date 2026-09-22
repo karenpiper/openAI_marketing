@@ -783,7 +783,7 @@ export function readout(s: Session): string {
     ),
     "## Midday readout summary",
     `Ownership boundaries: ${s.closing.ownership || "See captured boundaries"}\nProposed sequence: ${s.closing.sequence || "See actions"}\nOpen decisions and dependencies: ${s.closing.open || "See decisions"}\nAsk for Colin: ${s.closing.colin || "See sponsorship requests"}`,
-    "## Content-at-scale workflow scenario",
+    "## Engagement-at-scale workflow scenario",
     scenarioSummary(s.scenario),
     `Room corrections: ${s.scenario.notes || "None captured"}`,
     "## Earlier content exercise records",

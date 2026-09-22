@@ -65,8 +65,8 @@ export const chapters = [
   {
     id: "s3",
     time: "11:00",
-    title: "Content at scale",
-    short: "One brief. Three buying roles.",
+    title: "Engagement at scale",
+    short: "One next-best action. Three buying roles.",
     prompt: "Turn this opportunity into an audience-specific plan.",
     story:
       "Northstar’s opportunity now has a brief. Morgan returns to a proposed plan that carries the account context, buying roles and objective forward, without asking her to start again.",

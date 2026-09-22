@@ -27,12 +27,30 @@ const extract = (name) =>
       ),
     ),
   );
-test("all original scene fields, feedback, decisions and rubric remain verbatim", () => {
+test("all original scene fields remain verbatim except the intentional engagement-at-scale reframe", () => {
   const original = extract("scenes").filter((s) => !s.kind);
   assert.equal(useCases.length, 7);
+  const s3 = {
+    label: "Engagement at scale",
+    title: "Can the right action happen at scale?",
+    narrative:
+      "Say Morgan knows what to do: bring the security team into the evaluation. The question is whether marketing and sales can execute that next action across the account, with relevant materials and the right controls, without rebuilding the plan by hand.",
+    problem:
+      "Even with the right move identified, teams still need to turn it into coordinated engagement across people, channels and sales follow-up.",
+    evidence:
+      "The working team identified the execution gap: the next best action needs to become a governed, repeatable motion rather than a one-off handoff.",
+    kpiGrowth: "AAR created and advanced from qualified pipeline",
+    kpiProd: "Time from recommended action to coordinated execution",
+    question:
+      "Where does the next-best-action motion break down today: deciding, preparing, routing or following through?",
+    dependsOn:
+      "Mostly none — the core question is how decisioning, execution and governance connect across the current systems.",
+    proofPrompt:
+      "Prove that a recommended marketing or sales action can become a governed, account-specific engagement motion.",
+  };
   original.forEach((s, i) =>
     Object.keys(s).forEach((k) =>
-      assert.equal(useCases[i][k], s[k], `${s.id}.${k}`),
+      assert.equal(useCases[i][k], s.id === "s3" && s3[k] ? s3[k] : s[k], `${s.id}.${k}`),
     ),
   );
   assert.deepEqual(heard, extract("HEARD"));

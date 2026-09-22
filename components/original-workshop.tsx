@@ -542,7 +542,7 @@ export default function Workshop() {
                         setSession((s) => ({ ...s, architectureTab: "lab" }))
                       }
                     >
-                      Explore the workflow · content at scale
+                      Explore the workflow · engagement at scale
                     </button>
                     <small>
                       The exercise sits within the 45-minute architecture block.

@@ -354,7 +354,7 @@ test("expanded use-case set retains the original seven and Adobe feedback candid
     [
       "Buying-group engagement",
       "Signal to action",
-      "Content at scale",
+      "Engagement at scale",
       "Campaign launch & approvals",
       "Routine marketing operations",
       "Human oversight",

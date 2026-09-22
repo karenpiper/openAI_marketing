@@ -185,7 +185,7 @@ export function architectureDocument(s: Session): TDocumentDefinitions {
   }
   content.push(
     {
-      text: "Content at scale / workflow scenario",
+      text: "Engagement at scale / workflow scenario",
       style: "caseTitle",
       pageBreak: "before",
     },
