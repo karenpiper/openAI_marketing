@@ -20,7 +20,7 @@ export function workStages(s: AgentState, id: string): WorkStage[] {
         title: "Bring the signals together",
         action: "Inspect the buying-group gap",
         summary:
-          "The agent groups the lead account’s activity by person and role before proposing a next action for the 12-account expansion cohort.",
+          "The agent groups Northstar Health’s activity by person and role before proposing a next action for the 12-account expansion cohort.",
         input:
           "Product usage, website activity, event engagement and account keys.",
         output: "A traceable account-level signal summary.",
@@ -34,7 +34,7 @@ export function workStages(s: AgentState, id: string): WorkStage[] {
           [
             "Product engagement",
             "18 weekly active users · +28% in 30 days",
-            "The lead account’s technical team completed two workspace projects",
+            "Northstar’s technical team completed two workspace projects",
           ],
           [
             "Roundtable + website",
@@ -94,12 +94,12 @@ export function workStages(s: AgentState, id: string): WorkStage[] {
         rows: [
           [
             "Objective",
-            "Enterprise expansion cohort",
+            "Northstar Health expansion",
             "Bring the business sponsor and procurement into the active evaluation",
           ],
           [
             "Scope",
-            "Lead account + 11 matched expansion accounts",
+            "Northstar + 11 matched expansion accounts",
             "Keep unmatched accounts out of activation until resolved",
           ],
           [
@@ -419,7 +419,7 @@ export function workflowArtifact(s: AgentState, id: string, index: number) {
           {
             name: "Campaign direction",
             status: "Proposed content plan",
-            detail: `Objective: ${s.campaign?.objective || "Help the lead account move from technical evaluation to an expansion decision"}.\nScope: Lead account plus 11 matched expansion accounts; two unmatched accounts remain excluded.\nAudience direction: ${processState(s, "s2", 1).choice || "Technical lead, business sponsor and procurement"}.\nDirection from Morgan: ${s.campaign?.instruction || `Use the ${sourceSet.title} to give each role a distinct next step without creating unsupported claims.`}`,
+            detail: `Objective: ${s.campaign?.objective || "Help Northstar Health move from technical evaluation to an expansion decision"}.\nScope: Northstar plus 11 matched expansion accounts; two unmatched accounts remain excluded.\nAudience direction: ${processState(s, "s2", 1).choice || "Technical lead, business sponsor and procurement"}.\nDirection from Morgan: ${s.campaign?.instruction || `Use the ${sourceSet.title} to give each role a distinct next step without creating unsupported claims.`}`,
           },
           {
             name: "Audience and deliverables",
@@ -452,7 +452,7 @@ export function workflowArtifact(s: AgentState, id: string, index: number) {
           detail: deliveredDetail(s, id, index, name, detail),
         })));
   const sources = workflowSources(s, id, index);
-  const text = `# ${title}\n\nILLUSTRATIVE PROTOTYPE OUTPUT — no live systems queried or actions executed.\n\nCampaign: Enterprise expansion / 12-account cohort\nObjective: ${s.campaign?.objective || "Help the lead account move from technical evaluation to an expansion decision"}\nMorgan’s instruction: ${s.campaign?.instruction || "None added"}\nAudience: ${s.audience}\nChannels: ${s.channel}\n\n${stage.summary}\n\n${sections.map((r) => `## ${r.name}\nStatus: ${r.status}\n${r.detail}`).join("\n\n")}\n\n## Illustrative sources used\n${sources.map((source) => `- ${source.name}: ${source.purpose} | System: ${source.system} | Connection: ${source.connection}`).join("\n")}\n\n## Handoff\n${stage.output}\n\n## Required control\n${stage.control}\n\n## Workflow decisions and review history\n${processDigest(s) || "No decisions recorded yet."}`;
+  const text = `# ${title}\n\nILLUSTRATIVE PROTOTYPE OUTPUT — Northstar Health is fictional; no live systems queried or actions executed.\n\nCampaign: Northstar Health expansion / 12-account cohort\nObjective: ${s.campaign?.objective || "Help Northstar Health move from technical evaluation to an expansion decision"}\nMorgan’s instruction: ${s.campaign?.instruction || "None added"}\nAudience: ${s.audience}\nChannels: ${s.channel}\n\n${stage.summary}\n\n${sections.map((r) => `## ${r.name}\nStatus: ${r.status}\n${r.detail}`).join("\n\n")}\n\n## Illustrative sources used\n${sources.map((source) => `- ${source.name}: ${source.purpose} | System: ${source.system} | Connection: ${source.connection}`).join("\n")}\n\n## Handoff\n${stage.output}\n\n## Required control\n${stage.control}\n\n## Workflow decisions and review history\n${processDigest(s) || "No decisions recorded yet."}`;
   const variantText =
     id === "s3" && index >= 1 && !blocked
       ? "\n\n## Candidate email variants reviewed and handed off\n" +

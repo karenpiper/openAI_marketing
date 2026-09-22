@@ -218,7 +218,7 @@ export default function ProcessActions({
       {id === "s3" && index === 0 && (
         <>
           <p>
-            I searched the approved content bank against this account’s
+            I searched the approved content bank against Northstar Health’s
             audience, objective and channel mix. Choose the source set that
             should ground the work; I will assemble the role-specific packages
             from it.

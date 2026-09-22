@@ -14,10 +14,10 @@ export const contentSourceOptions = [
       headline:
         "How enterprises turn early AI adoption into durable ways of working.",
       message:
-        "Public OpenAI customer stories show enterprises building adoption through practical workflows, deliberate enablement and secure operating foundations—not one-off experimentation.",
+        "For Northstar Health, the next step is to turn active technical use into a practical, governed expansion plan—connecting the teams already experimenting with the people who own operating outcomes and procurement decisions.",
       proof:
-        "MUFG reports enterprise-wide adoption and employee-led workflow innovation; Zenken describes sales preparation and productivity gains; Hyatt describes marketing and brand teams using AI to scale content and consistency. Use the source stories as evidence, not as a promise that another organization will achieve the same results.",
-      cta: "Explore the enterprise adoption case studies.",
+        "Public OpenAI stories from MUFG, Zenken and Hyatt show how enterprises pair adoption with practical workflows, enablement and governance. They are reference evidence for Northstar’s discussion—not a promise of the same results.",
+      cta: "Plan Northstar’s 45-minute expansion working session.",
     },
     references: [
       { label: "MUFG customer story", url: "https://openai.com/index/mufg/" },
@@ -41,10 +41,10 @@ export const contentSourceOptions = [
     baseContent: {
       headline: "Make more room for the work that moves the business forward.",
       message:
-        "The strongest enterprise adoption stories start with repeatable work: preparing for client conversations, synthesizing context and giving people back time for judgment and customer work.",
+        "Northstar can connect its active technical use to a specific operating priority, giving the business sponsor a clear decision, a bounded scope and a way to judge whether expansion is warranted.",
       proof:
         "Zenken reports material time savings in knowledge work and a more efficient sales-preparation process. Enterprise Signals describes deeper agentic work where teams connect context, tools and repeatable workflows. Each organization should validate its own baseline and outcome before making any efficiency claim.",
-      cta: "Review the sales and operating-value stories.",
+      cta: "Review Northstar’s operating-value discussion guide.",
     },
     references: [
       {
@@ -67,10 +67,10 @@ export const contentSourceOptions = [
     baseContent: {
       headline: "Build the foundation for secure, confident AI adoption.",
       message:
-        "Enterprise adoption scales when people have a usable platform, practical enablement and clear guardrails around the workflows they bring to it.",
+        "Northstar can turn its technical team’s early use into an evaluation that the wider organization can assess: a defined use case, explicit governance questions and a clear decision path.",
       proof:
         "CBA describes enterprise-wide rollout supported by connectors, training and leadership participation; MUFG describes structured adoption, learning programs and employee-created workflow tools. Neither story substitutes for an organization’s own security, privacy or procurement review.",
-      cta: "Review the governed-adoption stories.",
+      cta: "Review Northstar’s governed-adoption evaluation plan.",
     },
     references: [
       {

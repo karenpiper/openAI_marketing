@@ -660,11 +660,11 @@ export default function AgentWorkspace() {
                                     Recommended next step
                                   </span>
                                   <h3>
-                                    Bring the business sponsor and procurement
-                                    into the active evaluation.
+                                    Bring Northstar’s business sponsor and
+                                    procurement into the active evaluation.
                                   </h3>
                                   <p>
-                                    The technical team has completed two
+                                    Northstar’s technical team has completed two
                                     workspace projects; the business sponsor has
                                     not yet engaged; procurement returned to the
                                     governance guide after last week’s

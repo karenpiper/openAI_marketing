@@ -1,11 +1,11 @@
 import { useState } from "react";
 const items = [
   {
-    title: "Enterprise expansion opportunity is ready for a decision",
+    title: "Northstar Health expansion is ready for a decision",
     tag: "Recommended focus",
     time: "Opportunity · today",
-    body: "The technical team completed two workspace projects and attended the Enterprise Adoption Roundtable. The business sponsor and procurement have not yet joined the evaluation.",
-    next: "Review the buying-group signals, choose a direction and build the content plan.",
+    body: "Northstar’s technical team completed two workspace projects and attended the Enterprise Adoption Roundtable. The business sponsor and procurement have not yet joined the evaluation.",
+    next: "Review the buying-group signals, choose a direction and build the Northstar content plan.",
     featured: true,
   },
   {

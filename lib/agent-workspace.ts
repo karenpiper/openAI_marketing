@@ -38,9 +38,9 @@ export const chapters = [
     short: "An opportunity worth acting on",
     prompt: "Where should we focus today?",
     story:
-      "Morgan opens an illustrative enterprise expansion opportunity from her morning briefing. Its technical team has completed two workspace projects and attended last week’s enterprise adoption roundtable, but the business sponsor and procurement lead have not joined the conversation. The account is one of 12 matched accounts in the current cohort.",
+      "Morgan opens Northstar Health’s expansion opportunity from her morning briefing. Its technical team has completed two workspace projects and attended last week’s enterprise adoption roundtable, but the business sponsor and procurement lead have not joined the conversation. Northstar is a fictional lead account in a 12-account matched cohort.",
     response:
-      "The lead account has 18 weekly active technical users, 3 roundtable attendees and two return visits to the governance guide. The technical lead is engaged; the business sponsor has not yet interacted. I recommend a coordinated adoption plan: an evaluation path for the technical team, an operating-value story for the sponsor, and a governance brief for procurement.",
+      "Northstar has 18 weekly active technical users, 3 roundtable attendees and two return visits to the governance guide. Its technical lead is engaged; the business sponsor has not yet interacted. I recommend a coordinated adoption plan: an evaluation path for the technical team, an operating-value story for the sponsor, and a governance brief for procurement.",
     inputs: [
       [
         "Product signals",
@@ -69,9 +69,9 @@ export const chapters = [
     short: "One brief. Three buying roles.",
     prompt: "Turn this opportunity into an audience-specific plan.",
     story:
-      "The opportunity now has a brief. Morgan returns to a proposed plan that carries the account context, buying roles and objective forward, without asking her to start again.",
+      "Northstar’s opportunity now has a brief. Morgan returns to a proposed plan that carries the account context, buying roles and objective forward, without asking her to start again.",
     response:
-      "For the lead account and the 11-account expansion cohort, I have prepared three role-specific paths. The technical lead receives a practical evaluation plan; the business sponsor receives the operating-value story; procurement receives the approved governance brief. All three use the selected public case-study source set. Review the plan below; I will coordinate asset preparation, approvals and channel handoffs.",
+      "For Northstar and the 11-account expansion cohort, I have prepared three role-specific paths. The technical lead receives a practical evaluation plan; the business sponsor receives the operating-value story; procurement receives the approved governance brief. All three use the selected public case-study source set. Review the plan below; I will coordinate asset preparation, approvals and channel handoffs.",
     inputs: [
       [
         "Audience context",

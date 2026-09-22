@@ -43,9 +43,10 @@ export default function PerformanceLoop({
       </span>
       <h1>What happened—and what should we change?</h1>
       <p>
-        This fictional readout follows the enterprise expansion cohort after a
-        reviewed email and roundtable-follow-up program. It is fixed reference
-        data, not results from a live deployment or from your current edits.
+        This fictional readout follows Northstar Health and its expansion cohort
+        after a reviewed email and roundtable-follow-up program. It is fixed
+        reference data, not results from a live deployment or from your current
+        edits.
       </p>
       <div className="performance-metrics">
         <article>
@@ -68,10 +69,10 @@ export default function PerformanceLoop({
       <div className="learning-agent">
         <b>✳ My read</b>
         <p>
-          The technical audience engaged, but the business-sponsor segment
-          generated only one qualified next step. I’d test the sponsor message
-          before adding volume—and resolve the two unmatched cohort accounts
-          before claiming account-level impact.
+          Northstar’s technical audience engaged, but the business-sponsor
+          segment generated only one qualified next step. I’d test the sponsor
+          message before adding volume—and resolve the two unmatched cohort
+          accounts before claiming account-level impact.
         </p>
       </div>
       <nav>
