@@ -129,6 +129,7 @@ export type Scorecard = {
 };
 export type CandidateAssessment = {
   priority: string;
+  moveNow: "No" | "Not sure" | "Yes";
   scores: Scorecard;
 };
 export type Finding = {
@@ -195,6 +196,7 @@ export function createAgentState(): AgentState {
         candidate.id,
         {
           priority: "To discuss",
+          moveNow: "Not sure",
           scores: {
             frequency: 3,
             severity: 3,
@@ -282,6 +284,12 @@ export function restoreAgentState(raw: unknown): AgentState {
       )
         base.useCases[candidate.id] = {
           priority: assessment.priority,
+          moveNow:
+            assessment.moveNow === "No" ||
+            assessment.moveNow === "Yes" ||
+            assessment.moveNow === "Not sure"
+              ? assessment.moveNow
+              : "Not sure",
           scores: restoreScorecard(assessment.scores),
         };
     }
@@ -290,6 +298,7 @@ export function restoreAgentState(raw: unknown): AgentState {
     for (const id of ["s2", "s3", "s5"]) {
       base.useCases[id] = {
         priority: base.findings[id].priority,
+        moveNow: "Not sure",
         scores: base.findings[id].scores,
       };
     }
