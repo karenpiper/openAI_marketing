@@ -91,15 +91,14 @@ export function architectureDiagram(
     xx: number,
     yy: number,
     groups: string[] = [],
+    route: [number, number][] = [],
   ) => {
-    const needsElbow = x !== xx && y !== yy;
-    const elbowX = (x + xx) / 2;
-    const path = needsElbow
-      ? `M ${x} ${y} L ${elbowX} ${y} L ${elbowX} ${yy} L ${xx} ${yy}`
-      : `M ${x} ${y} L ${xx} ${yy}`;
-    const a = needsElbow
-      ? Math.atan2(0, xx - elbowX)
-      : Math.atan2(yy - y, xx - x);
+    const points: [number, number][] = [[x, y], ...route, [xx, yy]];
+    const path = points
+      .map(([px, py], i) => `${i ? "L" : "M"} ${px} ${py}`)
+      .join(" ");
+    const [px, py] = points[points.length - 2];
+    const a = Math.atan2(yy - py, xx - px);
     const color =
       focused && groups.length && groups.every((g) => active.has(g))
         ? "#a85c00"
@@ -168,12 +167,12 @@ export function architectureDiagram(
  ${text(490, 27, ["B2B Marketing Touchpoints"], 23)}
  ${box(490, 40, 340, 55, ["Events"])}${box(490, 105, 340, 55, ["CRM (Marketing)"])}${box(490, 170, 340, 55, ["Marketing Website"])}${tag(850, 10, "E")}
  ${text(103, 257, ["Adobe marketing tools"], 17)}<rect rx="16" x="85" y="265" width="365" height="155" fill="#edf2e8" stroke="#c0cdbf"/>
- ${box(103, 270, 100, 135, ["Adobe", "Workfront"], 16)}${tag(103, 240, "B")}
- ${box(220, 270, 100, 135, ["Adobe", "CSC"], 17)}${tag(220, 240, "C")}
+ ${box(103, 270, 100, 135, ["Adobe", "Workfront"], 16)}${tag(162, 278, "B")}
+ ${box(220, 270, 100, 135, ["Adobe", "CSC"], 17)}${tag(279, 278, "C")}
  ${box(337, 270, 96, 135, ["Adobe", "Marketo"], 16)}
  ${box(103, 430, 330, 60, ["Adobe CDP (w/ ABM)"])}${tag(330, 430, "D")}
  ${box(610, 270, 250, 72, ["OpenAI Frontier", "Orchestration layer"], 18, "H")}${tag(842, 242, "H")}
- ${arrow(610, 288, 433, 177, ["H", "A"])}${arrow(735, 270, 660, 162, ["H", "E"])}${arrow(610, 318, 433, 460, ["H", "D"])}${arrow(610, 330, 320, 337, ["H", "C"])}${arrow(860, 306, 907, 306, ["H", "F"])}
+ ${arrow(610, 288, 433, 177, ["H", "A"], [[470, 288], [470, 177]])}${arrow(735, 270, 830, 132, ["H", "E"], [[860, 270], [860, 132]])}${arrow(610, 318, 433, 460, ["H", "D"], [[470, 318], [470, 460]])}${arrow(610, 330, 320, 405, ["H", "C"], [[470, 330], [470, 420], [320, 420]])}${arrow(860, 306, 907, 306, ["H", "F"])}
  <path d="M 470 40 L 470 410" stroke="#c0cdbf" stroke-dasharray="7 7"/>
  ${text(18, 523, ["OAI Infrastructure"], 17)}<rect rx="16" x="18" y="535" width="582" height="300" fill="#edf2e8" stroke="#c0cdbf"/>
  ${box(113, 555, 455, 255, ["OpenAI", "Data Lake"], 32)}
