@@ -18,12 +18,14 @@ export default function ProcessActions({
   index,
   onChange,
   onCampaignChange,
+  onArchitectureActivity,
 }: {
   session: AgentState;
   id: string;
   index: number;
   onChange: (p: ProcessState) => void;
   onCampaignChange?: (patch: Partial<AgentState>) => void;
+  onArchitectureActivity?: (activity: string) => void;
 }) {
   const p = processState(session, id, index);
   const approvalVariants = contentVariants(session).filter(
@@ -265,6 +267,9 @@ export default function ProcessActions({
                     className="agent-primary"
                     onClick={() => {
                       setSubmittedSearch("");
+                      onArchitectureActivity?.(
+                        "The agent is using the confirmed audience and need to retrieve recommended approved creative from the CDP-connected catalog.",
+                      );
                       setSourceLookup("searching");
                       window.setTimeout(() => setSourceLookup("results"), 800);
                     }}
@@ -282,6 +287,9 @@ export default function ProcessActions({
                           if (event.key === "Enter") {
                             event.preventDefault();
                             setSubmittedSearch(contentSearch.trim());
+                            onArchitectureActivity?.(
+                              `Searching the CDP-connected content catalog for “${contentSearch.trim()}”.`,
+                            );
                             setSourceLookup("searching");
                             window.setTimeout(() => setSourceLookup("results"), 800);
                           }
@@ -293,6 +301,9 @@ export default function ProcessActions({
                         disabled={!contentSearch.trim()}
                         onClick={() => {
                           setSubmittedSearch(contentSearch.trim());
+                          onArchitectureActivity?.(
+                            `Searching the CDP-connected content catalog for “${contentSearch.trim()}”.`,
+                          );
                           setSourceLookup("searching");
                           window.setTimeout(() => setSourceLookup("results"), 800);
                         }}
@@ -333,12 +344,15 @@ export default function ProcessActions({
                           key={source.id}
                           aria-checked={p.choice === source.id}
                           className={p.choice === source.id ? "selected" : ""}
-                          onClick={() =>
+                          onClick={() => {
                             update(
                               { choice: source.id, status: "Not started" },
                               `Source set selected: ${source.title}`,
-                            )
-                          }
+                            );
+                            onArchitectureActivity?.(
+                              `${source.title} is selected from the approved content catalog; its version and claim permissions will travel with the campaign.`,
+                            );
+                          }}
                           role="radio"
                         >
                           <span>{source.badge}</span>

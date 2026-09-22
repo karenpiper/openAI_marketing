@@ -23,6 +23,7 @@ export function WorkflowWork({
   onEdit,
   onProcess,
   onCampaignChange,
+  onArchitectureActivity,
 }: {
   session: AgentState;
   id: string;
@@ -30,6 +31,7 @@ export function WorkflowWork({
   onFinish: () => void;
   onProcess: (p: ProcessState) => void;
   onCampaignChange: (patch: Partial<AgentState>) => void;
+  onArchitectureActivity?: (activity: string) => void;
   onEdit: (
     key: string,
     rows: { name: string; status: string; detail: string }[],
@@ -318,6 +320,7 @@ export function WorkflowWork({
                       index={index}
                       onChange={onProcess}
                       onCampaignChange={onCampaignChange}
+                      onArchitectureActivity={onArchitectureActivity}
                     />
                   )}
                 <div className="assembly-sources">
@@ -354,6 +357,7 @@ export function WorkflowWork({
               index={index}
               onChange={onProcess}
               onCampaignChange={onCampaignChange}
+              onArchitectureActivity={onArchitectureActivity}
             />
           )}
           {blocked ? (

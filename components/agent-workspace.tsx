@@ -18,7 +18,7 @@ import {
 } from "../lib/agent-workspace";
 import { WorkflowWork } from "./workflow-work";
 import { CampaignEditor } from "./campaign-editor";
-import { processKey } from "../lib/process-state";
+import { processKey, processState } from "../lib/process-state";
 import {
   currentWorkStep,
   workSignature,
@@ -70,15 +70,31 @@ function WorkflowArchitectureRail({
   session,
   id,
   onClose,
+  activity,
 }: {
   session: ReturnType<typeof createAgentState>;
   id: string;
   onClose: () => void;
+  activity: string;
 }) {
   const step = currentWorkStep(session, id);
   const stage = workStages(session, id)[step];
+  const isPlanning = id === "s3" && !session.campaign;
+  const contentChoice = processState(session, id, step).choice;
   const route =
-    id === "s3" && step === 0
+    isPlanning
+      ? [
+          "Morgan’s plan choices",
+          `Marketing agent · ${session.audience}`,
+          `CDP / ABM · ${session.channel}`,
+        ]
+      : id === "s3" && step === 0 && contentChoice
+        ? [
+            "Marketing agent",
+            "Adobe CDP / ABM",
+            "Adobe CSC · approved source selected",
+          ]
+      : id === "s3" && step === 0
       ? ["Marketing agent", "Adobe CDP / ABM", "Adobe CSC content library"]
       : id === "s3" && step === 1
         ? ["Marketing agent", "CDP / identity", "Content production tools"]
@@ -90,7 +106,11 @@ function WorkflowArchitectureRail({
               ? ["OpenAI data lake", "CDP / ABM", "Marketing agent"]
               : ["Marketing agent", "Workflow controls", "Activation systems"];
   const transition =
-    id === "s3" && step === 0
+    isPlanning
+      ? "Audience + channel mix → campaign context"
+      : id === "s3" && step === 0 && contentChoice
+        ? "CDP recommendation → approved creative"
+      : id === "s3" && step === 0
       ? "Plan choices → recommended creative"
       : stage.action;
 
@@ -104,7 +124,12 @@ function WorkflowArchitectureRail({
       </header>
       <p className="workflow-architecture-now">Now moving through</p>
       <h3>{transition}</h3>
-      <p className="workflow-architecture-summary">{stage.summary}</p>
+      <p className="workflow-architecture-summary">
+        {activity ||
+          (isPlanning
+            ? `Using ${session.audience.toLowerCase()} and ${session.channel.toLowerCase()} to shape the campaign context.`
+            : stage.summary)}
+      </p>
       <div
         className="workflow-architecture-route"
         aria-label="Systems active in this transition"
@@ -134,6 +159,7 @@ function MorganScreen({
   onRestart,
   onToggleArchitecture,
   architectureOpen = false,
+  architectureRail,
   onCampaignResults,
   campaignResultsOpen = false,
 }: {
@@ -142,6 +168,7 @@ function MorganScreen({
   onRestart?: () => void;
   onToggleArchitecture?: () => void;
   architectureOpen?: boolean;
+  architectureRail?: ReactNode;
   onCampaignResults?: () => void;
   campaignResultsOpen?: boolean;
 }) {
@@ -245,6 +272,7 @@ function MorganScreen({
               )}
               <small>Enterprise marketing</small>
             </aside>
+            {architectureRail}
             <div className="workspace-thread">{children}</div>
           </div>
         </div>
@@ -260,6 +288,7 @@ export default function AgentWorkspace() {
   const [saved, setSaved] = useState("");
   const [page, setPage] = useState("intro");
   const [showStepContext, setShowStepContext] = useState(false);
+  const [architectureActivity, setArchitectureActivity] = useState("");
   const [showRecapResults, setShowRecapResults] = useState(false);
   const chapter = Math.max(0, Math.min(2, s.day.moment - 1));
   function setChapter(index: number) {
@@ -271,7 +300,7 @@ export default function AgentWorkspace() {
       ...prev,
       // Restart inside the same full-screen workspace rather than returning
       // to the separate arrival layout.
-      day: { ...fresh.day, moment: 1 },
+      day: { ...fresh.day, moment: 0 },
       audience: fresh.audience,
       channel: fresh.channel,
       source: fresh.source,
@@ -285,6 +314,7 @@ export default function AgentWorkspace() {
     setConversation({});
     setDraft("");
     setShowStepContext(false);
+    setArchitectureActivity("");
     setShowRecapResults(false);
     setPage("workspace");
     requestAnimationFrame(() =>
@@ -467,6 +497,9 @@ export default function AgentWorkspace() {
   }
   function condition(p: Partial<typeof s>) {
     setPlanStatus("Plan choices saved in this browser. Confirm the plan to continue.");
+    setArchitectureActivity(
+      "Audience and channel choices are updating the CDP context for the next recommendation.",
+    );
     setS((prev) => ({
       ...prev,
       ...p,
@@ -796,6 +829,16 @@ export default function AgentWorkspace() {
                         setShowStepContext((shown) => !shown)
                       }
                       architectureOpen={showStepContext}
+                      architectureRail={
+                        showStepContext ? (
+                          <WorkflowArchitectureRail
+                            session={s}
+                            id={c.id}
+                            onClose={() => setShowStepContext(false)}
+                            activity={architectureActivity}
+                          />
+                        ) : undefined
+                      }
                     >
                       <div className="agent-product">
                         <header>
@@ -1004,6 +1047,9 @@ export default function AgentWorkspace() {
                                         setPlanStatus(
                                           "Plan confirmed. The fictional practice library is ready for Morgan’s selection.",
                                         );
+                                        setArchitectureActivity(
+                                          "The confirmed audience and channel mix are now passing into CDP-informed content discovery.",
+                                        );
                                       }}
                                     >
                                       Confirm audience, channels & source
@@ -1025,6 +1071,7 @@ export default function AgentWorkspace() {
                             }
                           />
                           <WorkflowWork
+                            onArchitectureActivity={setArchitectureActivity}
                             onProcess={(value) =>
                               setS((prev) => ({
                                 ...prev,
@@ -1143,15 +1190,6 @@ export default function AgentWorkspace() {
                         </div>
                       </div>
                     </MorganScreen>
-                    <div className="prototype-context-control">
-                      {showStepContext && (
-                        <WorkflowArchitectureRail
-                          session={s}
-                          id={c.id}
-                          onClose={() => setShowStepContext(false)}
-                        />
-                      )}
-                    </div>
                   </div>
                 </>
               )}

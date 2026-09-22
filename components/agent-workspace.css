@@ -4597,6 +4597,7 @@
   grid-template-columns: 210px minmax(0, 1fr);
   background: #fff;
 }
+.prototype-screen-layout .workspace-desktop { position: relative; }
 .chat-sidebar,
 .prototype-screen-layout .chat-sidebar {
   padding: 13px 10px;
