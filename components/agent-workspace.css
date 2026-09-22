@@ -5298,10 +5298,11 @@
 }
 .prototype-context-popover {
   position: fixed;
-  top: 112px;
+  z-index: 30;
+  top: 212px;
   left: max(222px, calc(50% - 710px));
   width: 270px;
-  max-height: calc(100dvh - 132px);
+  max-height: calc(100dvh - 232px);
   overflow: auto;
   padding: 14px;
   border: 1px solid #b8cbd8;
