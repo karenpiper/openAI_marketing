@@ -330,10 +330,10 @@ export default function ChannelHandoff({
               </nav>
               <main className="website-landing">
                 <section className="website-copy">
-                  <small>OPENAI FOR BUSINESS</small>
+                  <small>OPENAI FOR BUSINESS · NORTHSTAR HEALTH</small>
                   <h2>{variant.headline}</h2>
                   <p>{variant.body}</p>
-                  <button>{variant.cta} <span>↗</span></button>
+                  <button>{variant.cta} <span>→</span></button>
                 </section>
                 <section className="website-image">
                   <img src={creativeImage} alt="Illustrative enterprise team collaborating" />
@@ -351,24 +351,55 @@ export default function ChannelHandoff({
               </section>
             </div>
           ) : activeTab === "Sales enablement" ? (
-            <div className="seller-preview">
-              <header><span>OPENAI FOR ENTERPRISE</span><b>Account brief</b><em>Northstar Health</em></header>
-              <div className="seller-score"><span>Opportunity signal</span><b>Active evaluation · sponsor gap</b></div>
-              <section><small>WHY NOW</small><p>{variant.context}</p></section>
-              <section><small>CONVERSATION OPENING</small><h2>{variant.headline}</h2><p>{variant.body}</p><img src={creativeImage} alt="" /></section>
-              <footer><b>Suggested next move</b><span>{variant.cta} →</span></footer>
+            <div className="factsheet-preview">
+              <header><b>OpenAI</b><span>ENTERPRISE FACT SHEET</span><small>Prepared for Northstar Health</small></header>
+              <main>
+                <section className="factsheet-title"><small>THE OPPORTUNITY</small><h2>{variant.headline}</h2><p>{variant.body}</p></section>
+                <img src={creativeImage} alt="Illustrative team collaboration" />
+                <section className="factsheet-grid"><div><small>WHY NOW</small><b>{variant.context}</b></div><div><small>WHAT TO DO</small><b>{variant.cta}</b></div><div><small>WORKING SIGNAL</small><b>Technical evaluation is active</b></div></section>
+              </main>
+              <footer><span>Account-specific conversation guide</span><b>OPENAI FOR ENTERPRISE</b></footer>
             </div>
           ) : activeTab === "Executive thought leadership" ? (
-            <div className="pov-preview">
-              <header><b>OpenAI</b><span>Ideas</span><span>Enterprise</span></header>
-              <article><small>POINT OF VIEW</small><img src={creativeImage} alt="" /><h2>{variant.headline}</h2><p>{variant.body}</p><blockquote>“The question is no longer whether teams can begin. It is how leaders create the conditions for useful, governed adoption.”</blockquote><div><span>5 min read</span><b>Read the perspective →</b></div></article>
+            <div className="whitepaper-preview">
+              <aside><b>OpenAI</b><span>ENTERPRISE SERIES</span><span>01 / 06</span></aside>
+              <main>
+                <header><small>WHITE PAPER</small><span>For enterprise leaders</span></header>
+                <h2>{variant.headline}</h2>
+                <p>{variant.body}</p>
+                <blockquote>“The question is no longer whether teams can begin. It is how leaders create the conditions for useful, governed adoption.”</blockquote>
+                <img src={creativeImage} alt="Illustrative enterprise collaboration" />
+                <footer><span>8 minute read</span><b>Download the guide →</b></footer>
+              </main>
             </div>
           ) : (
-            <div className="social-preview">
-              <header><span className="social-avatar">O</span><div><b>OpenAI</b><small>Sponsored · for {variant.recipient}</small></div><span>•••</span></header>
-              <p>{variant.body}</p>
-              <div className="social-card"><img src={creativeImage} alt="" /><small>OPENAI FOR ENTERPRISE</small><h2>{variant.headline}</h2><span>{variant.cta} →</span></div>
-              <footer><span>♡ 128</span><span>◌ 24 comments</span><span>↗ Share</span></footer>
+            <div className="social-native-previews">
+              <div className="linkedin-post">
+                <header>
+                  <span className="linkedin-mark">in</span>
+                  <div><b>OpenAI</b><small>1,845,321 followers · Promoted</small></div>
+                  <span className="social-more">•••</span>
+                </header>
+                <p>{variant.body}</p>
+                <img src={creativeImage} alt="Illustrative campaign creative" />
+                <section>
+                  <small>OPENAI.COM</small>
+                  <b>{variant.headline}</b>
+                  <span>{variant.cta} →</span>
+                </section>
+                <footer><span>● 384</span><span>42 comments</span><span>18 reposts</span><b>Like&nbsp;&nbsp; Comment&nbsp;&nbsp; Repost&nbsp;&nbsp; Send</b></footer>
+              </div>
+              <div className="x-post">
+                <header>
+                  <span className="x-mark">𝕏</span>
+                  <div><b>OpenAI <i>✓</i></b><small>@OpenAI · Promoted</small></div>
+                  <span className="social-more">•••</span>
+                </header>
+                <p>{variant.headline} {variant.body.split(".")[0]}.</p>
+                <div className="x-media"><img src={creativeImage} alt="" /><div><small>OPENAI.COM</small><b>{variant.cta}</b></div></div>
+                <footer><span>◯ 36</span><span>↻ 82</span><span>♡ 517</span><span>↗</span></footer>
+              </div>
+              <p className="social-targeting-note">Illustrative paid social placements · matched to Northstar Health’s active buying-group signals, not published or individually targeted.</p>
             </div>
           )}
         </div>
