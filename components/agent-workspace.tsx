@@ -94,43 +94,52 @@ function MorganScreen({
         <div className="monitor-camera" aria-hidden="true" />
         <div className="monitor-screen">
           <div className="monitor-toolbar">
-            <span aria-hidden="true">● ● ●</span>
-            <span>ChatGPT Work · Enterprise marketing</span>
-            <span>Morgan</span>
+            <span className="workspace-title">ChatGPT Work</span>
+            <span className="workspace-project">Enterprise marketing</span>
+            <span className="workspace-user" aria-label="Morgan's profile">
+              M
+            </span>
           </div>
           <div className="workspace-desktop">
             <aside className="chat-sidebar">
-              <b>ChatGPT</b>
-              <span className="chat-sidebar-label">Project</span>
-              <strong>Enterprise adoption</strong>
               <button
+                className="new-chat"
+                onClick={(e) => jump(".agent-product", e)}
+              >
+                <span aria-hidden="true">＋</span> New chat
+              </button>
+              <button className="chat-search" onClick={(e) => jump(".agent-composer", e)}>
+                <span aria-hidden="true">⌕</span> Search chats
+              </button>
+              <span className="chat-sidebar-label">Project</span>
+              <button className="project-chat" onClick={(e) => jump(".agent-product", e)}>
+                <span className="project-icon" aria-hidden="true">▣</span>
+                Enterprise adoption
+              </button>
+              <span className="chat-sidebar-label">Recent</span>
+              <button
+                className="chat-thread active-thread"
                 onClick={(e) =>
                   jump(".agent-product, .day-arrival, .day-evening", e)
                 }
               >
-                ◌ Morgan’s workspace
+                Morgan’s workspace
               </button>
               {workflow && (
                 <>
-                  <span className="chat-sidebar-label">
-                    In this conversation
-                  </span>
                   <button onClick={(e) => jump(".campaign-editor", e)}>
-                    ▤ Campaign brief
+                    Campaign brief
                   </button>
                   <button
                     onClick={(e) =>
                       jump(".execution-assets, .work-artifact", e)
                     }
                   >
-                    ▧ Work products
-                  </button>
-                  <button onClick={(e) => jump(".agent-composer", e)}>
-                    ✎ Ask for a change
+                    Work products
                   </button>
                 </>
               )}
-              <small>One campaign · shared context</small>
+              <small>Enterprise marketing</small>
             </aside>
             <div className="workspace-thread">{children}</div>
           </div>
