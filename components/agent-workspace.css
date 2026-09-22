@@ -1559,7 +1559,16 @@
   min-height: 100%;
   background: #fff;
 }
+.monitor-wrap .campaign-results-chat {
+  min-height: 100%;
+  background: #fff;
+}
 .monitor-wrap .day-recap-chat > header {
+  position: sticky;
+  top: 48px;
+  z-index: 1;
+}
+.monitor-wrap .campaign-results-chat > header {
   position: sticky;
   top: 48px;
   z-index: 1;
@@ -1592,9 +1601,36 @@
 .day-recap-chat .day-brief { margin: 18px 0 0; padding: 18px; border-radius: 10px; }
 .day-recap-chat .day-brief h2 { margin: 0 0 7px; font-size: 18px; }
 .day-recap-chat .day-brief p { margin: 7px 0 0; font-size: 11px; line-height: 1.5; }
+.campaign-results-reply { margin-bottom: 18px; }
+.campaign-results-reply p { margin: 6px 0 0; color: #58665d; font-size: 13px; line-height: 1.5; }
+.campaign-results-artifact {
+  overflow: hidden;
+  margin: 0 0 22px;
+  border: 1px solid #d8dfd9;
+  border-radius: 12px;
+  background: #fbfcfb;
+  box-shadow: 0 4px 14px #24342a0d;
+}
+.campaign-results-artifact-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 16px;
+  border-bottom: 1px solid #e4e9e4;
+  background: #f4f7f4;
+  color: #637267;
+  font-size: 10px;
+}
+.campaign-results-artifact-bar span { font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+.campaign-results-artifact-bar b { color: #365644; font-size: 10px; }
+.campaign-results-artifact .performance-loop { padding: 22px; }
+.campaign-results-artifact .performance-loop h1 { margin: 6px 0 9px; font-size: 25px; }
+.campaign-results-return { margin-bottom: 28px; color: #426052; font-size: 12px; }
 @media (max-width: 760px) {
   .day-recap-metrics { grid-template-columns: 1fr 1fr; }
   .day-recap-insights { grid-template-columns: 1fr; }
+  .campaign-results-artifact-bar { align-items: flex-start; flex-direction: column; }
 }
 .monitor-wrap .day-history {
   background: #fff;

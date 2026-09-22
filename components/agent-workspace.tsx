@@ -781,7 +781,7 @@ export default function AgentWorkspace() {
           <main className="agent-main prototype-main">
             <section className="agent-stage" id="morgan-day">
               {s.day.moment === 0 ? (
-                <>
+                <div className="prototype-screen-layout">
                   <MorganScreen onRestart={resetPrototype}>
                     <div className="day-arrival">
                       <span className="agent-kicker">
@@ -810,7 +810,7 @@ export default function AgentWorkspace() {
                       </p>
                     </div>
                   </MorganScreen>
-                </>
+                </div>
               ) : s.day.moment === 4 ? (
                 <div className="prototype-screen-layout">
                   <MorganScreen
@@ -823,32 +823,65 @@ export default function AgentWorkspace() {
                     campaignResultsOpen={showRecapResults}
                   >
                     {showRecapResults ? (
-                      <div className="day-results">
-                        <button
-                          className="day-results-back"
-                          onClick={() => setShowRecapResults(false)}
-                        >
-                          ← Back to today’s recap
-                        </button>
-                        <PerformanceLoop
-                          session={s}
-                          onSave={(learning) =>
-                            setS((prev) => ({ ...prev, learning }))
-                          }
-                          onApply={(instruction) => {
-                            setS((prev) => ({
-                              ...prev,
-                              campaign: {
-                                objective:
-                                  prev.campaign?.objective ||
-                                  "Help Northstar Health move from technical evaluation to an expansion decision",
-                                instruction,
-                              },
-                              day: { ...prev.day, moment: 2 },
-                            }));
-                            setShowRecapResults(false);
-                          }}
-                        />
+                      <div className="agent-product campaign-results-chat">
+                        <header>
+                          <b>
+                            Marketing agent <span aria-hidden="true">⌄</span>
+                          </b>
+                          <span>Enterprise adoption campaign</span>
+                        </header>
+                        <div className="agent-conversation">
+                          <div className="day-recap-thread">
+                            <span>17:30 · Campaign results &amp; learnings</span>
+                            <p>
+                              Morgan asked to inspect the first campaign signals
+                              and decide what they should change in the next run.
+                            </p>
+                          </div>
+                          <div className="agent-reply campaign-results-reply">
+                            <span className="agent-orb">✳</span>
+                            <div>
+                              <b>Marketing agent</b>
+                              <p>
+                                I’ve opened the campaign dashboard as an
+                                artifact in this conversation. It combines the
+                                reference results, the limits of the evidence,
+                                and a recommendation for the next iteration.
+                              </p>
+                            </div>
+                          </div>
+                          <section className="campaign-results-artifact" aria-label="Campaign results dashboard artifact">
+                            <div className="campaign-results-artifact-bar">
+                              <span>Dashboard artifact</span>
+                              <b>Northstar Health · first-week reference</b>
+                            </div>
+                            <PerformanceLoop
+                              session={s}
+                              onSave={(learning) =>
+                                setS((prev) => ({ ...prev, learning }))
+                              }
+                              onApply={(instruction) => {
+                                setS((prev) => ({
+                                  ...prev,
+                                  campaign: {
+                                    objective:
+                                      prev.campaign?.objective ||
+                                      "Help Northstar Health move from technical evaluation to an expansion decision",
+                                    instruction,
+                                  },
+                                  day: { ...prev.day, moment: 2 },
+                                }));
+                                setShowRecapResults(false);
+                              }}
+                            />
+                          </section>
+                          <button
+                            className="campaign-results-return"
+                            onClick={() => setShowRecapResults(false)}
+                          >
+                            Back to today’s recap
+                          </button>
+                        </div>
                       </div>
                     ) : (
                       <div className="agent-product day-recap-chat">
