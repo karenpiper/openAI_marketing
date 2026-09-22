@@ -102,158 +102,74 @@ export default function ArchitectureOutput({
         </p>
       )}
       {explorer ? (
-        explorerCase ? (
-          <section className="architecture-explorer" aria-live="polite">
-            <header className="architecture-explorer-heading">
-              <div>
-                <button
-                  className="architecture-back"
-                  onClick={() => chooseExplorerCase("")}
-                >
-                  ← All architecture
-                </button>
-                <span className="eyebrow">Priority workflow</span>
-                <h3>{cases.find((u) => u.id === explorerCase)?.label}</h3>
-              </div>
+        <section className="architecture-explorer" aria-live="polite">
+          <header className="architecture-explorer-heading">
+            <div>
+              <span className="eyebrow">Explore the proposed architecture</span>
+              <h3>{explorerCase ? cases.find((u) => u.id === explorerCase)?.label : "The complete system"}</h3>
+            </div>
+            {explorerCase && (
               <button
                 className="architecture-play"
                 aria-pressed={playing}
                 onClick={() => {
-                  setExplorerStep((current) =>
-                    current >= (workflows[explorerCase] || []).length - 1
-                      ? 0
-                      : current,
-                  );
+                  setExplorerStep((current) => current >= (workflows[explorerCase] || []).length - 1 ? 0 : current);
                   setPlaying((value) => !value);
                 }}
               >
                 {playing ? "Pause walkthrough" : "▶ Watch workflow"}
               </button>
-            </header>
-            <div
-              className="diagram-step-selector"
-              role="tablist"
-              aria-label="Workflow steps"
-            >
-              <button
-                role="tab"
-                aria-selected={explorerStep === -1}
-                onClick={() => {
-                  setExplorerStep(-1);
-                  setPlaying(false);
-                }}
-              >
-                Whole flow
-              </button>
+            )}
+          </header>
+          <div className="architecture-usecase-tabs" role="tablist" aria-label="Architecture views">
+            <button role="tab" aria-selected={!explorerCase} onClick={() => chooseExplorerCase("")}>All architecture</button>
+            {cases.slice(0, 3).map((u) => (
+              <button key={u.id} role="tab" aria-selected={explorerCase === u.id} onClick={() => chooseExplorerCase(u.id)}>{u.label}</button>
+            ))}
+          </div>
+          {explorerCase && (
+            <div className="diagram-step-selector" role="tablist" aria-label="Workflow steps">
+              <button role="tab" aria-selected={explorerStep === -1} onClick={() => { setExplorerStep(-1); setPlaying(false); }}>Whole flow</button>
               {(workflows[explorerCase] || []).map((item, index) => (
-                <button
-                  key={item.title}
-                  role="tab"
-                  aria-selected={explorerStep === index}
-                  onClick={() => {
-                    setExplorerStep(index);
-                    setPlaying(false);
-                  }}
-                >
-                  {index + 1}. {item.title}
-                </button>
+                <button key={item.title} role="tab" aria-selected={explorerStep === index} onClick={() => { setExplorerStep(index); setPlaying(false); }}>{index + 1}. {item.title}</button>
               ))}
             </div>
-            <div className="architecture-story-layout architecture-explorer-layout">
-              <div>
-                <div
-                  className="closing-diagram"
-                  role="img"
-                  aria-label={`Architecture highlighting ${cases.find((u) => u.id === explorerCase)?.label || "the selected workflow"}${explorerStep >= 0 ? ` — ${workflows[explorerCase]?.[explorerStep]?.title}` : ""}`}
-                  dangerouslySetInnerHTML={{
-                    __html: architectureDiagram(s, explorerCase, explorerStep),
-                  }}
-                />
-                <p className="diagram-legend">
-                  Gold traces the components and connections involved in this
-                  workflow. Dashed connections are the proposed flow to
-                  validate.
-                </p>
-              </div>
-              <aside className="architecture-explorer-story">
-                {explorerStep < 0 ? (
-                  <>
-                    <span className="eyebrow">The proposed flow</span>
-                    <h4>One connected sequence</h4>
-                    <ol>
-                      {(workflows[explorerCase] || []).map((item, index) => (
-                        <li key={item.title}>
-                          <button onClick={() => setExplorerStep(index)}>
-                            <b>
-                              {index + 1}. {item.title}
-                            </b>
-                            <span>{item.output}</span>
-                          </button>
-                        </li>
-                      ))}
-                    </ol>
-                  </>
-                ) : (
-                  (() => {
-                    const active = workflows[explorerCase]?.[explorerStep];
-                    if (!active) return null;
-                    return (
-                      <>
-                        <span className="eyebrow">
-                          {explorerStep + 1} / {workflows[explorerCase]?.length}
-                        </span>
-                        <h4>{active.title}</h4>
-                        <p>{active.proposal}</p>
-                        <div className="architecture-step-components">
-                          <span className="eyebrow">Components involved</span>
-                          {active.boxes.map((box) => (
-                            <span key={box}>{pdfBoxes[box]}</span>
-                          ))}
-                        </div>
-                        <div className="architecture-step-output">
-                          <span className="eyebrow">Passes forward</span>
-                          <p>{active.output}</p>
-                        </div>
-                      </>
-                    );
-                  })()
-                )}
-              </aside>
+          )}
+          <div className="architecture-story-layout architecture-explorer-layout">
+            <div>
+              <div
+                className="closing-diagram"
+                role="img"
+                aria-label={explorerCase ? `Architecture highlighting ${cases.find((u) => u.id === explorerCase)?.label || "the selected workflow"}${explorerStep >= 0 ? ` — ${workflows[explorerCase]?.[explorerStep]?.title}` : ""}` : "The full proposed OpenAI, Adobe and Code and Theory architecture"}
+                dangerouslySetInnerHTML={{ __html: explorerCase ? architectureDiagram(s, explorerCase, explorerStep) : architectureDiagram(s) }}
+              />
+              <p className="diagram-legend">
+                {explorerCase ? "Gold traces the components and connections involved in this workflow. Dashed connections are the proposed flow to validate." : "The starting proposal: a complete system view before any workflow is highlighted."}
+              </p>
             </div>
-          </section>
-        ) : (
-          <section className="architecture-overview">
-            <div
-              className="closing-diagram architecture-overview-diagram"
-              role="img"
-              aria-label="The full proposed OpenAI, Adobe and Code and Theory architecture"
-              dangerouslySetInnerHTML={{ __html: architectureDiagram(s) }}
-            />
-            <p className="diagram-legend">
-              The starting proposal: a complete system view before any workflow
-              is highlighted.
-            </p>
-            <div className="architecture-priority-picker">
-              <div>
-                <span className="eyebrow">Follow a priority use case</span>
-                <h3>Where does each workflow run through the architecture?</h3>
-                <p>
-                  Choose a priority to trace its components, data movement and
-                  proposed handoffs step by step.
-                </p>
-              </div>
-              <div>
-                {cases.slice(0, 3).map((u, index) => (
-                  <button key={u.id} onClick={() => chooseExplorerCase(u.id)}>
-                    <span>{String(index + 1).padStart(2, "0")}</span>
-                    <b>{u.label}</b>
-                    <i aria-hidden="true">→</i>
-                  </button>
-                ))}
-              </div>
-            </div>
-          </section>
-        )
+            <aside className="architecture-explorer-story">
+              {!explorerCase ? (
+                <>
+                  <span className="eyebrow">Start here</span>
+                  <h4>One shared foundation</h4>
+                  <p>This is the proposed system as a whole: OpenAI intelligence and orchestration connect to Adobe identity, content operations, activation, governance and measurement.</p>
+                  <div className="architecture-starting-points"><div><b>OpenAI</b><span>Marketer surface, reasoning, intelligence and attribution.</span></div><div><b>Adobe</b><span>Identity, content operations, activation, governance and measurement.</span></div><div><b>Code and Theory</b><span>Interface design, orchestration implementation and operating model.</span></div></div>
+                  <p className="architecture-explorer-note">Choose a priority use case above to see only the relevant components and the story of how work moves between them.</p>
+                </>
+              ) : explorerStep < 0 ? (
+                <>
+                  <span className="eyebrow">The proposed flow</span>
+                  <h4>One connected sequence</h4>
+                  <ol>{(workflows[explorerCase] || []).map((item, index) => <li key={item.title}><button onClick={() => setExplorerStep(index)}><b>{index + 1}. {item.title}</b><span>{item.output}</span></button></li>)}</ol>
+                </>
+              ) : (() => {
+                const active = workflows[explorerCase]?.[explorerStep];
+                if (!active) return null;
+                return <><span className="eyebrow">{explorerStep + 1} / {workflows[explorerCase]?.length}</span><h4>{active.title}</h4><p>{active.proposal}</p><div className="architecture-step-components"><span className="eyebrow">Components involved</span>{active.boxes.map((box) => <span key={box}>{pdfBoxes[box]}</span>)}</div><div className="architecture-step-output"><span className="eyebrow">Passes forward</span><p>{active.output}</p></div></>;
+              })()}
+            </aside>
+          </div>
+        </section>
       ) : compact ? (
         <>
           <div
