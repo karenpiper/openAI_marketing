@@ -5390,7 +5390,9 @@
   border-color: #bcd4c4;
   background: #f5faf5;
   box-shadow: 0 18px 42px #1d4e3426;
+  pointer-events: none;
 }
+.workflow-architecture-rail > header button { pointer-events: auto; }
 .workflow-architecture-rail > header {
   padding-bottom: 7px;
 }
@@ -5424,6 +5426,11 @@
   background: #fff;
 }
 .workflow-architecture-route div { display: grid; gap: 4px; }
+.workflow-architecture-route-step {
+  opacity: .18;
+  transform: translateY(3px);
+  animation: workflow-architecture-light .5s ease-out forwards;
+}
 .workflow-architecture-route span {
   padding: 7px 9px;
   border: 1px solid #c6ddcb;
@@ -5439,6 +5446,11 @@
   font-style: normal;
   line-height: .7;
   text-align: center;
+}
+@keyframes workflow-architecture-light {
+  0% { opacity: .18; transform: translateY(3px); filter: saturate(.4); }
+  60% { opacity: 1; transform: translateY(0); filter: saturate(1.25); }
+  100% { opacity: 1; transform: translateY(0); filter: saturate(1); }
 }
 .workflow-architecture-pass {
   display: grid;

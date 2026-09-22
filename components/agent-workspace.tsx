@@ -111,12 +111,14 @@ function WorkflowArchitectureRail({
   onClose,
   activity,
   activeRoute,
+  activityVersion,
 }: {
   session: ReturnType<typeof createAgentState>;
   id: string;
   onClose: () => void;
   activity: string;
   activeRoute: string[] | null;
+  activityVersion: number;
 }) {
   const step = currentWorkStep(session, id);
   const stage = workStages(session, id)[step];
@@ -176,7 +178,11 @@ function WorkflowArchitectureRail({
         aria-label="Systems active in this transition"
       >
         {(activeRoute || defaultRoute).map((component, index, route) => (
-          <div key={component}>
+          <div
+            key={`${activityVersion}-${component}`}
+            className="workflow-architecture-route-step"
+            style={{ animationDelay: `${index * 0.55}s` }}
+          >
             <span>{component}</span>
             {index < route.length - 1 && <i aria-hidden="true">↓</i>}
           </div>
@@ -345,6 +351,8 @@ export default function AgentWorkspace() {
   const [architectureRoute, setArchitectureRoute] = useState<string[] | null>(
     null,
   );
+  const [architectureActivityVersion, setArchitectureActivityVersion] =
+    useState(0);
   const [showRecapResults, setShowRecapResults] = useState(false);
   const chapter = Math.max(0, Math.min(2, s.day.moment - 1));
   function setChapter(index: number) {
@@ -372,6 +380,7 @@ export default function AgentWorkspace() {
     setShowStepContext(false);
     setArchitectureActivity("");
     setArchitectureRoute(null);
+    setArchitectureActivityVersion(0);
     setShowRecapResults(false);
     setPage("workspace");
     requestAnimationFrame(() =>
@@ -570,6 +579,7 @@ export default function AgentWorkspace() {
   function recordArchitectureActivity(activity: string) {
     setArchitectureActivity(activity);
     setArchitectureRoute(routeForArchitectureActivity(activity));
+    setArchitectureActivityVersion((version) => version + 1);
   }
   const arch = architectureSession(s);
   return (
@@ -960,6 +970,7 @@ export default function AgentWorkspace() {
                             onClose={() => setShowStepContext(false)}
                             activity={architectureActivity}
                             activeRoute={architectureRoute}
+                            activityVersion={architectureActivityVersion}
                           />
                         ) : undefined
                       }
