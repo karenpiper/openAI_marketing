@@ -1,12 +1,12 @@
 import type { Session } from "./workshop";
 import { currentQuestions, findAnswer } from "./workshop-guide";
 export const pdfBoxes = {
-  orchestration: "OpenAI Frontier",
+  orchestration: "OpenAI Frontier orchestration layer",
   interface: "Codex Interfaces + ChatGPT work / Agent Interface(s)",
   data: "OpenAI Data Lake / Adobe CDP (w/ ABM)",
   assets: "Adobe CSC",
   review: "Adobe Workfront",
-  touchpoints: "Events / CRM (Marketing) / Marketing Website / Adobe Marketo",
+  touchpoints: "Events / CRM (Marketing) / Marketing Website",
   journeys: "Adobe Customer Journey Analytics → OpenAI Data Lake",
   sales: "Salesforce / CRM (Sales) / Offer Tools",
 };

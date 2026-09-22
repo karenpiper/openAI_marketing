@@ -13,7 +13,7 @@ const routes: Record<string, string[][]> = {
   ],
 };
 const names: Record<string, string> = {
-  A: "OpenAI agent interface",
+  A: "ChatGPT / agent interface",
   B: "Adobe Workfront",
   C: "Adobe CSC / assets",
   D: "OpenAI data lake + CDP ABM",

@@ -32,7 +32,7 @@ export function architectureDiagram(
     focusReferences ??
       shown.flatMap((step) => step.boxes.map((k) => diagramReferences[k])),
   );
-  // Frontier is the shared orchestration layer for every proposed workflow.
+  // Frontier is the shared orchestration layer for every proposed workflow; agents use it, rather than being it.
   if (shown.length || focusReferences?.length) active.add("H");
   const focused = active.size > 0;
   const groupFor = (x: number, y: number) =>
@@ -92,13 +92,19 @@ export function architectureDiagram(
     yy: number,
     groups: string[] = [],
   ) => {
-    const a = Math.atan2(yy - y, xx - x);
+    const dx = xx - x;
+    const dy = yy - y;
+    const distance = Math.hypot(dx, dy) || 1;
+    const bend = Math.min(34, distance * 0.12) * (dx >= 0 ? -1 : 1);
+    const cx = (x + xx) / 2 + (-dy / distance) * bend;
+    const cy = (y + yy) / 2 + (dx / distance) * bend;
+    const a = Math.atan2(yy - cy, xx - cx);
     const color =
       focused && groups.length && groups.every((g) => active.has(g))
         ? "#a85c00"
         : "#365343";
     const opacity = focused && !groups.every((g) => active.has(g)) ? 0.2 : 1;
-    return `<g opacity="${opacity}"><path d="M ${x} ${y} L ${xx} ${yy}" fill="none" stroke="#365343" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M ${xx} ${yy} L ${xx - 11 * Math.cos(a - 0.45)} ${yy - 11 * Math.sin(a - 0.45)} L ${xx - 11 * Math.cos(a + 0.45)} ${yy - 11 * Math.sin(a + 0.45)} Z" fill="#365343"/></g>`.replaceAll(
+    return `<g opacity="${opacity}"><path d="M ${x} ${y} Q ${cx.toFixed(1)} ${cy.toFixed(1)} ${xx} ${yy}" fill="none" stroke="#365343" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M ${xx} ${yy} L ${xx - 11 * Math.cos(a - 0.45)} ${yy - 11 * Math.sin(a - 0.45)} L ${xx - 11 * Math.cos(a + 0.45)} ${yy - 11 * Math.sin(a + 0.45)} Z" fill="#365343"/></g>`.replaceAll(
       "#365343",
       color,
     );
@@ -147,9 +153,9 @@ export function architectureDiagram(
         ];
       };
       const points = [...ports(a), ...ports(b).reverse()];
-      const path = points
-        .map(([x, y], i) => `${i ? "L" : "M"} ${x} ${y}`)
-        .join(" ");
+      const [sx, sy] = points[0];
+      const [ex, ey] = points[points.length - 1];
+      const path = `M ${sx} ${sy} C 470 ${sy}, 470 ${ey}, ${ex} ${ey}`;
       const [xx, yy] = anchors[b];
       return `<path d="${path}" stroke="#a85c00" stroke-width="3" stroke-dasharray="9 6" stroke-linecap="round" stroke-linejoin="round" fill="none"/><circle cx="${xx}" cy="${yy}" r="4" fill="#a85c00"/>`;
     })
@@ -160,11 +166,12 @@ export function architectureDiagram(
  ${box(103, 65, 330, 65, ["Codex Interfaces", "+ ChatGPT work"])}${box(103, 145, 330, 65, ["Agent Interface(s)"])}${tag(345, 40, "A")}
  ${text(490, 27, ["B2B Marketing Touchpoints"], 23)}
  ${box(490, 40, 340, 55, ["Events"])}${box(490, 105, 340, 55, ["CRM (Marketing)"])}${box(490, 170, 340, 55, ["Marketing Website"])}${tag(850, 10, "E")}
+ ${text(103, 257, ["Adobe marketing tools"], 17)}<rect rx="16" x="85" y="265" width="365" height="155" fill="#edf2e8" stroke="#c0cdbf"/>
  ${box(103, 270, 100, 135, ["Adobe", "Workfront"], 16)}${tag(103, 240, "B")}
  ${box(220, 270, 100, 135, ["Adobe", "CSC"], 17)}${tag(220, 240, "C")}
  ${box(337, 270, 96, 135, ["Adobe", "Marketo"], 16)}
  ${box(103, 430, 330, 60, ["Adobe CDP (w/ ABM)"])}${tag(330, 430, "D")}
- ${box(610, 270, 250, 72, ["OpenAI Frontier"], 20, "H")}${tag(842, 242, "H")}
+ ${box(610, 270, 250, 72, ["OpenAI Frontier", "Orchestration layer"], 18, "H")}${tag(842, 242, "H")}
  ${arrow(610, 288, 433, 177, ["H", "A"])}${arrow(735, 270, 660, 162, ["H", "E"])}${arrow(610, 318, 433, 460, ["H", "D"])}${arrow(610, 330, 320, 337, ["H", "C"])}${arrow(860, 306, 907, 306, ["H", "F"])}
  <path d="M 470 40 L 470 410" stroke="#c0cdbf" stroke-dasharray="7 7"/>
  ${text(18, 523, ["OAI Infrastructure"], 17)}<rect rx="16" x="18" y="535" width="582" height="300" fill="#edf2e8" stroke="#c0cdbf"/>
