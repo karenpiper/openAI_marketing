@@ -271,13 +271,13 @@ export function workStages(s: AgentState, id: string): WorkStage[] {
   }
   return [
     {
-      title: "Run the routine checks",
+      title: "Run pre-flight release checks",
       action: "Inspect the exception",
       summary:
-        "The agent applies the campaign checklist and separates routine checks from a consent conflict.",
+        "Before launch, the agent applies the release checklist and separates routine validation from a consent conflict.",
       input:
         "Staged campaign, destination references, configuration and policy.",
-      output: "Check results and an exception queue.",
+      output: "Pre-flight check results and an exception queue.",
       connection:
         "Scoped read tools for marketing activation + campaign state → OpenAI agent.",
       enables:
@@ -442,7 +442,7 @@ export function workflowArtifact(s: AgentState, id: string, index: number) {
       "Channel handoff bundle",
     ],
     s5: [
-      "Campaign check report",
+      "Pre-flight release check",
       "Consent exception ticket",
       "Decision and audit record",
     ],

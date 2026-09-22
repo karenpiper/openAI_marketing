@@ -534,8 +534,10 @@ export default function ProcessActions({
       {id === "s5" && index === 0 && (
         <>
           <p>
-            Run a simulated check against the staged campaign. The result
-            returns to this same screen.
+            This is the pre-flight release check: confirm the staged audience,
+            assets and destinations before launch. It is not a performance
+            report; campaign results return after launch in Morgan’s end-of-day
+            recap.
           </p>
           <button
             onClick={() =>
@@ -545,7 +547,7 @@ export default function ProcessActions({
               )
             }
           >
-            Run link, setup and consent checks
+            Run pre-flight checks
           </button>
           {["Checked", "Complete"].includes(p.status) && (
             <>
