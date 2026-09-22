@@ -1311,17 +1311,6 @@ export default function AgentWorkspace() {
                               </div>
                             </div>
                           ))}
-                          <div className="agent-suggestions">
-                            {[
-                              "Why these accounts?",
-                              "Use website instead",
-                              "Focus on lifecycle stages",
-                            ].map((prompt) => (
-                              <button key={prompt} onClick={() => ask(prompt)}>
-                                {prompt}
-                              </button>
-                            ))}
-                          </div>
                           <form
                             className="agent-composer"
                             onSubmit={(e) => {

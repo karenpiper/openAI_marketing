@@ -421,7 +421,7 @@ export default function ProcessActions({
                   )
                 }
               >
-                Use this source set
+                Apply selected foundation to brief →
               </button>
               {p.status === "Blocked" && (
                 <p>

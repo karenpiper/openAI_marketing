@@ -84,7 +84,7 @@ export default function AgentBriefing({ onEnter }: { onEnter: () => void }) {
         <div className="opening-cards outcome-cards">
           <article>
             <span>01</span>
-            <h3>AAR growth</h3>
+            <h3>Value realization · AAR</h3>
             <p>
               The primary measure: AAR created and realized from enterprise
               pipeline, including expansion opportunities.
@@ -199,15 +199,15 @@ export function MeetMorgan({ onEnter }: { onEnter: () => void }) {
           sizes="(max-width:700px) 90vw, 480px"
         />
         <p>
+          She leads growth and account-based marketing. Her job today is to turn
+          enterprise interest into meaningful adoption while making sound calls
+          across that queue.
+        </p>
+        <p>
           She arrives to a real marketing queue: account signals to interpret,
           requests waiting for operations, campaigns in review, new contacts to
           reach and yesterday’s results to learn from. There may be thirty
           things competing for attention before the first meeting even starts.
-        </p>
-        <p>
-          She leads growth and account-based marketing. Her job today is to turn
-          enterprise interest into meaningful adoption while making sound calls
-          across that queue.
         </p>
         <div className="morgan-story-note">
           <b>This is a working hypothesis of Morgan’s day today.</b>
