@@ -60,11 +60,19 @@ export default function ChannelHandoff({
   const variants = contentVariants(session, previewTheme);
   const accountVariants = variants.filter((v) => v.accountId === "ACCT-01");
   const variant = accountVariants[segmentIndex] || accountVariants[0];
+  const themeImage: Record<string, string> = {
+    "adoption-in-practice": "/images/campaign/adoption-in-practice.png",
+    "business-value": "/images/campaign/business-value.png",
+    "confidence-to-scale": "/images/campaign/confidence-to-scale.png",
+  };
+  const creativeImage =
+    themeImage[previewTheme] || themeImage["adoption-in-practice"];
   const p = processState(session, "s3", 3);
   const channels = activationChannels(session.channel);
   const activeTab = channels.includes(tab) ? tab : channels[0];
   const approved = processReady(session, "s3", 2);
   const campaignPrepared = channels.every((channel) => p.reviewers[channel] === "Staged");
+  const deploymentStaged = p.owner === "Deployment staged";
   function stage() {
     const reviewers = {
       ...p.reviewers,
@@ -78,6 +86,23 @@ export default function ChannelHandoff({
           status: "Complete",
         },
         `${activeTab} output for Northstar Health accepted by the simulated connector. Routed to the configured team. Not sent.`,
+      ),
+    );
+  }
+  function deploymentDestination(channel: string) {
+    if (channel === "Email") return "Marketing CRM / Marketo connector";
+    if (channel === "Event follow-up") return "Event platform + marketing CRM";
+    if (channel === "Website") return "Marketing website / CMS connector";
+    if (channel === "Sales enablement") return "Sales CRM / account workspace";
+    if (channel === "Executive thought leadership") return "Executive communications workflow";
+    return "Social trafficking / advocacy workflow";
+  }
+  function deploy() {
+    onChange(
+      processUpdate(
+        p,
+        { owner: "Deployment staged" },
+        `Campaign deployment staged through the proposed connectors: ${channels.map((channel) => `${channel} → ${deploymentDestination(channel)}`).join("; ")}. No live assets were published.`,
       ),
     );
   }
@@ -262,6 +287,7 @@ export default function ChannelHandoff({
                 <small>OPENAI FOR ENTERPRISE</small>
                 <h2>{variant.headline}</h2>
                 <p>{variant.body}</p>
+                <img className="email-creative" src={creativeImage} alt="" />
                 <p className="email-proof">{variant.proof}</p>
                 <span className="preview-cta">{variant.cta} →</span>
               </article>
@@ -299,6 +325,7 @@ export default function ChannelHandoff({
             <div className="website-preview">
               <nav><b>OpenAI</b><span>Enterprise</span><span>Resources</span><button>Talk to sales</button></nav>
               <div className="website-hero">
+                <img src={creativeImage} alt="" />
                 <small>FOR NORTHSTAR HEALTH · {variant.segment.toUpperCase()}</small>
                 <h2>{variant.headline}</h2>
                 <p>{variant.body}</p>
@@ -311,25 +338,61 @@ export default function ChannelHandoff({
               <header><span>OPENAI FOR ENTERPRISE</span><b>Account brief</b><em>Northstar Health</em></header>
               <div className="seller-score"><span>Opportunity signal</span><b>Active evaluation · sponsor gap</b></div>
               <section><small>WHY NOW</small><p>{variant.context}</p></section>
-              <section><small>CONVERSATION OPENING</small><h2>{variant.headline}</h2><p>{variant.body}</p></section>
+              <section><small>CONVERSATION OPENING</small><h2>{variant.headline}</h2><p>{variant.body}</p><img src={creativeImage} alt="" /></section>
               <footer><b>Suggested next move</b><span>{variant.cta} →</span></footer>
             </div>
           ) : activeTab === "Executive thought leadership" ? (
             <div className="pov-preview">
               <header><b>OpenAI</b><span>Ideas</span><span>Enterprise</span></header>
-              <article><small>POINT OF VIEW</small><h2>{variant.headline}</h2><p>{variant.body}</p><blockquote>“The question is no longer whether teams can begin. It is how leaders create the conditions for useful, governed adoption.”</blockquote><div><span>5 min read</span><b>Read the perspective →</b></div></article>
+              <article><small>POINT OF VIEW</small><img src={creativeImage} alt="" /><h2>{variant.headline}</h2><p>{variant.body}</p><blockquote>“The question is no longer whether teams can begin. It is how leaders create the conditions for useful, governed adoption.”</blockquote><div><span>5 min read</span><b>Read the perspective →</b></div></article>
             </div>
           ) : (
             <div className="social-preview">
               <header><span className="social-avatar">O</span><div><b>OpenAI</b><small>Sponsored · for {variant.recipient}</small></div><span>•••</span></header>
               <p>{variant.body}</p>
-              <div className="social-card"><small>OPENAI FOR ENTERPRISE</small><h2>{variant.headline}</h2><span>{variant.cta} →</span></div>
+              <div className="social-card"><img src={creativeImage} alt="" /><small>OPENAI FOR ENTERPRISE</small><h2>{variant.headline}</h2><span>{variant.cta} →</span></div>
               <footer><span>♡ 128</span><span>◌ 24 comments</span><span>↗ Share</span></footer>
             </div>
           )}
         </div>
       </div>
         </div>
+      )}
+      {campaignPrepared && (
+        <section className="deployment-panel">
+          <header>
+            <span className="agent-kicker">Next · simulated deployment</span>
+            <h3>Stage the campaign in its connected destinations.</h3>
+            <p>
+              The agent carries the approved audience rules, personalized
+              assets, campaign ID and measurement instructions into every
+              destination as one coordinated release package.
+            </p>
+          </header>
+          <div className="deployment-routes">
+            {channels.map((channel) => (
+              <article key={channel}>
+                <span>{channel}</span>
+                <b>→</b>
+                <strong>{deploymentDestination(channel)}</strong>
+              </article>
+            ))}
+          </div>
+          {!deploymentStaged ? (
+            <button className="agent-primary" onClick={deploy}>
+              Stage campaign in connected destinations
+            </button>
+          ) : (
+            <div className="deployment-receipt" role="status">
+              <b>✓ Campaign staged · not published</b>
+              <p>
+                Each destination has the right personalized asset, audience
+                rule, campaign identifier and measurement instruction. Final
+                eligibility and destination checks remain before release.
+              </p>
+            </div>
+          )}
+        </section>
       )}
       <div className="handoff-progress">
         {campaignPrepared

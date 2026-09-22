@@ -4805,7 +4805,9 @@
 }
 .website-preview nav b,.pov-preview header b { font-size: 16px; color:#1d1d1d; }
 .website-preview nav button { margin-left:auto; padding: 7px 10px; font-size: 10px; }
-.website-hero { padding: 38px 34px; background: #123a2d; color: #f7f7f2; }
+.website-hero { position:relative; overflow:hidden; padding: 38px 34px; background: #123a2d; color: #f7f7f2; }
+.website-hero > img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; opacity:.28; mix-blend-mode:screen; }
+.website-hero > *:not(img) { position:relative; z-index:1; }
 .website-hero small,.seller-preview small,.pov-preview small { font-size:10px; letter-spacing:.1em; }
 .website-hero h2 { max-width: 15ch; margin: 13px 0; font-size: 31px; line-height: 1.03; letter-spacing:-.05em; }
 .website-hero p { max-width: 57ch; line-height:1.55; font-size:13px; }
@@ -4818,8 +4820,10 @@
 .seller-preview section { padding:16px 18px; border-top:1px solid #e7ece7; }
 .seller-preview section p { margin:7px 0 0; font-size:12px; line-height:1.55; }
 .seller-preview h2 { margin:8px 0; font-size:20px; letter-spacing:-.04em; }
+.seller-preview section img { display:block; width:100%; height:150px; margin-top:15px; border-radius:8px; object-fit:cover; }
 .seller-preview footer { display:flex; justify-content:space-between; padding:15px 18px; background:#193e30; color:white; font-size:11px; }
 .pov-preview article { padding:35px; background:#f5f2eb; }
+.pov-preview article > img { display:block; width:100%; height:190px; margin:14px 0 22px; object-fit:cover; }
 .pov-preview h2 { max-width:15ch; margin:12px 0; font-size:32px; line-height:1.03; letter-spacing:-.05em; }
 .pov-preview p { max-width:60ch; font-size:13px; line-height:1.6; }
 .pov-preview blockquote { margin:25px 0; padding-left:16px; border-left:2px solid #b46847; font-size:17px; line-height:1.35; }
@@ -4831,6 +4835,8 @@
 .social-preview header small { display:block; margin-top:2px; color:#778078; font-size:10px; }
 .social-preview > p { padding:0 16px; font-size:13px; line-height:1.55; }
 .social-card { margin:15px 16px; padding:27px; background:#d7e4d7; min-height:170px; }
+.social-card img { display:block; width:calc(100% + 54px); height:155px; margin:-27px -27px 22px; object-fit:cover; }
+.email-creative { display:block; width:100%; height:145px; margin:18px 0; border-radius:6px; object-fit:cover; }
 .social-card small { font-size:10px; letter-spacing:.1em; }
 .social-card h2 { max-width:15ch; margin:11px 0 20px; font-size:25px; line-height:1.05; letter-spacing:-.05em; }
 .social-card span { font-size:12px; font-weight:600; }
@@ -4918,6 +4924,22 @@
 .agent-app .gallery-choice-row button[aria-pressed="true"] { border-color: #24704a; background: #eaf4eb; color: #174a31; font-weight: 650; }
 .gallery-choice-row small { display: block; margin-top: 3px; color: #367453; font-size: 9px; font-weight: 500; }
 .gallery-preview-note { grid-column: 1 / -1; padding-top: 10px; border-top: 1px solid #edf0ed; }
+.deployment-panel {
+  margin: 22px 0 0;
+  padding: 22px;
+  border: 1px solid #cdddcf;
+  border-radius: 14px;
+  background: #f2f7f1;
+}
+.deployment-panel h3 { margin: 8px 0; font-size: 20px; letter-spacing: -.04em; }
+.deployment-panel header > p { max-width: 72ch; margin: 0; color: #56705e; font-size: 12px; line-height: 1.55; }
+.deployment-routes { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin: 18px 0; }
+.deployment-routes article { display: grid; grid-template-columns: minmax(90px, .8fr) 18px minmax(0, 1.2fr); gap: 7px; align-items: center; padding: 12px; border: 1px solid #d7e4d8; border-radius: 8px; background: #fff; }
+.deployment-routes span,.deployment-routes strong { font-size: 11px; line-height: 1.35; }
+.deployment-routes b { color: #4e8060; }
+.deployment-receipt { margin-top: 16px; padding: 14px; border-radius: 9px; background: #e1f0e2; color: #285538; }
+.deployment-receipt p { margin: 6px 0 0; font-size: 11px; line-height: 1.55; }
+@media (max-width: 700px) { .deployment-routes { grid-template-columns: 1fr; } }
 @media (max-width: 900px) {
   .asset-gallery-modal { left: 22px; right: 22px; top: 72px; bottom: 18px; }
   .gallery-inspector { grid-template-columns: 1fr; }
