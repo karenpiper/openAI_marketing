@@ -31,12 +31,12 @@ export default function AgentBriefing({ onEnter }: { onEnter: () => void }) {
         <h1>
           Imagine the day.
           <br />
-          Define what makes it possible.
+          Define what delivers enterprise revenue now.
         </h1>
         <p>
-          Start with the experience we want a marketer to have. Use it to align
-          on the work worth doing—and the capabilities, connections and
-          boundaries that would make it real.
+          Start with the work that can move enterprise opportunities forward
+          now. Use the experience to align on the decisions, capabilities,
+          connections and boundaries that make that work repeatable.
         </p>
         <a href="#opening-heard">What we heard ↓</a>
       </section>
@@ -63,11 +63,11 @@ export default function AgentBriefing({ onEnter }: { onEnter: () => void }) {
           </article>
           <article>
             <span>THE QUESTION</span>
-            <h3>What makes it real?</h3>
+            <h3>What delivers enterprise revenue now?</h3>
             <p>
-              Some capabilities may already exist. Others may be feasible
-              internally or need additional support. An absent process is not
-              automatically a missing capability.
+              Start with the actions that help buying groups advance today.
+              Then identify what is already usable, what needs connecting and
+              which gaps would unlock more value.
             </p>
           </article>
         </div>
