@@ -1,6 +1,7 @@
 import type { Session } from "./workshop";
 import { workflows } from "./architecture-workflow";
 export const diagramReferences = {
+  orchestration: "H",
   interface: "A",
   review: "B",
   assets: "C",
@@ -31,6 +32,8 @@ export function architectureDiagram(
     focusReferences ??
       shown.flatMap((step) => step.boxes.map((k) => diagramReferences[k])),
   );
+  // Frontier is the shared orchestration layer for every proposed workflow.
+  if (shown.length || focusReferences?.length) active.add("H");
   const focused = active.size > 0;
   const groupFor = (x: number, y: number) =>
     x === 103 && y < 230
@@ -74,10 +77,11 @@ export function architectureDiagram(
     h: number,
     lines: string[],
     size = 19,
+    id = groupFor(x, y),
   ) =>
     tint(
-      `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="12" fill="#ffffff" stroke="#365343" stroke-width="1.5"/>${text(x + 16, y + Math.max(28, (h - lines.length * (size + 5)) / 2 + size), lines, size)}`,
-      groupFor(x, y),
+      `<g class="architecture-component" data-architecture-component="${id}" tabindex="0" role="button"><rect x="${x}" y="${y}" width="${w}" height="${h}" rx="12" fill="#ffffff" stroke="#365343" stroke-width="1.5"/>${text(x + 16, y + Math.max(28, (h - lines.length * (size + 5)) / 2 + size), lines, size)}</g>`,
+      id,
     );
   const tag = (x: number, y: number, id: string) =>
     `<rect x="${x}" y="${y}" width="${counts[id] ? 85 : 30}" height="27" rx="6" fill="${counts[id] ? "#85581f" : "#365343"}"/>${text(x + 7, y + 19, [`${id}${counts[id] ? ` · ${counts[id]} notes` : ""}`], 13).replaceAll("#203d33", "#ffffff")}`;
@@ -159,6 +163,7 @@ export function architectureDiagram(
  ${box(220, 270, 100, 135, ["Adobe", "CSC"], 17)}${tag(220, 240, "C")}
  ${box(337, 270, 96, 135, ["Adobe", "Marketo"], 16)}
  ${box(103, 430, 330, 60, ["Adobe CDP (w/ ABM)"])}${tag(330, 430, "D")}
+ ${box(610, 270, 250, 72, ["OpenAI Frontier"], 20, "H")}${tag(842, 242, "H")}
  <path d="M 470 40 L 470 410" stroke="#c0cdbf" stroke-dasharray="7 7"/>
  ${text(18, 523, ["OAI Infrastructure"], 17)}<rect rx="16" x="18" y="535" width="582" height="300" fill="#edf2e8" stroke="#c0cdbf"/>
  ${box(113, 555, 455, 255, ["OpenAI", "Data Lake"], 32)}

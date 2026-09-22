@@ -1,6 +1,7 @@
 import type { Session } from "./workshop";
 import { currentQuestions, findAnswer } from "./workshop-guide";
 export const pdfBoxes = {
+  orchestration: "OpenAI Frontier",
   interface: "Codex Interfaces + ChatGPT work / Agent Interface(s)",
   data: "OpenAI Data Lake / Adobe CDP (w/ ABM)",
   assets: "Adobe CSC",

@@ -3751,6 +3751,23 @@ body {
   color: #275440;
   font-size: 0.8rem;
 }
+.architecture-step-components > button {
+  padding: 0.45rem 0.6rem;
+  border: 1px solid #b9cfbe;
+  border-radius: 999px;
+  background: #fffdf7;
+  color: #275440;
+  font-size: 0.8rem;
+  text-align: left;
+}
+.architecture-step-components > button:hover { border-color: #527864; background: #eef5ee; }
+.architecture-component { cursor: pointer; }
+.architecture-component:hover rect, .architecture-component:focus rect { stroke: #a85c00; stroke-width: 4; }
+.architecture-component:focus { outline: none; }
+.architecture-component-capabilities { margin: 1.15rem 0; padding: 1rem; border: 1px solid #c9d9ca; border-radius: 10px; background: #fffdf7; }
+.architecture-component-capabilities .eyebrow { display: block; margin-bottom: .55rem; }
+.architecture-component-capabilities ul { display: grid; gap: .5rem; margin: 0; padding-left: 1.1rem; color: #365343; font-size: .85rem; line-height: 1.4; }
+.architecture-component-back { margin-top: 1rem; padding: .55rem .75rem; border: 1px solid #c9d2c5; border-radius: 8px; background: #fffdf7; color: #18382c; font-size: .82rem; }
 .architecture-step-output {
   padding-top: 1rem;
   border-top: 1px solid #c9d2c5;

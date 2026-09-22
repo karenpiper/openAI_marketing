@@ -1,10 +1,25 @@
 import { workflows } from "../lib/architecture-workflow";
-import { architectureDiagram } from "../lib/architecture-diagram";
+import { architectureDiagram, diagramReferences } from "../lib/architecture-diagram";
 import { pdfBoxes } from "../lib/architecture-workflow";
 import { useEffect, useState, type Dispatch, type SetStateAction } from "react";
 import { activeCases, type Session } from "../lib/workshop";
 import { architectureOutput } from "../lib/architecture-output";
 import { Badge } from "./workshop-fields";
+
+const componentProfiles: Record<string, { title: string; role: string; capabilities: string[] }> = {
+  H: {
+    title: "OpenAI Frontier",
+    role: "The shared decision and coordination layer: it preserves working context, selects the right specialist capability, retrieves connected evidence and keeps people in control before an external action.",
+    capabilities: ["Shared campaign and account memory", "Model and specialist-agent routing", "Retrieval before action", "Guardrails, permissions and review gates"],
+  },
+  A: { title: "Codex Interfaces + ChatGPT work", role: "Morgan’s working surface for seeing evidence, steering the recommendation and reviewing work without reconstructing context.", capabilities: ["Conversation and artifact workspace", "Recommendation rationale and alternatives", "Human edits and approvals", "Persistent campaign context"] },
+  B: { title: "Adobe Workfront", role: "The review and workflow system that assigns the right checks, records decisions and holds release until they are complete.", capabilities: ["Review routing", "Approval records", "Exceptions and rework", "Release gates"] },
+  C: { title: "Adobe CSC", role: "The governed content source that supplies approved assets, versions, claims and permitted reuse conditions.", capabilities: ["Approved-content retrieval", "Source versioning", "Claims and usage metadata", "Asset references"] },
+  D: { title: "OpenAI Data Lake + Adobe CDP / ABM", role: "The connected account, identity and signal foundation that makes a recommendation specific and defensible.", capabilities: ["Consent-safe identity joins", "Account and buying-group context", "Audience eligibility", "Signal freshness and provenance"] },
+  E: { title: "Marketing touchpoints", role: "The systems that receive approved work for delivery across events, marketing CRM, Marketo and the website.", capabilities: ["Channel-ready payloads", "Campaign and audience identifiers", "Staged activation", "Response events returned to measurement"] },
+  F: { title: "Adobe Customer Journey Analytics", role: "The measurement layer that joins touchpoint response into a view of progression and returns the evidence needed for the next decision.", capabilities: ["Cross-touchpoint journey signals", "Audience progression", "Measurement inputs", "Learning loop to the agent"] },
+  G: { title: "Sales experience", role: "The sales systems that contribute relationship context and receive a qualified, coordinated action when marketing and sales need to work together.", capabilities: ["CRM account context", "Relationship ownership", "Offer and next-step tools", "Confirmed progression signals"] },
+};
 export default function ArchitectureOutput({
   session: s,
   download = true,
@@ -22,6 +37,7 @@ export default function ArchitectureOutput({
   const [error, setError] = useState("");
   const [explorerCase, setExplorerCase] = useState("");
   const [explorerStep, setExplorerStep] = useState(-1);
+  const [explorerComponent, setExplorerComponent] = useState("");
   const [playing, setPlaying] = useState(false);
   const model = architectureOutput(s);
   const cases = activeCases(s);
@@ -48,8 +64,10 @@ export default function ArchitectureOutput({
   function chooseExplorerCase(id: string) {
     setExplorerCase(id);
     setExplorerStep(-1);
+    setExplorerComponent("");
     setPlaying(false);
   }
+  const selectedComponent = componentProfiles[explorerComponent];
 
   async function exportPdf() {
     setBusy(true);
@@ -133,14 +151,34 @@ export default function ArchitectureOutput({
                 className="closing-diagram"
                 role="img"
                 aria-label={explorerCase ? `Workflow architecture highlighting ${cases.find((u) => u.id === explorerCase)?.label || "the selected workflow"}${explorerStep >= 0 ? ` — ${workflows[explorerCase]?.[explorerStep]?.title}` : ""}` : "The full proposed OpenAI, Adobe and Code and Theory workflow architecture"}
-                dangerouslySetInnerHTML={{ __html: explorerCase ? architectureDiagram(s, explorerCase, explorerStep) : architectureDiagram(s) }}
+                onClick={(event) => {
+                  const component = (event.target as HTMLElement).closest<HTMLElement>("[data-architecture-component]")?.dataset.architectureComponent;
+                  if (component && componentProfiles[component]) setExplorerComponent(component);
+                }}
+                onKeyDown={(event) => {
+                  if (event.key !== "Enter" && event.key !== " ") return;
+                  const component = (event.target as HTMLElement).closest<HTMLElement>("[data-architecture-component]")?.dataset.architectureComponent;
+                  if (component && componentProfiles[component]) { event.preventDefault(); setExplorerComponent(component); }
+                }}
+                dangerouslySetInnerHTML={{ __html: explorerCase ? architectureDiagram(s, explorerCase, explorerStep, explorerComponent ? [explorerComponent] : undefined) : architectureDiagram(s, undefined, -1, explorerComponent ? [explorerComponent] : undefined) }}
               />
               <p className="diagram-legend">
-                {explorerCase ? "Gold traces the components and connections involved in this workflow. Dashed connections are the proposed flow to validate." : "The starting proposal: a complete system view before any workflow is highlighted."}
+                {explorerComponent ? "This component is highlighted. Select another box to inspect it, or return to the workflow story." : explorerCase ? "Gold traces the components and connections involved in this workflow. Select any box to inspect what it provides." : "The starting proposal: a complete system view. Select any box to inspect what it provides."}
               </p>
             </div>
             <aside className="architecture-explorer-story">
-              {!explorerCase ? (
+              {selectedComponent ? (
+                <>
+                  <span className="eyebrow">Component drill-down</span>
+                  <h4>{selectedComponent.title}</h4>
+                  <p>{selectedComponent.role}</p>
+                  <div className="architecture-component-capabilities">
+                    <span className="eyebrow">What it has to provide</span>
+                    <ul>{selectedComponent.capabilities.map((capability) => <li key={capability}>{capability}</li>)}</ul>
+                  </div>
+                  <button className="architecture-component-back" onClick={() => setExplorerComponent("")}>← Back to workflow view</button>
+                </>
+              ) : !explorerCase ? (
                 <>
                   <span className="eyebrow">Start here</span>
                   <h4>One shared foundation</h4>
@@ -157,7 +195,7 @@ export default function ArchitectureOutput({
               ) : (() => {
                 const active = workflows[explorerCase]?.[explorerStep];
                 if (!active) return null;
-                return <><span className="eyebrow">{explorerStep + 1} / {workflows[explorerCase]?.length}</span><h4>{active.title}</h4><p>{active.proposal}</p><div className="architecture-step-components"><span className="eyebrow">Components involved</span>{active.boxes.map((box) => <span key={box}>{pdfBoxes[box]}</span>)}</div><div className="architecture-step-output"><span className="eyebrow">Passes forward</span><p>{active.output}</p></div></>;
+                return <><span className="eyebrow">{explorerStep + 1} / {workflows[explorerCase]?.length}</span><h4>{active.title}</h4><p>{active.proposal}</p><div className="architecture-step-components"><span className="eyebrow">Components involved</span><button onClick={() => setExplorerComponent("H")}>{pdfBoxes.orchestration}</button>{active.boxes.map((box) => <button key={box} onClick={() => setExplorerComponent(diagramReferences[box])}>{pdfBoxes[box]}</button>)}</div><div className="architecture-step-output"><span className="eyebrow">Passes forward</span><p>{active.output}</p></div></>;
               })()}
             </aside>
           </div>
