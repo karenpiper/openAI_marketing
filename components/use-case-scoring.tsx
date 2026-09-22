@@ -124,8 +124,9 @@ export default function UseCaseScoring({
               <p>{active.short}</p>
             </div>
             <div className="focus-signal">
-              <small>Composite</small>
+              <small>Composite score</small>
               <b>{prioritySignal(assessment).toFixed(1)}</b>
+              <span>Value, confidence and effort</span>
             </div>
           </header>
           <div className="focus-subcases">
