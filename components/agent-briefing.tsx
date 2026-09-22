@@ -209,14 +209,6 @@ export function MeetMorgan({ onEnter }: { onEnter: () => void }) {
           reach and yesterday’s results to learn from. There may be thirty
           things competing for attention before the first meeting even starts.
         </p>
-        <div className="morgan-story-note">
-          <b>This is a working hypothesis of Morgan’s day today.</b>
-          <p>
-            Correct it with the room. We are mapping the current experience
-            before proposing a future workflow or deciding which capabilities
-            should change it.
-          </p>
-        </div>
         <p className="morgan-human-note">
           Follow her Tuesday first. The use cases come afterwards, when we name
           the repeatable needs that surfaced from it.
@@ -228,42 +220,36 @@ export function MeetMorgan({ onEnter }: { onEnter: () => void }) {
               title: "She opens a full queue.",
               image: "s1",
               body: "Morgan starts with twenty-four possible tasks: an account showing new product interest, an event follow-up waiting for a list, a campaign stalled in review, a sales request, an audience question, and yesterday’s performance results. None arrives as a clean brief. Each competes for attention.",
-              room: "What usually makes it to the top of the queue today? What sits there longer than it should?",
             },
             {
               time: "9:00 AM",
               title: "She decides where to put her attention.",
               image: "s2",
               body: "She pulls together what she can see about the accounts, people, activity and business priorities behind the requests. The difficult part is not finding one more signal; it is judging which signal deserves action and what a good next move would be.",
-              room: "Where does this decision come from now: a playbook, a specialist, a spreadsheet, or Morgan’s own judgment?",
             },
             {
               time: "10:30 AM",
               title: "She tries to turn a decision into work.",
               image: "s3",
               body: "Once Morgan has chosen a direction, she has to find the right people, source material, message and channel. Some of it exists somewhere. Some needs to be created. The work crosses the team’s tools, operating rhythms and people.",
-              room: "What has to come together before a sound decision can become something the market actually sees?",
             },
             {
               time: "12:00 PM",
               title: "She keeps the work moving.",
               image: "s4",
               body: "The afternoon brings routine requests alongside decisions that need real care. Morgan is coordinating marketing operations, reviewers, sales context and delivery—not because every task is complex, but because the handoffs are.",
-              room: "Which work should move without waiting for Morgan, and which moments still need a person in the loop?",
             },
             {
               time: "3:30 PM",
               title: "She steps in where judgment matters.",
               image: "s6",
               body: "A sensitive account, an unclear consent signal and a message for a senior contact do not belong in the same pathway as a routine follow-up. Morgan needs the important exceptions to be visible, intelligible and easy to resolve.",
-              room: "What makes a moment high-stakes enough to require human judgment?",
             },
             {
               time: "6:00 PM",
               title: "She asks what today changed.",
               image: "s7",
-              body: "At the end of the day, Morgan can see activity: sends, event attendance, engagement, replies and work still pending. The harder question is whether those results improve tomorrow’s choices—or remain a report someone reviews later.",
-              room: "How quickly does learning from today change the next decision?",
+              body: "At the end of the day, Morgan can see activity: sends, event attendance, engagement, replies and work still pending. The value comes when those results improve tomorrow’s choices instead of remaining a report someone reviews later.",
             },
           ].map((moment) => (
             <article className="current-day-stop" key={moment.time}>
@@ -279,12 +265,6 @@ export function MeetMorgan({ onEnter }: { onEnter: () => void }) {
                 </span>
                 <h2>{moment.title}</h2>
                 <p className="current-day-narrative">{moment.body}</p>
-                <div className="current-day-detail">
-                  <div>
-                    <b>Ask the room</b>
-                    <p>{moment.room}</p>
-                  </div>
-                </div>
               </div>
             </article>
           ))}
