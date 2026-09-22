@@ -1,4 +1,8 @@
 import type { AgentState } from "./agent-workspace";
+import {
+  contentSourceOptions,
+  selectedContentSource,
+} from "./content-source-library";
 
 // Fictional account context for the prototype, never customer data.
 const accountNames = [
@@ -30,6 +34,10 @@ export const exampleAccounts = accountNames.map((name, i) => ({
   ][i % 3],
 }));
 export function contentVariants(s: Pick<AgentState, "audience">) {
+  const sourceSet =
+    "process" in s
+      ? selectedContentSource(s as AgentState)
+      : contentSourceOptions[0];
   const segments =
     s.audience === "Buying roles"
       ? [
@@ -89,10 +97,10 @@ export function contentVariants(s: Pick<AgentState, "audience">) {
       context: account.context,
       segment,
       subject: `${headline}: ${account.focus}`,
-      headline,
-      body: `For ${account.name}, the starting point is ${account.focus}. ${body}`,
+      headline: `${headline} — ${sourceSet.baseContent.headline}`,
+      body: `Base message: ${sourceSet.baseContent.message}\n\nAdapted for ${account.name} / ${segment}: the starting point is ${account.focus}. ${body}\n\nApproved proof to retain: ${sourceSet.baseContent.proof}`,
       cta,
-      source: "Enterprise adoption guide v3 · illustrative source",
+      source: `${sourceSet.title} · public OpenAI references`,
       eligibility:
         "Candidate only: requires matched identity, segment membership and consent",
     })),

@@ -1,6 +1,7 @@
 import { contentVariants } from "./content-variants";
 import { processState, processDigest } from "./process-state";
 import type { AgentState } from "./agent-workspace";
+import { selectedContentSource } from "./content-source-library";
 export type WorkStage = {
   title: string;
   action: string;
@@ -117,6 +118,7 @@ export function workStages(s: AgentState, id: string): WorkStage[] {
           ? ["Exploring", "Evaluating", "Ready for sales"]
           : ["Eligible audience"];
     const channel = s.channel.toLowerCase();
+    const sourceSet = selectedContentSource(s);
     return [
       {
         title: "Check the source material",
@@ -124,7 +126,7 @@ export function workStages(s: AgentState, id: string): WorkStage[] {
         summary:
           s.source === "Source material missing"
             ? "No approved source is available. The agent has prepared a source request; audience adaptation is on hold."
-            : "The agent has matched the brief to an approved adoption guide and recorded what can be reused.",
+            : `The agent searched the approved content bank and ranked the ${sourceSet.title.toLowerCase()} for this account and buying group.`,
         input:
           "Account brief, audience needs, approved asset metadata, rights and brand rules.",
         output:
@@ -137,23 +139,26 @@ export function workStages(s: AgentState, id: string): WorkStage[] {
           "No approved source means no adaptation; version and usage permissions travel with the work.",
         rows: [
           [
-            "Enterprise adoption guide",
+            "Recommended source set",
             s.source === "Source material missing"
               ? "Missing · blocked"
-              : "v3 · illustrative approved source",
-            "Primary source for all audience briefs",
+              : sourceSet.badge,
+            s.source === "Source material missing"
+              ? "No approved material is available for this request"
+              : sourceSet.assets,
+          ],
+          ["Why this matches", "Ranked for this brief", sourceSet.rationale],
+          [
+            "Base content",
+            sourceSet.baseContent.headline,
+            `${sourceSet.baseContent.message} Next action: ${sourceSet.baseContent.cta}`,
           ],
           [
-            "Claims and proof points",
-            "Reuse within source limits",
-            "No invented ROI or unsupported claims",
-          ],
-          [
-            "Source request",
+            "Content controls",
             s.source === "Source material missing"
               ? "Required before proceeding"
-              : "Not required",
-            "Asset owner supplies and approves the source",
+              : "Approved claims only",
+            "Morgan can choose a different source set; source rights and claim limits remain attached to every package",
           ],
         ],
       },
@@ -180,7 +185,7 @@ export function workStages(s: AgentState, id: string): WorkStage[] {
                 : i === 1
                   ? "Connect adoption to business value"
                   : "Address governance and purchasing readiness",
-              `Source: adoption guide v3 · ${s.channel}`,
+              `Source: ${sourceSet.title} · ${s.channel}`,
             ] as [string, string, string],
         ),
       },
@@ -405,6 +410,7 @@ export function workflowArtifact(s: AgentState, id: string, index: number) {
     ],
   };
   const blocked = id === "s3" && s.source === "Source material missing";
+  const sourceSet = selectedContentSource(s);
   const title = blocked ? "Source material request" : names[id][index];
   const sections =
     s.artifactEdits?.[artifactKey(s, id, index)] ??
@@ -413,7 +419,7 @@ export function workflowArtifact(s: AgentState, id: string, index: number) {
           {
             name: "Campaign direction",
             status: "Proposed content plan",
-            detail: `Objective: ${s.campaign?.objective || "Help Northstar Health move from technical evaluation to an expansion decision"}.\nScope: Northstar Health plus 11 matched expansion accounts; two unmatched accounts remain excluded.\nAudience direction: ${processState(s, "s2", 1).choice || "Priya Shah (technical), Mateo Ruiz (business sponsor), Northstar procurement"}.\nDirection from Morgan: ${s.campaign?.instruction || "Use Enterprise Adoption Guide v3.2 to give each role a distinct next step without creating unsupported claims."}`,
+            detail: `Objective: ${s.campaign?.objective || "Help Northstar Health move from technical evaluation to an expansion decision"}.\nScope: Northstar Health plus 11 matched expansion accounts; two unmatched accounts remain excluded.\nAudience direction: ${processState(s, "s2", 1).choice || "Priya Shah (technical), Mateo Ruiz (business sponsor), Northstar procurement"}.\nDirection from Morgan: ${s.campaign?.instruction || `Use the ${sourceSet.title} to give each role a distinct next step without creating unsupported claims.`}`,
           },
           {
             name: "Audience and deliverables",
@@ -437,8 +443,7 @@ export function workflowArtifact(s: AgentState, id: string, index: number) {
           {
             name: "Source and release gates",
             status: "Approved source available · release not authorized",
-            detail:
-              "Source: Enterprise Adoption Guide v3.2 (fictional approved source).\nPreserve approved claims and attach source references to each work package.\nNext: prepare audience packages, route required reviews and assemble staged channel handoffs.\nRelease only after required brand / legal checks and audience eligibility are resolved.",
+            detail: `Selected source set: ${sourceSet.assets}.\nWhy selected: ${sourceSet.rationale}\nPreserve approved claims and attach source references to each work package.\nNext: prepare audience packages, route required reviews and assemble staged channel handoffs.\nRelease only after required brand / legal checks and audience eligibility are resolved.`,
           },
         ]
       : stage.rows.map(([name, status, detail]) => ({
@@ -462,6 +467,7 @@ export function workflowArtifact(s: AgentState, id: string, index: number) {
 }
 
 export function workflowSources(s: AgentState, id: string, index: number) {
+  const sourceSet = selectedContentSource(s);
   const sources: Record<string, { name: string; purpose: string }[][]> = {
     s2: [
       [
@@ -518,11 +524,11 @@ export function workflowSources(s: AgentState, id: string, index: number) {
           purpose: "Tailor each work package to a decision need",
         },
         {
-          name: "Enterprise adoption guide · v3",
+          name: sourceSet.title,
           purpose:
             s.source === "Source material missing"
               ? "Missing — adaptation is blocked"
-              : "Illustrative approved source for claims and references",
+              : sourceSet.assets,
         },
         {
           name: "Channel specifications",
@@ -606,7 +612,11 @@ export function workflowSources(s: AgentState, id: string, index: number) {
       system = "CDP ABM / identity + CRM context";
       connection =
         "Proposed audience and identity lookup; consent source must be confirmed";
-    } else if (/asset|adoption guide|rights/.test(name)) {
+    } else if (
+      /asset|adoption guide|rights|source set|narrative|casebook|workshop kit/.test(
+        name,
+      )
+    ) {
       system = "Adobe CSC (assets) / approved content repository";
       connection =
         "Proposed asset-search connector returning references, versions and permissions";

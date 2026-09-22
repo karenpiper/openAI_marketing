@@ -9,6 +9,7 @@ import {
   processReady,
   type ProcessState,
 } from "../lib/process-state";
+import { contentSourceOptions } from "../lib/content-source-library";
 export default function ProcessActions({
   session,
   id,
@@ -217,43 +218,67 @@ export default function ProcessActions({
       {id === "s3" && index === 0 && (
         <>
           <p>
-            Confirm the source and limits you want the agent to use. Selecting a
-            source does not approve the campaign for release.
+            I searched the approved content bank against Northstar’s audience,
+            objective and channel mix. Choose the source set that should ground
+            the work; I will assemble the role-specific packages from it.
           </p>
-          <div className="process-evidence">
-            <span>
-              Enterprise adoption guide <b>v3 · illustrative approved source</b>
-            </span>
-            <span>
-              Allowed use <b>Adapt emphasis; preserve factual claims</b>
-            </span>
-            <span>
-              Excluded <b>Unsupported ROI and security assertions</b>
-            </span>
+          <div className="content-source-options" role="radiogroup">
+            {contentSourceOptions.map((source) => (
+              <button
+                key={source.id}
+                aria-checked={p.choice === source.id}
+                className={p.choice === source.id ? "selected" : ""}
+                onClick={() =>
+                  update(
+                    { choice: source.id, status: "Not started" },
+                    `Source set selected: ${source.title}`,
+                  )
+                }
+                role="radio"
+              >
+                <span>{source.badge}</span>
+                <b>{source.title}</b>
+                <small>{source.assets}</small>
+                <p>{source.rationale}</p>
+              </button>
+            ))}
           </div>
-          {select("Source instruction", [
-            "Use v3 within its approved claims",
-            "Request a different approved source",
-          ])}
+          <div className="source-references">
+            <b>Public source material</b>
+            {(
+              contentSourceOptions.find((source) => source.id === p.choice) ||
+              contentSourceOptions[0]
+            ).references.map((reference) => (
+              <a
+                href={reference.url}
+                key={reference.url}
+                rel="noreferrer"
+                target="_blank"
+              >
+                {reference.label} ↗
+              </a>
+            ))}
+          </div>
+          <p className="source-selection-note">
+            The agent ranks and assembles approved material. Morgan selects the
+            content approach; asset rights, factual-claim limits and required
+            reviews remain attached to each package.
+          </p>
           <button
             disabled={!p.choice || session.source === "Source material missing"}
             onClick={() =>
-              p.choice.startsWith("Use")
-                ? complete(
-                    "Adoption guide v3 selected; approved claims and source references required in each package",
-                  )
-                : update(
-                    { status: "Blocked" },
-                    "Replacement source requested; adaptation paused",
-                  )
+              complete(
+                `Source set confirmed: ${contentSourceOptions.find((source) => source.id === p.choice)?.title || "selected source"}. Approved claims and source references are required in each package.`,
+              )
             }
           >
-            Confirm source instruction
+            Use this source set
           </button>
           {p.status === "Blocked" && (
             <p>
-              Source replacement is pending. Select the available approved
-              source to continue this scenario.
+              The content bank is unavailable for this scenario. Request an
+              approved source set from the asset owner before adaptation can
+              continue.
             </p>
           )}
         </>
