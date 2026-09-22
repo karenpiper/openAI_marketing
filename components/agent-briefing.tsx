@@ -1,19 +1,24 @@
 import Image from "next/image";
 export const workshopAgenda = [
   {
+    title: "Current-state workflow",
+    minutes: 10,
+    body: "Map how work moves today, including the tools, people, handoffs and constraints that shape the current experience.",
+  },
+  {
     title: "Priority use cases and outcomes",
-    minutes: 25,
+    minutes: 20,
     body: "Align on the first use cases worth solving, the Northstar, the business outcome for each, and what should be validated and proven first.",
   },
   {
-    title: "Current-state workflow architecture and capability reuse",
-    minutes: 25,
-    body: "Map the OpenAI capabilities and workflow architecture patterns already in place across Codex, product/growth infrastructure, S3/data, Marketo, and internal tooling. Pinpoint foundational capabilities still required.",
+    title: "Target workflow (prototype)",
+    minutes: 20,
+    body: "Use Morgan’s day to examine one tangible target workflow, the moments where judgment matters and the proposed near-term experience.",
   },
   {
     title: "Target workflow architecture and operating boundaries",
-    minutes: 25,
-    body: "Work through how OpenAI intelligence and orchestration connect with Adobe capabilities and Code and Theory’s implementation approach across identity, buying groups, journeys, content operations, activation, governance, and measurement. Clarify system ownership, integration points, state, and controls.",
+    minutes: 30,
+    body: "Work through how OpenAI intelligence and orchestration connect with Adobe capabilities and Code and Theory’s implementation approach across identity, buying groups, journeys, content operations, activation, governance and measurement.",
   },
   {
     title: "Decisions, sequencing, and Colin readout",
@@ -26,7 +31,7 @@ export default function AgentBriefing({ onEnter }: { onEnter: () => void }) {
     <main className="workshop-opening">
       <section id="opening-purpose" className="opening-hero">
         <span className="agent-kicker">
-          Step 0 · OpenAI × Adobe × Code and Theory · 90 minutes
+          Step 0 · OpenAI × Adobe × Code and Theory · 95 minutes
         </span>
         <h1>
           Imagine the day.
