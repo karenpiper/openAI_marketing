@@ -32,6 +32,9 @@ export default function ProcessActions({
   const approvalChannels = session.channel.split(" + ").filter(Boolean);
   const selectedTheme = selectedContentSource(session);
   const [feedback, setFeedback] = useState("");
+  const [sourceLookup, setSourceLookup] = useState<
+    "idle" | "searching" | "results"
+  >("idle");
   const update = (patch: Partial<ProcessState>, event?: string) =>
     onChange(processUpdate(p, patch, event));
   const complete = (event: string) => update({ status: "Complete" }, event);
@@ -240,42 +243,83 @@ export default function ProcessActions({
             </div>
           ) : (
             <>
-              <p>
-                Choose the content theme that should lead this fictional work.
-                It changes the point of view and message emphasis; the agent
-                then adapts that theme for each audience and channel.
-              </p>
-              <div className="content-source-options" role="radiogroup">
-                {contentSourceOptions.map((source) => (
+              <div className="content-lookup">
+                <span className="agent-kicker">Content discovery</span>
+                <h4>Find approved creative for this audience</h4>
+                <p>
+                  The agent uses the CDP’s account and buying-group context to
+                  query the approved content library. The CDP informs the
+                  search; approved material and claim permissions remain in the
+                  content system.
+                </p>
+                <div className="content-lookup-query">
+                  <span>CDP context</span>
+                  <b>Northstar Health · {session.audience} · active technical evaluation</b>
+                  <small>Signals: product usage, event engagement, sponsor gap</small>
+                </div>
+                {sourceLookup === "idle" && (
                   <button
-                    key={source.id}
-                    aria-checked={p.choice === source.id}
-                    className={p.choice === source.id ? "selected" : ""}
-                    onClick={() =>
-                      update(
-                        { choice: source.id, status: "Not started" },
-                        `Source set selected: ${source.title}`,
-                      )
-                    }
-                    role="radio"
+                    className="agent-primary"
+                    onClick={() => {
+                      setSourceLookup("searching");
+                      window.setTimeout(() => setSourceLookup("results"), 800);
+                    }}
                   >
-                    <span>{source.badge}</span>
-                    <b>{source.title}</b>
-                    <small>{source.assets}</small>
-                    <p>{source.rationale}</p>
+                    Search approved library
                   </button>
-                ))}
+                )}
+                {sourceLookup === "searching" && (
+                  <p role="status" className="content-lookup-status">
+                    <span aria-hidden="true">✳</span> Checking the content
+                    library for approved, reusable foundations…
+                  </p>
+                )}
               </div>
-              <p className="source-selection-note">
-                These are purpose-built practice themes for this prototype, not
-                customer case studies or production source material. Morgan
-                selects the narrative direction; approved source material,
-                factual claim limits and required reviews would be attached in
-                production.
-              </p>
+              {sourceLookup === "results" && (
+                <>
+                  <div className="content-library-results">
+                    <div className="content-library-heading">
+                      <div>
+                        <span className="agent-kicker">Approved library results</span>
+                        <b>3 foundations match this audience brief</b>
+                      </div>
+                      <span>Asset system · fictional practice library</span>
+                    </div>
+                    <div className="content-source-options" role="radiogroup">
+                      {contentSourceOptions.map((source) => (
+                        <button
+                          key={source.id}
+                          aria-checked={p.choice === source.id}
+                          className={p.choice === source.id ? "selected" : ""}
+                          onClick={() =>
+                            update(
+                              { choice: source.id, status: "Not started" },
+                              `Source set selected: ${source.title}`,
+                            )
+                          }
+                          role="radio"
+                        >
+                          <span>{source.badge}</span>
+                          <b>{source.title}</b>
+                          <small>{source.assets}</small>
+                          <p>{source.rationale}</p>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  <p className="source-selection-note">
+                    These are purpose-built practice foundations, not customer
+                    case studies or production source material. In production,
+                    the selected item would carry its current version, approved
+                    claim limits and required reviews into every package.
+                  </p>
+                </>
+              )}
               <button
                 disabled={
-                  !p.choice || session.source === "Source material missing"
+                  sourceLookup !== "results" ||
+                  !p.choice ||
+                  session.source === "Source material missing"
                 }
                 onClick={() =>
                   complete(

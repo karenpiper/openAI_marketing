@@ -69,12 +69,16 @@ function MorganScreen({
   onRestart,
   onToggleArchitecture,
   architectureOpen = false,
+  onCampaignResults,
+  campaignResultsOpen = false,
 }: {
   children: ReactNode;
   workflow?: boolean;
   onRestart?: () => void;
   onToggleArchitecture?: () => void;
   architectureOpen?: boolean;
+  onCampaignResults?: () => void;
+  campaignResultsOpen?: boolean;
 }) {
   function jump(selector: string, e: React.MouseEvent<HTMLButtonElement>) {
     const screen = e.currentTarget.closest(".monitor-screen");
@@ -127,6 +131,18 @@ function MorganScreen({
                 >
                   <span aria-hidden="true">◇</span>
                   {architectureOpen ? "Close architecture" : "Architecture for this step"}
+                </button>
+              )}
+              {onCampaignResults && (
+                <button
+                  className="campaign-results-sidebar-tool"
+                  aria-pressed={campaignResultsOpen}
+                  onClick={onCampaignResults}
+                >
+                  <span aria-hidden="true">◌</span>
+                  {campaignResultsOpen
+                    ? "Back to today’s recap"
+                    : "Campaign results & learnings"}
                 </button>
               )}
               <button className="chat-search" onClick={(e) => jump(".agent-composer", e)}>
@@ -564,7 +580,10 @@ export default function AgentWorkspace() {
                 next decision draws on results.
               </p>
             </div>
-            <MorganScreen onRestart={resetPrototype}>
+            <MorganScreen
+              onRestart={resetPrototype}
+              onToggleArchitecture={() => setPage("architecture")}
+            >
               <PerformanceLoop
                 session={s}
                 onSave={(learning) => setS((prev) => ({ ...prev, learning }))}
@@ -623,7 +642,15 @@ export default function AgentWorkspace() {
                 </>
               ) : s.day.moment === 4 ? (
                 <div className="prototype-screen-layout">
-                  <MorganScreen workflow onRestart={resetPrototype}>
+                  <MorganScreen
+                    workflow
+                    onRestart={resetPrototype}
+                    onToggleArchitecture={() => setPage("architecture")}
+                    onCampaignResults={() =>
+                      setShowRecapResults((shown) => !shown)
+                    }
+                    campaignResultsOpen={showRecapResults}
+                  >
                     {showRecapResults ? (
                       <div className="day-results">
                         <button
@@ -691,16 +718,6 @@ export default function AgentWorkspace() {
                       </div>
                     )}
                   </MorganScreen>
-                  <div className="prototype-context-control prototype-recap-controls">
-                    <button
-                      className="prototype-recap-results"
-                      onClick={() => setShowRecapResults((shown) => !shown)}
-                    >
-                      {showRecapResults
-                        ? "Back to today’s recap"
-                        : "Campaign results & learnings"}
-                    </button>
-                  </div>
                 </div>
               ) : (
                 <>
@@ -872,18 +889,30 @@ export default function AgentWorkspace() {
                                       })}
                                     </div>
                                   </section>
-                                  <label className="source-choice">
-                                    Source status
-                                    <select
-                                      value={s.source}
-                                      onChange={(e) =>
-                                        condition({ source: e.target.value })
-                                      }
-                                    >
-                                      <option>Approved source available</option>
-                                      <option>Source material missing</option>
-                                    </select>
-                                  </label>
+                                  <section className="source-availability">
+                                    <span className="adjustment-label">
+                                      Approved creative
+                                    </span>
+                                    <p>
+                                      The content step will use the CDP context
+                                      to search the approved library. Confirm
+                                      whether that library is available in this
+                                      scenario.
+                                    </p>
+                                    <div>
+                                      {["Approved source available", "Source material missing"].map((value) => (
+                                        <button
+                                          key={value}
+                                          className={s.source === value ? "selected" : ""}
+                                          aria-pressed={s.source === value}
+                                          onClick={() => condition({ source: value })}
+                                        >
+                                          <b>{value === "Approved source available" ? "Approved library connected" : "Content library unavailable"}</b>
+                                          <span>{value === "Approved source available" ? "Search for an approved creative foundation in the next step." : "Keep the workflow open, but request an approved source before adaptation."}</span>
+                                        </button>
+                                      ))}
+                                    </div>
+                                  </section>
                                   <div className="recommendation-confirm">
                                     <b>Confirm this plan before work begins</b>
                                     <p>
