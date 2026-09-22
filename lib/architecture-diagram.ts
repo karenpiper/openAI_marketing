@@ -92,19 +92,20 @@ export function architectureDiagram(
     yy: number,
     groups: string[] = [],
   ) => {
-    const dx = xx - x;
-    const dy = yy - y;
-    const distance = Math.hypot(dx, dy) || 1;
-    const bend = Math.min(34, distance * 0.12) * (dx >= 0 ? -1 : 1);
-    const cx = (x + xx) / 2 + (-dy / distance) * bend;
-    const cy = (y + yy) / 2 + (dx / distance) * bend;
-    const a = Math.atan2(yy - cy, xx - cx);
+    const needsElbow = x !== xx && y !== yy;
+    const elbowX = (x + xx) / 2;
+    const path = needsElbow
+      ? `M ${x} ${y} L ${elbowX} ${y} L ${elbowX} ${yy} L ${xx} ${yy}`
+      : `M ${x} ${y} L ${xx} ${yy}`;
+    const a = needsElbow
+      ? Math.atan2(0, xx - elbowX)
+      : Math.atan2(yy - y, xx - x);
     const color =
       focused && groups.length && groups.every((g) => active.has(g))
         ? "#a85c00"
         : "#365343";
     const opacity = focused && !groups.every((g) => active.has(g)) ? 0.2 : 1;
-    return `<g opacity="${opacity}"><path d="M ${x} ${y} Q ${cx.toFixed(1)} ${cy.toFixed(1)} ${xx} ${yy}" fill="none" stroke="#365343" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M ${xx} ${yy} L ${xx - 11 * Math.cos(a - 0.45)} ${yy - 11 * Math.sin(a - 0.45)} L ${xx - 11 * Math.cos(a + 0.45)} ${yy - 11 * Math.sin(a + 0.45)} Z" fill="#365343"/></g>`.replaceAll(
+    return `<g opacity="${opacity}"><path d="${path}" fill="none" stroke="#365343" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M ${xx} ${yy} L ${xx - 11 * Math.cos(a - 0.45)} ${yy - 11 * Math.sin(a - 0.45)} L ${xx - 11 * Math.cos(a + 0.45)} ${yy - 11 * Math.sin(a + 0.45)} Z" fill="#365343"/></g>`.replaceAll(
       "#365343",
       color,
     );
@@ -153,9 +154,9 @@ export function architectureDiagram(
         ];
       };
       const points = [...ports(a), ...ports(b).reverse()];
-      const [sx, sy] = points[0];
-      const [ex, ey] = points[points.length - 1];
-      const path = `M ${sx} ${sy} C 470 ${sy}, 470 ${ey}, ${ex} ${ey}`;
+      const path = points
+        .map(([x, y], i) => `${i ? "L" : "M"} ${x} ${y}`)
+        .join(" ");
       const [xx, yy] = anchors[b];
       return `<path d="${path}" stroke="#a85c00" stroke-width="3" stroke-dasharray="9 6" stroke-linecap="round" stroke-linejoin="round" fill="none"/><circle cx="${xx}" cy="${yy}" r="4" fill="#a85c00"/>`;
     })
