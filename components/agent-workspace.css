@@ -4124,10 +4124,12 @@
   .prototype-screen-layout .monitor-wrap {
     display: flex;
     flex-direction: column;
+    min-height: 0;
   }
   .prototype-screen-layout .monitor-bezel {
     height: auto;
     flex: 1;
+    min-height: 0;
     display: flex;
     flex-direction: column;
   }
@@ -4136,6 +4138,9 @@
     height: auto;
     min-height: 0;
   }
+}
+.agent-app:has(.prototype-main) .agent-footer {
+  display: none;
 }
 .prototype-human-context {
   display: flex;
