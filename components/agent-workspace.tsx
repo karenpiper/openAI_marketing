@@ -1484,36 +1484,6 @@ export default function AgentWorkspace() {
                 <br />
                 <strong>Questions, thoughts, ideas</strong>
               </h2>
-              <div className="agent-capture">
-                {(
-                  [
-                    ["ownership", "Agreed ownership boundaries"],
-                    ["open", "Open decisions and dependencies"],
-                    ["sequence", "Proposed sequence of work"],
-                    ["colin", "Decisions or sponsorship needed from Colin"],
-                  ] as const
-                ).map(([key, label]) => (
-                  <label key={key}>
-                    {label}
-                    <textarea
-                      value={s.architecture.closing[key]}
-                      onChange={(e) =>
-                        setS((prev) => ({
-                          ...prev,
-                          architecture: {
-                            ...prev.architecture,
-                            closing: {
-                              ...prev.architecture.closing,
-                              [key]: e.target.value,
-                            },
-                          },
-                        }))
-                      }
-                    />
-                  </label>
-                ))}
-                <button onClick={save}>Save readout</button>
-              </div>
             </section>
             <button className="agent-primary" onClick={() => download()}>
               Download concise readout
