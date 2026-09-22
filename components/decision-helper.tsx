@@ -5,8 +5,8 @@ const helpers: Record<string, [string, string][]> = {
       "Use matched evidence for planning, but hold unresolved contacts out of activation.",
     ],
     [
-      "Choose the gap, not the biggest number",
-      "High technical engagement does not show that a business sponsor is ready. Choose the next decision you need to enable.",
+      "Coordinate the buying group, led by sponsor value",
+      "Keep technical, sponsor and procurement paths moving together. Lead with the sponsor because that is the missing decision path, not because the other roles no longer matter.",
     ],
     [
       "Make the brief falsifiable",

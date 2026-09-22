@@ -3,15 +3,15 @@ import type { AgentState } from "./agent-workspace";
 
 export const contentSourceOptions = [
   {
-    id: "enterprise-adoption-case-studies",
-    title: "Enterprise expansion narrative",
+    id: "adoption-decision-kit",
+    title: "The adoption decision kit",
     badge: "Recommended",
-    assets: "Executive narrative · adoption pathway · governance proof points",
+    assets: "Executive opener · working-session guide · proof-point framework",
     rationale:
-      "A fictional content foundation for taking active technical use into a credible, governed expansion conversation across the buying group.",
+      "A practice foundation created for this workshop: move active technical use into a credible, governed expansion conversation across the buying group.",
     baseContent: {
       headline:
-        "How enterprises turn early AI adoption into durable ways of working.",
+        "Turn early AI use into a decision the wider organization can make.",
       message:
         "For Northstar Health, the next step is to turn active technical use into a practical, governed expansion plan—connecting the teams already experimenting with the people who own operating outcomes and procurement decisions.",
       proof:
@@ -20,13 +20,13 @@ export const contentSourceOptions = [
     },
   },
   {
-    id: "operating-value-set",
-    title: "Operating-value narrative",
+    id: "operating-change-playbook",
+    title: "The operating change playbook",
     badge: "Alternative",
     assets:
-      "Value hypothesis · executive point of view · seller conversation guide",
+      "Value hypothesis · executive discussion guide · seller enablement card",
     rationale:
-      "A fictional foundation for a sponsorship conversation focused on the operating problem, a bounded adoption scope and a decision the sponsor can make.",
+      "A practice foundation for a sponsorship conversation focused on the operating problem, a bounded adoption scope and a decision the sponsor can make.",
     baseContent: {
       headline: "Make more room for the work that moves the business forward.",
       message:
@@ -37,12 +37,12 @@ export const contentSourceOptions = [
     },
   },
   {
-    id: "evaluation-set",
-    title: "Guided evaluation narrative",
+    id: "governed-evaluation-toolkit",
+    title: "The governed evaluation toolkit",
     badge: "Alternative",
     assets: "Evaluation guide · governance FAQ · implementation checklist",
     rationale:
-      "A fictional foundation for a bounded technical proof that gives procurement and governance teams a clear path into the decision.",
+      "A practice foundation for a bounded technical proof that gives procurement and governance teams a clear path into the decision.",
     baseContent: {
       headline: "Build the foundation for secure, confident AI adoption.",
       message:

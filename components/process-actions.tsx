@@ -132,11 +132,12 @@ export default function ProcessActions({
         <>
           <div className="recommended-decision">
             <span className="agent-kicker">Agent recommendation</span>
-            <b>Bring the business sponsor into the evaluation.</b>
+            <b>Coordinate three buying-role paths, led by sponsor value.</b>
             <p>
-              The technical team is already active. The next constraint is the
-              operating decision the sponsor needs to make; procurement can
-              enter once that decision has a clear scope.
+              The technical team is already active and procurement is
+              researching governance. The sponsor path is the missing
+              progression point, so it leads the coordinated plan without
+              sidelining the other two roles.
             </p>
           </div>
           <p className="decision-prompt">
@@ -233,10 +234,10 @@ export default function ProcessActions({
           ) : (
             <>
               <p>
-                I searched the approved content bank against Northstar Health’s
-                audience, objective and channel mix. Choose the source set that
-                should ground the work; I will assemble the role-specific
-                packages from it.
+                I matched the workshop’s fictional practice library to
+                Northstar Health’s audience, objective and channel mix. Choose
+                the thematic foundation that should ground the work; I will
+                assemble the role-specific packages from it.
               </p>
               <div className="content-source-options" role="radiogroup">
                 {contentSourceOptions.map((source) => (
@@ -260,10 +261,11 @@ export default function ProcessActions({
                 ))}
               </div>
               <p className="source-selection-note">
-                These are fictional content foundations for the prototype.
-                Morgan selects the narrative direction; approved source
-                material, factual claim limits and required reviews would be
-                attached in production.
+                These are purpose-built practice materials for this prototype,
+                not customer case studies or production source material. Morgan
+                selects the narrative direction; approved source material,
+                factual claim limits and required reviews would be attached in
+                production.
               </p>
               <button
                 disabled={

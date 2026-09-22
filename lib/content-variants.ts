@@ -101,7 +101,7 @@ export function contentVariants(s: Pick<AgentState, "audience">) {
       body: `${sourceSet.baseContent.message}\n\nFor ${account.name}, the practical starting point is ${account.focus}. ${body}`,
       proof: sourceSet.baseContent.proof,
       cta,
-      source: `${sourceSet.title} · fictional content baseline`,
+      source: `${sourceSet.title} · workshop practice foundation`,
       eligibility:
         "Candidate only: requires matched identity, segment membership and consent",
     })),
