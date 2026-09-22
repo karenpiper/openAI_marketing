@@ -21,8 +21,8 @@ export default function PerformanceLoop({
     ],
     [
       "data",
-      "Resolve missing account matches first",
-      "Improve confidence in account progression before making an expansion decision.",
+      "Improve campaign measurement before widening activation",
+      "Strengthen the evidence for account progression before making an expansion decision.",
     ],
     [
       "scale",
@@ -34,7 +34,7 @@ export default function PerformanceLoop({
     choice === "message"
       ? "Next iteration: test a clearer business-sponsor value proposition using approved evidence. Keep volume fixed and compare qualified follow-up, not opens."
       : choice === "data"
-        ? "Next iteration: resolve unmatched account identities before widening activation. Retain the current audience and route the matching task to the data team."
+        ? "Next iteration: strengthen campaign measurement before widening activation. Retain the current audience and route the measurement task to the data team."
         : "Next iteration: run a limited technical-evaluator expansion test. Do not treat engagement as revenue impact; review qualified outcomes before scaling further.";
   return (
     <section className="performance-loop">
@@ -62,8 +62,8 @@ export default function PerformanceLoop({
           <span>Qualified next actions</span>
         </article>
         <article>
-          <b>10 / 12</b>
-          <span>Accounts reliably matched</span>
+          <b>12 / 12</b>
+          <span>Accounts in the reference cohort</span>
         </article>
       </div>
       <div className="learning-agent">
@@ -71,8 +71,8 @@ export default function PerformanceLoop({
         <p>
           Northstar’s technical audience engaged, but the business-sponsor
           segment generated only one qualified next step. I’d test the sponsor
-          message before adding volume—and resolve the two unmatched cohort
-          accounts before claiming account-level impact.
+          message before adding volume—and measure the next iteration before
+          claiming account-level impact.
         </p>
       </div>
       <nav>
@@ -143,11 +143,11 @@ export default function PerformanceLoop({
         </div>
       ) : (
         <div className="performance-table">
-          <h3>Two accounts cannot yet be joined reliably.</h3>
+          <h3>Measurement is incomplete for the next expansion decision.</h3>
           <p>
-            Activity is present, but identity matching is incomplete. Their
-            outcomes stay out of account-level conclusions. A consent hold also
-            remains separate from performance analysis.
+            Activity is present, but the current reference program does not yet
+            connect channel response to a confirmed account progression signal.
+            A consent hold also remains separate from performance analysis.
           </p>
           <p>
             <b>Data needed:</b> campaign identifiers, channel events,

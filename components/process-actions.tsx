@@ -85,8 +85,8 @@ export default function ProcessActions({
         <>
           <p>
             Inspect the evidence before letting the agent use it. The prototype
-            includes two unresolved identity records; decide whether they can
-            enter the working audience.
+            includes one unresolved identity record; decide whether it can enter
+            the working audience.
           </p>
           <div className="process-evidence">
             <span>
@@ -97,12 +97,12 @@ export default function ProcessActions({
               <b>Matched in this scenario</b>
             </span>
             <span>
-              Two unmatched records → account identity{" "}
+              One unmatched account → account identity{" "}
               <b>Unresolved · exclude from activation</b>
             </span>
           </div>
-          {select("How should the agent handle the unmatched records?", [
-            "Exclude them and retain the resolved account evidence",
+          {select("How should the agent handle the unmatched account?", [
+            "Exclude it and retain the resolved account evidence",
             "Hold the entire audience for identity review",
           ])}
           <button
@@ -110,7 +110,7 @@ export default function ProcessActions({
             onClick={() =>
               p.choice.startsWith("Exclude")
                 ? complete(
-                    "Unmatched records excluded; resolved evidence accepted for planning",
+                    "Unmatched account excluded; resolved evidence accepted for planning",
                   )
                 : update(
                     { status: "Blocked" },
@@ -516,9 +516,6 @@ export default function ProcessActions({
                 </span>
                 <span>
                   Audience / asset setup <b>Pass</b>
-                </span>
-                <span>
-                  Earlier identity exclusions <b>2 records carried forward</b>
                 </span>
                 <span>
                   Consent consistency{" "}

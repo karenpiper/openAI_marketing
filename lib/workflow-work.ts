@@ -44,7 +44,7 @@ export function workStages(s: AgentState, id: string): WorkStage[] {
           [
             "Account and role match",
             "Technical lead · business sponsor · procurement team",
-            "10 of 12 cohort accounts are matched; two remain excluded",
+            "11 of 12 cohort accounts are matched; one remains excluded",
           ],
         ],
       },
@@ -99,8 +99,8 @@ export function workStages(s: AgentState, id: string): WorkStage[] {
           ],
           [
             "Scope",
-            "Northstar + 11 matched expansion accounts",
-            "Keep unmatched accounts out of activation until resolved",
+            "Northstar + 11 eligible expansion accounts",
+            "Carry the eligible cohort into content planning",
           ],
           [
             "Handoff",
@@ -296,13 +296,8 @@ export function workStages(s: AgentState, id: string): WorkStage[] {
           "Match audience, assets and channel requirements",
         ],
         [
-          "Upstream identity exclusions",
-          "Carried forward",
-          "Two unmatched records remain suppressed from activation",
-        ],
-        [
           "Consent consistency",
-          "Separate exception found",
+          "Exception found",
           "One otherwise matched contact has conflicting permission records",
         ],
       ],
@@ -311,14 +306,14 @@ export function workStages(s: AgentState, id: string): WorkStage[] {
       title: "Resolve only the exception",
       action: "Apply the proposed hold",
       summary:
-        "Hold one otherwise matched contact for a consent conflict and ask the data owner to reconcile the records. The two earlier unmatched records remain excluded automatically; do not stop unrelated eligible work.",
+        "Hold one matched contact for a consent conflict and ask the data owner to reconcile the records. Do not stop unrelated eligible work.",
       input:
         "Conflicting consent records for one matched contact, plus escalation policy.",
       output: "Proposed contact hold and an assigned reconciliation request.",
       connection:
         "Identity / consent source + activation suppression tool + request system.",
       enables:
-        "Contains a separate consent risk at the affected contact rather than reopening the earlier identity decision or blocking the entire campaign.",
+        "Contains the consent risk at the affected contact rather than blocking the entire campaign.",
       control:
         "Morgan authorizes this proposed resolution. The agent cannot infer consent from engagement.",
       rows: [
@@ -424,7 +419,7 @@ export function workflowArtifact(s: AgentState, id: string, index: number) {
           {
             name: "Campaign direction",
             status: "Proposed content plan",
-            detail: `Objective: ${s.campaign?.objective || "Help Northstar Health move from technical evaluation to an expansion decision"}.\nScope: Northstar plus 11 matched expansion accounts; two unmatched accounts remain excluded.\nAudience direction: ${processState(s, "s2", 1).choice || "Technical lead, business sponsor and procurement"}.\nDirection from Morgan: ${s.campaign?.instruction || `Use the ${sourceSet.title} to give each role a distinct next step without creating unsupported claims.`}`,
+            detail: `Objective: ${s.campaign?.objective || "Help Northstar Health move from technical evaluation to an expansion decision"}.\nScope: Northstar plus 11 eligible expansion accounts.\nAudience direction: ${processState(s, "s2", 1).choice || "Technical lead, business sponsor and procurement"}.\nDirection from Morgan: ${s.campaign?.instruction || `Use the ${sourceSet.title} to give each role a distinct next step without creating unsupported claims.`}`,
           },
           {
             name: "Audience and deliverables",
@@ -456,7 +451,7 @@ export function workflowArtifact(s: AgentState, id: string, index: number) {
             {
               name: "Decision context",
               status: "Northstar Health · expansion cohort",
-              detail: `Decision to support: whether to move Northstar from technical evaluation toward an expansion conversation.\nCohort: Northstar plus 11 comparable expansion accounts; 10 accounts have reliable person-to-account matching.\nGuardrail: keep the two unmatched accounts out of activation and account-level conclusions until identity is resolved.`,
+              detail: `Decision to support: whether to move Northstar from technical evaluation toward an expansion conversation.\nCohort: Northstar plus 11 comparable expansion accounts; 11 accounts have reliable person-to-account matching.\nGuardrail: keep the one unmatched account out of activation and account-level conclusions until identity is resolved.`,
             },
             {
               name: "Product adoption signal",
@@ -806,6 +801,6 @@ function deliveredDetail(
   if (id === "s3" && index === 3)
     return `${fallback}\nCampaign reference: Enterprise adoption / 12 target accounts.\nAudience selection: ${s.audience}.\nChannel plan: ${s.channel}.\nRelease status: STAGED — not sent.\nRequired before release: approved content version, resolved consent, completed brand / legal review and channel configuration check.\nMeasurement handoff: campaign ID, audience role, channel and response event.`;
   if (id === "s5" && index === 1)
-    return `${fallback}\nCase: CONSENT-001 (fictional).\nAction: Hold the otherwise matched contact; do not infer permission from engagement.\nThis is separate from the two upstream identity exclusions, which remain suppressed without further action.\nAssigned role: data / consent owner, individual to be confirmed.\nResolution evidence: authoritative consent record and suppression status.\nRe-entry condition: eligibility rechecked before any activation.`;
+    return `${fallback}\nCase: CONSENT-001 (fictional).\nAction: Hold the matched contact; do not infer permission from engagement.\nAssigned role: data / consent owner, individual to be confirmed.\nResolution evidence: authoritative consent record and suppression status.\nRe-entry condition: eligibility rechecked before any activation.`;
   return fallback;
 }

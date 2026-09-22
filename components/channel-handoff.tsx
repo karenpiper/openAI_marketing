@@ -314,9 +314,7 @@ export default function ChannelHandoff({
           </div>
           <div>
             <b>Exclusions</b>
-            <p>
-              Unresolved consent, suppressed contacts and unmatched identities.
-            </p>
+            <p>Consent holds and pre-applied eligibility rules.</p>
           </div>
           <div>
             <b>Asset binding</b>
