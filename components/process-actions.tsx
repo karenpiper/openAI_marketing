@@ -127,23 +127,73 @@ export default function ProcessActions({
       )}
       {id === "s2" && index === 1 && (
         <>
-          <p>
-            Choose which gap should drive the recommendation. This direction is
-            carried into the campaign record.
+          <div className="recommended-decision">
+            <span className="agent-kicker">Agent recommendation</span>
+            <b>Bring Mateo, the business sponsor, into the evaluation.</b>
+            <p>
+              Priya’s technical team is already active. The next constraint is
+              the operating decision Mateo needs to make; procurement can enter
+              once that decision has a clear scope.
+            </p>
+          </div>
+          <p className="decision-prompt">
+            Confirm the recommendation or choose a different next move. This
+            choice becomes the campaign’s working direction.
           </p>
-          {select("Where should the campaign focus?", [
-            "Bring business sponsors into evaluation",
-            "Resolve procurement and governance questions",
-            "Help technical evaluators move into a pilot",
-          ])}
-          {field("What makes this the right next move?", "note")}
+          <div className="decision-options" role="radiogroup">
+            {[
+              [
+                "Bring business sponsors into evaluation",
+                "Recommended · connect adoption to Mateo’s operating priorities.",
+              ],
+              [
+                "Resolve procurement and governance questions",
+                "Use if procurement has become the immediate blocker.",
+              ],
+              [
+                "Help technical evaluators move into a pilot",
+                "Use if Priya’s team needs more proof before expanding the group.",
+              ],
+            ].map(([choice, detail]) => (
+              <button
+                key={choice}
+                aria-checked={p.choice === choice}
+                className={p.choice === choice ? "selected" : ""}
+                onClick={() =>
+                  update(
+                    { choice, status: "Not started" },
+                    `Direction selected: ${choice}`,
+                  )
+                }
+                role="radio"
+              >
+                <b>{choice}</b>
+                <span>{detail}</span>
+              </button>
+            ))}
+          </div>
+          <label className="optional-decision-note">
+            Add context for the brief <span>Optional</span>
+            <input
+              value={p.note}
+              onChange={(e) =>
+                update({
+                  note: e.target.value,
+                  status: p.status === "Complete" ? "Not started" : p.status,
+                })
+              }
+              placeholder="For example: keep the pilot scope fixed for Finance approval."
+            />
+          </label>
           <button
-            disabled={!p.choice || !p.note.trim()}
+            disabled={!p.choice}
             onClick={() =>
-              complete(`Audience direction: ${p.choice}. Rationale: ${p.note}`)
+              complete(
+                `Audience direction: ${p.choice}.${p.note.trim() ? ` Additional context: ${p.note.trim()}` : ""}`,
+              )
             }
           >
-            Use this direction
+            Carry this direction into the brief
           </button>
         </>
       )}
