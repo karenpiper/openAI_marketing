@@ -4749,6 +4749,92 @@
 @media (max-width: 800px) {
   .approval-summary { grid-template-columns: 1fr; }
 }
+.handoff-adjust-trigger {
+  margin: 0 0 16px;
+  font-size: 12px;
+}
+.handoff-output-picker {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(145px, 1fr));
+  gap: 9px;
+  margin: 18px 0 20px;
+}
+.handoff-output-picker > .agent-kicker {
+  grid-column: 1 / -1;
+  color: #76847a;
+}
+.agent-app .handoff-output-picker button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 13px;
+  border-radius: 10px;
+  background: #fff;
+  text-align: left;
+}
+.agent-app .handoff-output-picker button[aria-pressed="true"] {
+  border-color: #26704d;
+  background: #eff7f0;
+}
+.output-card-icon {
+  display: grid;
+  place-items: center;
+  width: 29px;
+  height: 29px;
+  border-radius: 8px;
+  background: #e9f0eb;
+  color: #246442;
+}
+.handoff-output-picker b,.handoff-output-picker small { display:block; }
+.handoff-output-picker b { font-size: 12px; }
+.handoff-output-picker small { margin-top: 2px; color: #7a867e; font-size: 10px; }
+.website-preview,.seller-preview,.pov-preview,.social-preview {
+  overflow: hidden;
+  border: 1px solid #dde3dd;
+  border-radius: 12px;
+  background: #fff;
+  color: #213c31;
+}
+.website-preview nav,.pov-preview header,.seller-preview header,.social-preview header {
+  display:flex;
+  align-items:center;
+  gap:16px;
+  padding: 13px 17px;
+  border-bottom: 1px solid #e7ece7;
+  font-size: 11px;
+}
+.website-preview nav b,.pov-preview header b { font-size: 16px; color:#1d1d1d; }
+.website-preview nav button { margin-left:auto; padding: 7px 10px; font-size: 10px; }
+.website-hero { padding: 38px 34px; background: #123a2d; color: #f7f7f2; }
+.website-hero small,.seller-preview small,.pov-preview small { font-size:10px; letter-spacing:.1em; }
+.website-hero h2 { max-width: 15ch; margin: 13px 0; font-size: 31px; line-height: 1.03; letter-spacing:-.05em; }
+.website-hero p { max-width: 57ch; line-height:1.55; font-size:13px; }
+.website-hero button { margin-top: 10px; background:#f6f5ef; color:#183a31; border:0; }
+.website-proof-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background:#dfe8df; }
+.website-proof-grid span { padding:14px; background:#f5f8f3; font-size:10px; font-weight:600; }
+.seller-preview header span,.seller-preview header b { font-size:10px; letter-spacing:.08em; text-transform:uppercase; }
+.seller-preview header em { margin-left:auto; color:#587065; font-size:11px; font-style:normal; }
+.seller-score { display:flex; justify-content:space-between; padding:15px 18px; background:#eff5ee; font-size:11px; }
+.seller-preview section { padding:16px 18px; border-top:1px solid #e7ece7; }
+.seller-preview section p { margin:7px 0 0; font-size:12px; line-height:1.55; }
+.seller-preview h2 { margin:8px 0; font-size:20px; letter-spacing:-.04em; }
+.seller-preview footer { display:flex; justify-content:space-between; padding:15px 18px; background:#193e30; color:white; font-size:11px; }
+.pov-preview article { padding:35px; background:#f5f2eb; }
+.pov-preview h2 { max-width:15ch; margin:12px 0; font-size:32px; line-height:1.03; letter-spacing:-.05em; }
+.pov-preview p { max-width:60ch; font-size:13px; line-height:1.6; }
+.pov-preview blockquote { margin:25px 0; padding-left:16px; border-left:2px solid #b46847; font-size:17px; line-height:1.35; }
+.pov-preview article > div { display:flex; justify-content:space-between; font-size:11px; }
+.social-preview { max-width:550px; margin:auto; }
+.social-preview header { padding:14px; }
+.social-preview header > span:last-child { margin-left:auto; }
+.social-avatar { display:grid; place-items:center; width:29px; height:29px; background:#1c4737; border-radius:50%; color:#fff; font-size:12px; }
+.social-preview header small { display:block; margin-top:2px; color:#778078; font-size:10px; }
+.social-preview > p { padding:0 16px; font-size:13px; line-height:1.55; }
+.social-card { margin:15px 16px; padding:27px; background:#d7e4d7; min-height:170px; }
+.social-card small { font-size:10px; letter-spacing:.1em; }
+.social-card h2 { max-width:15ch; margin:11px 0 20px; font-size:25px; line-height:1.05; letter-spacing:-.05em; }
+.social-card span { font-size:12px; font-weight:600; }
+.social-preview footer { display:flex; gap:18px; padding:12px 16px; border-top:1px solid #e7ece7; color:#68736b; font-size:10px; }
 @media (max-width: 900px) {
   .workspace-desktop,
   .prototype-screen-layout .workspace-desktop {

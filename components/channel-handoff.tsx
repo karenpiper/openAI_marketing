@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { contentVariants, exampleAccounts } from "../lib/content-variants";
+import { contentVariants } from "../lib/content-variants";
 import type { AgentState } from "../lib/agent-workspace";
 import {
   processReady,
@@ -47,28 +47,29 @@ export default function ChannelHandoff({
   onCampaignChange?: (patch: Partial<AgentState>) => void;
 }) {
   const [tab, setTab] = useState("Email");
-  const [accountId, setAccountId] = useState("ACCT-01");
   const [segmentIndex, setSegmentIndex] = useState(0);
+  const [adjustingChannels, setAdjustingChannels] = useState(false);
   const variants = contentVariants(session);
-  const accountVariants = variants.filter((v) => v.accountId === accountId);
+  const accountVariants = variants.filter((v) => v.accountId === "ACCT-01");
   const variant = accountVariants[segmentIndex] || accountVariants[0];
   const p = processState(session, "s3", 3);
   const channels = activationChannels(session.channel);
   const activeTab = channels.includes(tab) ? tab : channels[0];
   const approved = processReady(session, "s3", 2);
-  const staged = p.reviewers[activeTab] === "Staged";
+  const campaignPrepared = channels.every((channel) => p.reviewers[channel] === "Staged");
   function stage() {
-    const reviewers = { ...p.reviewers, [activeTab]: "Staged" };
+    const reviewers = {
+      ...p.reviewers,
+      ...Object.fromEntries(channels.map((channel) => [channel, "Staged"])),
+    };
     onChange(
       processUpdate(
         p,
         {
           reviewers,
-          status: channels.every((c) => reviewers[c] === "Staged")
-            ? "Complete"
-            : "Staging",
+          status: "Complete",
         },
-        `${activeTab} master handoff (three approved role patterns, then account-level assembly across the cohort) accepted by the simulated connector. Routed to the configured team. Not sent.`,
+        `${activeTab} output for Northstar Health accepted by the simulated connector. Routed to the configured team. Not sent.`,
       ),
     );
   }
@@ -78,23 +79,30 @@ export default function ChannelHandoff({
         <span className="agent-kicker">
           Activation workspace · simulated destination
         </span>
-        <h3>Three approved patterns. Account-specific assembly.</h3>
+        <h3>Campaign outputs for Northstar Health</h3>
         <p>
-          Approve the role-level channel pattern once. The system then adapts it
-          against account context and eligibility for the 12-account cohort. You
-          are not reviewing 36 separate packages.
+          Review the actual channel-ready work for this campaign. Each output
+          uses the selected audience, content theme and approved direction.
         </p>
       </header>
-      <section className="handoff-channel-editor">
-        <div>
-          <span className="agent-kicker">Channel mix</span>
-          <b>Adjust channels without leaving the handoff.</b>
-          <p>
-            Changes rebuild this handoff and require the revised mix to be
-            reviewed before release.
-          </p>
-        </div>
-        <div>
+      <button
+        className="handoff-adjust-trigger"
+        aria-expanded={adjustingChannels}
+        onClick={() => setAdjustingChannels((open) => !open)}
+      >
+        {adjustingChannels ? "Close channel settings" : "Adjust channel mix"}
+      </button>
+      {adjustingChannels && (
+        <section className="handoff-channel-editor">
+          <div>
+            <span className="agent-kicker">Channel mix</span>
+            <b>Choose the campaign outputs to prepare.</b>
+            <p>
+              Changes rebuild this handoff and require the revised mix to be
+              reviewed before release.
+            </p>
+          </div>
+          <div>
           {[
             "Email",
             "Event follow-up",
@@ -121,49 +129,41 @@ export default function ChannelHandoff({
               </button>
             );
           })}
-        </div>
-      </section>
-      <nav aria-label="Channel work orders">
+          </div>
+        </section>
+      )}
+      <section className="handoff-output-picker" aria-label="Campaign outputs">
+        <span className="agent-kicker">Choose an output to inspect</span>
         {channels.map((c) => (
           <button
             key={c}
             aria-pressed={activeTab === c}
             onClick={() => setTab(c)}
           >
-            {c} {p.reviewers[c] === "Staged" ? "✓" : ""}
+            <span className="output-card-icon" aria-hidden="true">
+              {c === "Email" ? "✉" : c === "Website" ? "◧" : c === "Social campaign" ? "◌" : c === "Sales enablement" ? "▤" : c === "Executive thought leadership" ? "✦" : "◎"}
+            </span>
+            <span>
+                <b>{c}</b>
+              <small>{campaignPrepared ? "Prepared" : "Open preview"}</small>
+            </span>
           </button>
         ))}
-      </nav>
+      </section>
       <section
         className="variant-browser"
-        aria-label="Account content variants"
+        aria-label="Audience versions"
       >
         <div>
-          <b>
-            {accountVariants.length} master role patterns · 12 account-level
-            instances after approval
-          </b>
+          <b>Northstar Health · {session.audience}</b>
           <p>
-            The master pattern holds the approved structure and claims. The
-            account context changes the emphasis and next action at assembly
-            time. This preview is a representative instance, not a recipient
-            list or a send.
+            This shows one audience-specific version of the selected output.
+            Switch versions to see how the same campaign adapts its message and
+            next action for a different audience.
           </p>
         </div>
         <div className="variant-controls">
-          <span className="agent-kicker">Representative account</span>
-          <div className="variant-choice-row">
-            {exampleAccounts.slice(0, 3).map((account) => (
-              <button
-                key={account.id}
-                aria-pressed={accountId === account.id}
-                onClick={() => setAccountId(account.id)}
-              >
-                {account.name}
-              </button>
-            ))}
-          </div>
-          <span className="agent-kicker">Role pattern</span>
+          <span className="agent-kicker">Audience version</span>
           <div className="variant-choice-row">
             {accountVariants.map((item, index) => (
               <button
@@ -176,11 +176,7 @@ export default function ChannelHandoff({
             ))}
           </div>
         </div>
-        <p>
-          <b>Account context:</b> {variant.context}. <b>Illustrative inputs:</b>{" "}
-          CRM account context + identity / audience membership + engagement
-          signals.
-        </p>
+        <p><b>Why this version:</b> {variant.context}</p>
       </section>
       <div className="handoff-canvas">
         <div className="handoff-preview">
@@ -233,75 +229,35 @@ export default function ChannelHandoff({
               </footer>
             </div>
           ) : activeTab === "Website" ? (
-            <div className="email-preview">
-              <div>OPENAI FOR ENTERPRISE / NORTHSTAR HEALTH</div>
-              <article>
-                <small>FOR {variant.segment.toUpperCase()}</small>
+            <div className="website-preview">
+              <nav><b>OpenAI</b><span>Enterprise</span><span>Resources</span><button>Talk to sales</button></nav>
+              <div className="website-hero">
+                <small>FOR NORTHSTAR HEALTH · {variant.segment.toUpperCase()}</small>
                 <h2>{variant.headline}</h2>
                 <p>{variant.body}</p>
-                <span className="preview-cta">{variant.cta} →</span>
-              </article>
-              <footer>
-                Audience rule: resolved identity + eligible account context
-              </footer>
+                <button>{variant.cta} →</button>
+              </div>
+              <div className="website-proof-grid"><span>Practical adoption path</span><span>Decision-ready guidance</span><span>Governed expansion</span></div>
             </div>
           ) : activeTab === "Sales enablement" ? (
-            <div className="event-preview">
-              <small>OPENAI FOR ENTERPRISE · SELLER BRIEF</small>
-              <h2>{variant.account}</h2>
-              <article>
-                <b>Why this account, now</b>
-                <p>
-                  {variant.context}. The next buying-group conversation should
-                  focus on {variant.segment.toLowerCase()} needs.
-                </p>
-              </article>
-              <article>
-                <b>Suggested seller action</b>
-                <p>{variant.body}</p>
-                <span>{variant.cta} →</span>
-              </article>
-              <footer>
-                Includes role context, approved guide and campaign reference.
-              </footer>
+            <div className="seller-preview">
+              <header><span>OPENAI FOR ENTERPRISE</span><b>Account brief</b><em>Northstar Health</em></header>
+              <div className="seller-score"><span>Opportunity signal</span><b>Active evaluation · sponsor gap</b></div>
+              <section><small>WHY NOW</small><p>{variant.context}</p></section>
+              <section><small>CONVERSATION OPENING</small><h2>{variant.headline}</h2><p>{variant.body}</p></section>
+              <footer><b>Suggested next move</b><span>{variant.cta} →</span></footer>
             </div>
           ) : activeTab === "Executive thought leadership" ? (
-            <div className="event-preview">
-              <small>OPENAI FOR ENTERPRISE · EXECUTIVE POV</small>
-              <h2>{variant.headline}</h2>
-              <article>
-                <b>Perspective</b>
-                <p>{variant.body}</p>
-              </article>
-              <article>
-                <b>Distribution</b>
-                <p>
-                  Prepare executive social copy, a seller talking point and an
-                  account-specific invitation to continue the conversation.
-                </p>
-              </article>
-              <footer>
-                Claims remain tied to the approved source and the review packet.
-              </footer>
+            <div className="pov-preview">
+              <header><b>OpenAI</b><span>Ideas</span><span>Enterprise</span></header>
+              <article><small>POINT OF VIEW</small><h2>{variant.headline}</h2><p>{variant.body}</p><blockquote>“The question is no longer whether teams can begin. It is how leaders create the conditions for useful, governed adoption.”</blockquote><div><span>5 min read</span><b>Read the perspective →</b></div></article>
             </div>
           ) : (
-            <div className="event-preview">
-              <small>OPENAI FOR ENTERPRISE · SOCIAL</small>
-              <h2>{variant.headline}</h2>
-              <article>
-                <b>Post copy</b>
-                <p>{variant.body}</p>
-              </article>
-              <article>
-                <b>Destination</b>
-                <p>
-                  Link to the matching approved website experience and retain
-                  campaign, audience and account context.
-                </p>
-              </article>
-              <footer>
-                Prepared for review and staging; no content has been published.
-              </footer>
+            <div className="social-preview">
+              <header><span className="social-avatar">O</span><div><b>OpenAI</b><small>Sponsored · for {variant.segment}</small></div><span>•••</span></header>
+              <p>{variant.body}</p>
+              <div className="social-card"><small>OPENAI FOR ENTERPRISE</small><h2>{variant.headline}</h2><span>{variant.cta} →</span></div>
+              <footer><span>♡ 128</span><span>◌ 24 comments</span><span>↗ Share</span></footer>
             </div>
           )}
         </div>
@@ -319,8 +275,8 @@ export default function ChannelHandoff({
           <div>
             <b>Asset binding</b>
             <p>
-              {variant.source}. All {variants.length} candidate variants are
-              included in the channel bundle; this preview shows one.
+              {variant.source}. This preview shows the approved Northstar
+              audience version for the selected channel.
             </p>
           </div>
           <div>
@@ -359,28 +315,23 @@ export default function ChannelHandoff({
           </div>
           <button
             className="agent-primary"
-            disabled={!approved || staged}
+            disabled={!approved || campaignPrepared}
             onClick={stage}
           >
-            {staged
-              ? "Prepared for release"
-              : `Prepare ${activeTab.toLowerCase()} for release`}
+            {campaignPrepared
+              ? "Campaign outputs prepared"
+              : `Prepare all ${channels.length} campaign outputs`}
           </button>
           {!approved && (
             <p>
               Return to the approval package to obtain the required reviews.
             </p>
           )}
-          {staged && (
+          {campaignPrepared && (
             <div className="handoff-receipt" role="status">
               <b>✓ Prepared · not sent</b>
               <p>
-                WO-
-                {activeTab
-                  .toUpperCase()
-                  .replace(/[^A-Z]/g, "")
-                  .slice(0, 8)}
-                -001
+                Campaign handoff · {channels.join(" · ")}
                 <br />
                 Status: accepted into staging
                 <br />
@@ -395,9 +346,8 @@ export default function ChannelHandoff({
         </div>
       </div>
       <div className="handoff-progress">
-        {channels.filter((c) => p.reviewers[c] === "Staged").length} of{" "}
-        {channels.length} channels prepared · then we’ll check eligibility
-        before release.
+        One campaign handoff covers {channels.length} selected outputs.
+        Eligibility and final destination checks still gate release.
       </div>
     </section>
   );
