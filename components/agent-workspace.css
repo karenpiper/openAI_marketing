@@ -4580,6 +4580,17 @@
   font-size: 17px;
   font-weight: 300;
 }
+.agent-app .chat-sidebar .restart-chat {
+  margin: 0 0 6px;
+  color: #68716c;
+  font-size: 11px;
+}
+.agent-app .chat-sidebar .restart-chat span {
+  display: inline-block;
+  margin-right: 5px;
+  color: #2f5e45;
+  font-size: 13px;
+}
 .agent-app .chat-sidebar .chat-search {
   color: #747474;
 }

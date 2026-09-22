@@ -66,9 +66,11 @@ function planForChannels(channels: string[]) {
 function MorganScreen({
   children,
   workflow = false,
+  onRestart,
 }: {
   children: ReactNode;
   workflow?: boolean;
+  onRestart?: () => void;
 }) {
   function jump(selector: string, e: React.MouseEvent<HTMLButtonElement>) {
     const screen = e.currentTarget.closest(".monitor-screen");
@@ -108,6 +110,11 @@ function MorganScreen({
               >
                 <span aria-hidden="true">＋</span> New chat
               </button>
+              {onRestart && (
+                <button className="restart-chat" onClick={onRestart}>
+                  <span aria-hidden="true">↺</span> Restart prototype
+                </button>
+              )}
               <button className="chat-search" onClick={(e) => jump(".agent-composer", e)}>
                 <span aria-hidden="true">⌕</span> Search chats
               </button>
@@ -182,6 +189,12 @@ export default function AgentWorkspace() {
     setDraft("");
     setShowStepContext(false);
     setShowRecapResults(false);
+    setPage("workspace");
+    requestAnimationFrame(() =>
+      document
+        .querySelector<HTMLElement>(".monitor-screen")
+        ?.scrollTo({ top: 0, behavior: "instant" }),
+    );
   }
   function updateInMonitor(update: () => void, showWork = false) {
     const before = document
@@ -537,7 +550,7 @@ export default function AgentWorkspace() {
                 next decision draws on results.
               </p>
             </div>
-            <MorganScreen>
+            <MorganScreen onRestart={resetPrototype}>
               <PerformanceLoop
                 session={s}
                 onSave={(learning) => setS((prev) => ({ ...prev, learning }))}
@@ -565,7 +578,7 @@ export default function AgentWorkspace() {
             <section className="agent-stage" id="morgan-day">
               {s.day.moment === 0 ? (
                 <>
-                  <MorganScreen>
+                  <MorganScreen onRestart={resetPrototype}>
                     <div className="day-arrival">
                       <span className="agent-kicker">
                         08:45 · Morgan arrives
@@ -596,7 +609,7 @@ export default function AgentWorkspace() {
                 </>
               ) : s.day.moment === 4 ? (
                 <div className="prototype-screen-layout">
-                  <MorganScreen workflow>
+                  <MorganScreen workflow onRestart={resetPrototype}>
                     {showRecapResults ? (
                       <div className="day-results">
                         <button
@@ -673,18 +686,12 @@ export default function AgentWorkspace() {
                         ? "Back to today’s recap"
                         : "Campaign results & learnings"}
                     </button>
-                    <button
-                      className="prototype-restart"
-                      onClick={resetPrototype}
-                    >
-                      ↺ Restart prototype
-                    </button>
                   </div>
                 </div>
               ) : (
                 <>
                   <div className="prototype-screen-layout">
-                    <MorganScreen workflow>
+                    <MorganScreen workflow onRestart={resetPrototype}>
                       <div className="agent-product">
                         <header>
                           <b>
@@ -1031,12 +1038,6 @@ export default function AgentWorkspace() {
                         <span aria-hidden="true">
                           {showStepContext ? "×" : "◇"}
                         </span>
-                      </button>
-                      <button
-                        className="prototype-restart"
-                        onClick={resetPrototype}
-                      >
-                        ↺ Restart prototype
                       </button>
                       {showStepContext && (
                         <aside className="prototype-context-popover">
