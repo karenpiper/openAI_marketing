@@ -48,6 +48,7 @@ export default function ChannelHandoff({
 }) {
   const [tab, setTab] = useState("Email");
   const [adjustingChannels, setAdjustingChannels] = useState(false);
+  const [showGallery, setShowGallery] = useState(false);
   const variants = contentVariants(session);
   const accountVariants = variants.filter((v) => v.accountId === "ACCT-01");
   // Audience adaptation is decided in the plan above. This screen previews a
@@ -159,6 +160,27 @@ export default function ChannelHandoff({
           {!approved && <small>Complete the approval packet first.</small>}
         </div>
       </section>
+      <button
+        className="open-output-gallery"
+        onClick={() => setShowGallery(true)}
+      >
+        <span aria-hidden="true">▧</span> Open campaign output gallery
+      </button>
+      {showGallery && (
+        <div
+          className="asset-gallery-modal"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Northstar Health campaign output gallery"
+        >
+          <header className="asset-gallery-header">
+            <div>
+              <span className="agent-kicker">Northstar Health campaign</span>
+              <h3>Campaign output gallery</h3>
+              <p>Inspect each channel-ready artifact, then return to Morgan’s workspace.</p>
+            </div>
+            <button onClick={() => setShowGallery(false)}>Close gallery ✕</button>
+          </header>
       <section className="handoff-output-picker" aria-label="Campaign outputs">
         <span className="agent-kicker">Preview a channel output</span>
         {channels.map((c) => (
@@ -261,6 +283,8 @@ export default function ChannelHandoff({
           )}
         </div>
       </div>
+        </div>
+      )}
       <div className="handoff-progress">
         {campaignPrepared
           ? `Prepared as one campaign handoff: ${channels.join(" · ")}. Release remains gated by eligibility and final destination checks.`
