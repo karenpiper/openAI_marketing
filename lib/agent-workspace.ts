@@ -71,7 +71,7 @@ export const chapters = [
     story:
       "Northstar’s opportunity now has a brief. Morgan returns to a proposed plan that carries the account context, buying roles and objective forward, without asking her to start again.",
     response:
-      "For Northstar and the 11-account expansion cohort, I have prepared three role-specific paths. The technical lead receives a practical evaluation plan; the business sponsor receives the operating-value story; procurement receives the approved governance brief. All three use the selected public case-study source set. Review the plan below; I will coordinate asset preparation, approvals and channel handoffs.",
+      "For Northstar and the 11-account expansion cohort, I have prepared three role-specific paths. The technical lead receives a practical evaluation plan; the business sponsor receives the operating-value story; procurement receives the governance brief. All three use the selected fictional content foundation. Review the plan below; I will coordinate asset preparation, approvals and channel handoffs.",
     inputs: [
       [
         "Audience context",

@@ -716,9 +716,9 @@ export default function AgentWorkspace() {
                                     not yet engaged; procurement returned to the
                                     governance guide after last week’s
                                     roundtable. Send a role-specific follow-up
-                                    from the selected case-study source set,
-                                    then apply the same pattern to the other 11
-                                    accounts in the cohort.
+                                    from the selected fictional content
+                                    foundation, then apply the same pattern to
+                                    the other 11 accounts in the cohort.
                                   </p>
                                 </div>
                                 <span className="recommendation-badge">

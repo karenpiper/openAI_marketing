@@ -100,7 +100,7 @@ export function contentVariants(s: Pick<AgentState, "audience">) {
       headline: `${headline} — ${sourceSet.baseContent.headline}`,
       body: `Base message: ${sourceSet.baseContent.message}\n\nAdapted for ${account.name} / ${segment}: the starting point is ${account.focus}. ${body}\n\nApproved proof to retain: ${sourceSet.baseContent.proof}`,
       cta,
-      source: `${sourceSet.title} · public OpenAI references`,
+      source: `${sourceSet.title} · fictional content baseline`,
       eligibility:
         "Candidate only: requires matched identity, segment membership and consent",
     })),

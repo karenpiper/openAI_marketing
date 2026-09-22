@@ -245,26 +245,10 @@ export default function ProcessActions({
               </button>
             ))}
           </div>
-          <div className="source-references">
-            <b>Public source material</b>
-            {(
-              contentSourceOptions.find((source) => source.id === p.choice) ||
-              contentSourceOptions[0]
-            ).references.map((reference) => (
-              <a
-                href={reference.url}
-                key={reference.url}
-                rel="noreferrer"
-                target="_blank"
-              >
-                {reference.label} ↗
-              </a>
-            ))}
-          </div>
           <p className="source-selection-note">
-            The agent ranks and assembles approved material. Morgan selects the
-            content approach; asset rights, factual-claim limits and required
-            reviews remain attached to each package.
+            These are fictional content foundations for the prototype. Morgan
+            selects the narrative direction; approved source material, factual
+            claim limits and required reviews would be attached in production.
           </p>
           <button
             disabled={!p.choice || session.source === "Source material missing"}
