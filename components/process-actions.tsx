@@ -10,6 +10,8 @@ import {
   type ProcessState,
 } from "../lib/process-state";
 import { contentSourceOptions } from "../lib/content-source-library";
+import { selectedContentSource } from "../lib/content-source-library";
+import { contentVariants } from "../lib/content-variants";
 export default function ProcessActions({
   session,
   id,
@@ -24,6 +26,11 @@ export default function ProcessActions({
   onCampaignChange?: (patch: Partial<AgentState>) => void;
 }) {
   const p = processState(session, id, index);
+  const approvalVariants = contentVariants(session).filter(
+    (variant) => variant.accountId === "ACCT-01",
+  );
+  const approvalChannels = session.channel.split(" + ").filter(Boolean);
+  const selectedTheme = selectedContentSource(session);
   const [feedback, setFeedback] = useState("");
   const update = (patch: Partial<ProcessState>, event?: string) =>
     onChange(processUpdate(p, patch, event));
@@ -234,10 +241,9 @@ export default function ProcessActions({
           ) : (
             <>
               <p>
-                I matched the workshop’s fictional practice library to
-                Northstar Health’s audience, objective and channel mix. Choose
-                the thematic foundation that should ground the work; I will
-                assemble the role-specific packages from it.
+                Choose the content theme that should lead this fictional work.
+                It changes the point of view and message emphasis; the agent
+                then adapts that theme for each audience and channel.
               </p>
               <div className="content-source-options" role="radiogroup">
                 {contentSourceOptions.map((source) => (
@@ -261,8 +267,8 @@ export default function ProcessActions({
                 ))}
               </div>
               <p className="source-selection-note">
-                These are purpose-built practice materials for this prototype,
-                not customer case studies or production source material. Morgan
+                These are purpose-built practice themes for this prototype, not
+                customer case studies or production source material. Morgan
                 selects the narrative direction; approved source material,
                 factual claim limits and required reviews would be attached in
                 production.
@@ -316,6 +322,37 @@ export default function ProcessActions({
               ? "Confirm the audience and channel mix. Then I’ll send this version to Brand and Legal."
               : "Review decisions stay attached to this version of the packet."}
           </p>
+          <section className="approval-summary" aria-label="What Morgan is approving">
+            <header>
+              <span className="agent-kicker">What you are approving</span>
+              <b>Review the actual direction before you send this packet.</b>
+            </header>
+            <article>
+              <span>Audience promise</span>
+              {approvalVariants.map((variant) => (
+                <div key={variant.id}>
+                  <b>{variant.segment}</b>
+                  <p>
+                    {variant.headline} <em>→ {variant.cta}</em>
+                  </p>
+                </div>
+              ))}
+            </article>
+            <article>
+              <span>Channel mix</span>
+              <b>{approvalChannels.join(" · ")}</b>
+              <p>
+                The same role-specific promise will be adapted for each
+                selected channel. Change the mix in the plan choices or the
+                handoff before approving.
+              </p>
+            </article>
+            <article>
+              <span>Content theme</span>
+              <b>{selectedTheme.title}</b>
+              <p>{selectedTheme.rationale}</p>
+            </article>
+          </section>
           <div className="process-reviewers">
             {["Morgan", "Brand / asset owner", "Legal / privacy"].map(
               (role) => (

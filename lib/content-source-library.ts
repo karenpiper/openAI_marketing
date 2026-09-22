@@ -3,12 +3,12 @@ import type { AgentState } from "./agent-workspace";
 
 export const contentSourceOptions = [
   {
-    id: "adoption-decision-kit",
-    title: "The adoption decision kit",
+    id: "adoption-in-practice",
+    title: "Adoption in practice",
     badge: "Recommended",
-    assets: "Executive opener · working-session guide · proof-point framework",
+    assets: "Theme: turn useful AI activity into a repeatable way of working",
     rationale:
-      "A practice foundation created for this workshop: move active technical use into a credible, governed expansion conversation across the buying group.",
+      "Lead with the practical path from early activity to broader adoption. Use when the room needs to make the work tangible before discussing scale.",
     baseContent: {
       headline:
         "Turn early AI use into a decision the wider organization can make.",
@@ -20,13 +20,13 @@ export const contentSourceOptions = [
     },
   },
   {
-    id: "operating-change-playbook",
-    title: "The operating change playbook",
+    id: "business-value",
+    title: "Business value",
     badge: "Alternative",
     assets:
-      "Value hypothesis · executive discussion guide · seller enablement card",
+      "Theme: connect adoption to an operating outcome the business can own",
     rationale:
-      "A practice foundation for a sponsorship conversation focused on the operating problem, a bounded adoption scope and a decision the sponsor can make.",
+      "Lead with the business problem and the decision it enables. Use when a sponsor needs a clear reason to engage.",
     baseContent: {
       headline: "Make more room for the work that moves the business forward.",
       message:
@@ -37,12 +37,12 @@ export const contentSourceOptions = [
     },
   },
   {
-    id: "governed-evaluation-toolkit",
-    title: "The governed evaluation toolkit",
+    id: "confidence-to-scale",
+    title: "Confidence to scale",
     badge: "Alternative",
-    assets: "Evaluation guide · governance FAQ · implementation checklist",
+    assets: "Theme: establish the guardrails and proof needed to expand with confidence",
     rationale:
-      "A practice foundation for a bounded technical proof that gives procurement and governance teams a clear path into the decision.",
+      "Lead with trust, governance and a bounded proof. Use when risk, policy or purchasing confidence is the immediate barrier.",
     baseContent: {
       headline: "Build the foundation for secure, confident AI adoption.",
       message:

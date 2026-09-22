@@ -126,11 +126,11 @@ export function workStages(s: AgentState, id: string): WorkStage[] {
         summary:
           s.source === "Source material missing"
             ? "No approved source is available. The agent has prepared a source request; audience adaptation is on hold."
-            : `The agent searched the approved content bank and ranked the ${sourceSet.title.toLowerCase()} for this account and buying group.`,
+            : `The agent has prepared ${sourceSet.title.toLowerCase()} as the fictional message theme for this account and buying group.`,
         input:
-          "Account brief, audience needs, approved asset metadata, rights and brand rules.",
+          "Account brief, audience needs, fictional practice theme, rights and brand rules.",
         output:
-          "Source manifest with version, allowed claims and missing material.",
+          "Message-theme brief with claim boundaries and missing-material flags.",
         connection:
           "OpenAI agent → approved asset repository / Adobe content capabilities.",
         enables:
@@ -385,6 +385,44 @@ export function currentWorkStep(s: AgentState, id: string) {
     : 0;
 }
 
+function selectedChannels(plan: string) {
+  const canonical: Record<string, string> = {
+    email: "Email",
+    "event follow-up": "Event follow-up",
+    website: "Website",
+    "sales enablement": "Sales enablement",
+    "executive thought leadership": "Executive thought leadership",
+    "social campaign": "Social campaign",
+  };
+  const explicit = plan
+    .split(" + ")
+    .filter(Boolean)
+    .map((channel) => canonical[channel.toLowerCase()] || channel);
+  if (explicit.length) return explicit;
+  return ["Email", "Website"];
+}
+
+function channelDeliverable(
+  channel: string,
+  example: ReturnType<typeof contentVariants>[number] | undefined,
+) {
+  if (!example) return `${channel}\nNo representative content pattern is available yet.`;
+  const shared = `${example.headline} ${example.body}`;
+  if (channel === "Email")
+    return `Email\nSubject: ${example.subject}\nMessage: ${shared}\nCTA: ${example.cta}.`;
+  if (channel === "Event follow-up")
+    return `Event follow-up\nAttendee opening: “Thank you for joining the enterprise adoption roundtable.”\nMessage: ${shared}\nCTA: ${example.cta}.\nNon-attendees receive the session guide and a distinct invitation.`;
+  if (channel === "Website")
+    return `Website experience\nHeadline: ${example.headline}\nSupporting copy: ${example.body}\nCTA: ${example.cta}.`;
+  if (channel === "Sales enablement")
+    return `Seller brief\nAccount context: ${example.context}\nTalking point: ${shared}\nNext action: ${example.cta}.`;
+  if (channel === "Executive thought leadership")
+    return `Executive POV\nPoint of view: ${shared}\nDistribution: executive social post, seller talking point and account-specific invitation.`;
+  if (channel === "Social campaign")
+    return `Social campaign\nPost theme: ${example.headline}\nDraft: ${example.body}\nDestination: the matching ${example.segment.toLowerCase()} website experience.`;
+  return `${channel}\n${shared}\nCTA: ${example.cta}.`;
+}
+
 export function workflowArtifact(s: AgentState, id: string, index: number) {
   const stages = workStages(s, id);
   index = Number.isInteger(index)
@@ -411,6 +449,9 @@ export function workflowArtifact(s: AgentState, id: string, index: number) {
   };
   const blocked = id === "s3" && s.source === "Source material missing";
   const sourceSet = selectedContentSource(s);
+  const variants = id === "s3" ? contentVariants(s) : [];
+  const northstarVariants = variants.filter((variant) => variant.accountId === "ACCT-01");
+  const planChannels = selectedChannels(s.channel);
   const title = blocked ? "Source material request" : names[id][index];
   const sections =
     s.artifactEdits?.[artifactKey(s, id, index)] ??
@@ -424,21 +465,30 @@ export function workflowArtifact(s: AgentState, id: string, index: number) {
           {
             name: "Audience and deliverables",
             status: s.audience,
-            detail:
-              s.audience === "Buying roles"
-                ? "Technical evaluators: evaluation-plan brief with office-hours CTA.\nBusiness sponsors: operating-value brief tied to expansion decision.\nProcurement: governance-readiness brief grounded in approved material."
-                : s.audience === "Lifecycle stages"
-                  ? "Exploring: introductory adoption brief.\nEvaluating: practical evaluation brief.\nReady for sales: account handoff and governance brief."
-                  : "One eligible audience: a unified adoption brief and next-action recommendation.",
+            detail: northstarVariants
+              .map(
+                (variant) => {
+                  const label =
+                    variant.segment === "Technical evaluator"
+                      ? "Technical evaluators"
+                      : variant.segment === "Business sponsor"
+                        ? "Business sponsors"
+                        : variant.segment === "Procurement"
+                          ? "Procurement teams"
+                          : variant.segment;
+                  return `${label}\nHeadline: ${variant.headline}\nMessage: ${variant.body}\nCTA: ${variant.cta}.`;
+                },
+              )
+              .join("\n\n"),
           },
           {
             name: "Channel plan",
             status: s.channel,
-            detail: s.channel.toLowerCase().includes("event")
-              ? "Email: role-specific message briefs.\nEvents: invitation and follow-up requirements, separated for attendees and non-attendees."
-              : s.channel.toLowerCase().includes("sales")
-                ? "Email: role-specific message briefs.\nSales: account and buying-role handoff with the same objective."
-                : "Email: role-specific message briefs.\nWebsite: aligned experience brief and eligibility rules.",
+            detail: planChannels
+              .map((channel) =>
+                channelDeliverable(channel, northstarVariants[0] || variants[0]),
+              )
+              .join("\n\n"),
           },
           {
             name: "Source and release gates",

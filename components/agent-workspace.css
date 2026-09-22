@@ -4694,6 +4694,61 @@
   border-radius: 17px;
   box-shadow: 0 4px 18px #0000000d;
 }
+.plan-status {
+  margin: 10px 0 0 !important;
+  color: #26704d !important;
+  font-size: 12px !important;
+}
+.approval-summary {
+  display: grid;
+  grid-template-columns: 1.35fr 1fr 1fr;
+  gap: 10px;
+  margin: 19px 0;
+}
+.approval-summary > header {
+  grid-column: 1 / -1;
+  display: grid;
+  gap: 4px;
+}
+.approval-summary > header > b {
+  font-size: 14px;
+}
+.approval-summary > article {
+  padding: 14px;
+  border: 1px solid #dce3de;
+  border-radius: 10px;
+  background: #fbfcfa;
+}
+.approval-summary > article > span {
+  display: block;
+  margin-bottom: 10px;
+  color: #77827a;
+  font-size: 10px;
+  font-weight: 650;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+.approval-summary article div + div {
+  margin-top: 9px;
+  padding-top: 9px;
+  border-top: 1px solid #e5e9e5;
+}
+.approval-summary b {
+  font-size: 12px;
+}
+.approval-summary p {
+  margin: 4px 0 0;
+  color: #607068;
+  font-size: 11px;
+  line-height: 1.5;
+}
+.approval-summary em {
+  color: #2d6b4c;
+  font-style: normal;
+}
+@media (max-width: 800px) {
+  .approval-summary { grid-template-columns: 1fr; }
+}
 @media (max-width: 900px) {
   .workspace-desktop,
   .prototype-screen-layout .workspace-desktop {

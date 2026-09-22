@@ -213,6 +213,7 @@ export default function AgentWorkspace() {
   const [demo, setDemo] = useState(false);
   const [draft, setDraft] = useState("");
   const [adjustingRecommendation, setAdjustingRecommendation] = useState(false);
+  const [planStatus, setPlanStatus] = useState("");
   const [conversation, setConversation] = useState<
     Record<string, { prompt: string; reply: string }[]>
   >({});
@@ -355,6 +356,7 @@ export default function AgentWorkspace() {
     setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
   function condition(p: Partial<typeof s>) {
+    setPlanStatus("Plan choices saved in this browser. Confirm the plan to continue.");
     setS((prev) => ({
       ...prev,
       ...p,
@@ -864,7 +866,7 @@ export default function AgentWorkspace() {
                                     </p>
                                     <button
                                       className="agent-primary"
-                                      onClick={() =>
+                                      onClick={() => {
                                         setS((prev) => ({
                                           ...prev,
                                           campaign: {
@@ -874,11 +876,19 @@ export default function AgentWorkspace() {
                                             instruction:
                                               prev.campaign?.instruction || "",
                                           },
-                                        }))
-                                      }
+                                        }));
+                                        setPlanStatus(
+                                          "Plan confirmed. The fictional practice library is ready for Morgan’s selection.",
+                                        );
+                                      }}
                                     >
                                       Confirm audience, channels & source
                                     </button>
+                                    {planStatus && (
+                                      <p role="status" className="plan-status">
+                                        {planStatus}
+                                      </p>
+                                    )}
                                   </div>
                                 </div>
                               )}

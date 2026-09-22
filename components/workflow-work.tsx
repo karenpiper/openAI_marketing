@@ -66,10 +66,13 @@ export function WorkflowWork({
     return () => timers.forEach(clearTimeout);
   }, [runKey]);
   useEffect(() => {
-    if (phase === 3) showArtifact(index);
+    // A refreshed brief can rerun this simulated activity. Reveal the output
+    // without taking Morgan away from the plan controls she is editing.
+    if (phase === 3) showArtifact(index, false);
   }, [phase, runKey]);
-  function showArtifact(n: number) {
+  function showArtifact(n: number, shouldScroll = true) {
     setOpened(n);
+    if (!shouldScroll) return;
     requestAnimationFrame(() => {
       const screen = panel.current?.closest(".monitor-screen");
       if (screen && panel.current)
