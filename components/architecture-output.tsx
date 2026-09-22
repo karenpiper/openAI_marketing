@@ -126,18 +126,6 @@ export default function ArchitectureOutput({
               <span className="eyebrow">Explore the proposed workflow architecture</span>
               <h3>{explorerCase ? cases.find((u) => u.id === explorerCase)?.label : "The complete system"}</h3>
             </div>
-            {explorerCase && (
-              <button
-                className="architecture-play"
-                aria-pressed={playing}
-                onClick={() => {
-                  setExplorerStep((current) => current >= (workflows[explorerCase] || []).length - 1 ? 0 : current);
-                  setPlaying((value) => !value);
-                }}
-              >
-                {playing ? "Pause walkthrough" : "▶ Watch workflow"}
-              </button>
-            )}
           </header>
           <div className="architecture-usecase-tabs" role="tablist" aria-label="Workflow architecture views">
             <button role="tab" aria-selected={!explorerCase} onClick={() => chooseExplorerCase("")}>All workflow architecture</button>
@@ -160,10 +148,10 @@ export default function ArchitectureOutput({
                   const component = (event.target as HTMLElement).closest<HTMLElement>("[data-architecture-component]")?.dataset.architectureComponent;
                   if (component && componentProfiles[component]) { event.preventDefault(); setExplorerComponent(component); }
                 }}
-                dangerouslySetInnerHTML={{ __html: explorerCase ? architectureDiagram(s, explorerCase, explorerStep, explorerComponent ? [explorerComponent] : undefined) : architectureDiagram(s, undefined, -1, explorerComponent ? [explorerComponent] : undefined) }}
+                dangerouslySetInnerHTML={{ __html: explorerCase && explorerStep >= 0 ? architectureDiagram(s, explorerCase, explorerStep, explorerComponent ? [explorerComponent] : undefined) : architectureDiagram(s, undefined, -1, explorerComponent ? [explorerComponent] : undefined) }}
               />
               <p className="diagram-legend">
-                {explorerComponent ? "This component is highlighted. Select another box to inspect it, or return to the workflow story." : explorerCase ? "Gold traces the components and connections involved in this workflow. Select any box to inspect what it provides." : "The starting proposal: a complete system view. Select any box to inspect what it provides."}
+                {explorerComponent ? "This component is highlighted. Select another box to inspect it, or return to the workflow story." : explorerCase && explorerStep >= 0 ? "Gold traces the components and connections involved in this step. Select any box to inspect what it provides." : explorerCase ? "Choose a step to see only the components and connections used at that moment." : "The starting proposal: a complete system view. Select any box to inspect what it provides."}
               </p>
             </div>
             <aside className="architecture-explorer-story">
@@ -190,12 +178,23 @@ export default function ArchitectureOutput({
                 <>
                   <span className="eyebrow">The proposed flow</span>
                   <h4>One connected sequence</h4>
+                  <button
+                    className="architecture-play"
+                    aria-pressed={playing}
+                    onClick={() => {
+                      setExplorerStep(0);
+                      setPlaying((value) => !value);
+                    }}
+                  >
+                    {playing ? "Pause walkthrough" : `▶ Watch ${cases.find((u) => u.id === explorerCase)?.label || "workflow"}`}
+                  </button>
                   <ol>{(workflows[explorerCase] || []).map((item, index) => <li key={item.title}><button onClick={() => setExplorerStep(index)}><b>{index + 1}. {item.title}</b><span>{item.output}</span></button></li>)}</ol>
                 </>
               ) : (() => {
                 const active = workflows[explorerCase]?.[explorerStep];
                 if (!active) return null;
-                return <><span className="eyebrow">{explorerStep + 1} / {workflows[explorerCase]?.length}</span><h4>{active.title}</h4><p>{active.proposal}</p><div className="architecture-step-components"><span className="eyebrow">Components involved</span><button onClick={() => setExplorerComponent("H")}>{pdfBoxes.orchestration}</button>{active.boxes.map((box) => <button key={box} onClick={() => setExplorerComponent(diagramReferences[box])}>{pdfBoxes[box]}</button>)}</div><div className="architecture-step-output"><span className="eyebrow">Passes forward</span><p>{active.output}</p></div></>;
+                const lastStep = (workflows[explorerCase] || []).length - 1;
+                return <><span className="eyebrow">{explorerStep + 1} / {workflows[explorerCase]?.length}</span><h4>{active.title}</h4><p>{active.proposal}</p><div className="architecture-step-components"><span className="eyebrow">Components involved</span><button onClick={() => setExplorerComponent("H")}>{pdfBoxes.orchestration}</button>{active.boxes.map((box) => <button key={box} onClick={() => setExplorerComponent(diagramReferences[box])}>{pdfBoxes[box]}</button>)}</div><div className="architecture-step-output"><span className="eyebrow">Passes forward</span><p>{active.output}</p></div><div className="architecture-step-navigation"><button onClick={() => setExplorerStep((current) => current === 0 ? -1 : current - 1)}>← {explorerStep === 0 ? "All steps" : "Previous step"}</button>{explorerStep < lastStep && <button className="agent-primary" onClick={() => setExplorerStep((current) => current + 1)}>Next step →</button>}</div></>;
               })()}
             </aside>
           </div>
