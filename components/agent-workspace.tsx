@@ -349,6 +349,10 @@ export default function AgentWorkspace() {
     setS((prev) => ({
       ...prev,
       ...p,
+      campaign:
+        "audience" in p || "channel" in p || "source" in p
+          ? undefined
+          : prev.campaign,
       outcomes: { ...prev.outcomes, [c.id]: "" },
     }));
   }
@@ -728,15 +732,11 @@ export default function AgentWorkspace() {
                               <div className="recommendation-actions">
                                 <button
                                   className="agent-primary"
-                                  onClick={() => {
-                                    condition({
-                                      audience: "Buying roles",
-                                      channel: "Email + event follow-up",
-                                    });
-                                    setAdjustingRecommendation(false);
-                                  }}
+                                  onClick={() =>
+                                    setAdjustingRecommendation(true)
+                                  }
                                 >
-                                  Use recommendation
+                                  Review plan choices
                                 </button>
                                 <button
                                   aria-expanded={adjustingRecommendation}
@@ -745,7 +745,7 @@ export default function AgentWorkspace() {
                                   }
                                 >
                                   {adjustingRecommendation
-                                    ? "Hide adjustments"
+                                    ? "Hide plan choices"
                                     : "Adjust recommendation"}
                                 </button>
                               </div>
@@ -845,6 +845,32 @@ export default function AgentWorkspace() {
                                       <option>Source material missing</option>
                                     </select>
                                   </label>
+                                  <div className="recommendation-confirm">
+                                    <b>Confirm this plan before work begins</b>
+                                    <p>
+                                      The agent will not select a content
+                                      foundation or prepare packages until you
+                                      confirm the audience, channel mix and
+                                      source status.
+                                    </p>
+                                    <button
+                                      className="agent-primary"
+                                      onClick={() =>
+                                        setS((prev) => ({
+                                          ...prev,
+                                          campaign: {
+                                            objective:
+                                              prev.campaign?.objective ||
+                                              "Help Northstar Health move from technical evaluation to an expansion decision",
+                                            instruction:
+                                              prev.campaign?.instruction || "",
+                                          },
+                                        }))
+                                      }
+                                    >
+                                      Confirm audience, channels & source
+                                    </button>
+                                  </div>
                                 </div>
                               )}
                             </section>
@@ -867,6 +893,13 @@ export default function AgentWorkspace() {
                                     currentWorkStep(prev, c.id),
                                   )]: value,
                                 },
+                              }))
+                            }
+                            onCampaignChange={(patch) =>
+                              setS((prev) => ({
+                                ...prev,
+                                ...patch,
+                                outcomes: { ...prev.outcomes, [c.id]: "" },
                               }))
                             }
                             key={`${c.id}:${workSignature(s, c.id)}`}

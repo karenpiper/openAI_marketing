@@ -3192,6 +3192,15 @@
 .source-preview small {
   font-size: 10px;
 }
+.email-proof {
+  margin: 20px 0;
+  padding: 13px 15px;
+  border-left: 3px solid #6c927b;
+  background: #f4f7f4;
+  color: #42614f;
+  font-size: 12px !important;
+  line-height: 1.55;
+}
 .preview-cta {
   display: inline-block;
   background: #243f32;
@@ -3906,6 +3915,68 @@
 }
 .variant-controls button {
   min-height: 40px;
+}
+.handoff-channel-editor {
+  display: grid;
+  grid-template-columns: minmax(200px, 0.8fr) minmax(0, 1.2fr);
+  gap: 18px;
+  margin: 18px 0;
+  padding: 17px;
+  border: 1px solid #d7e1d7;
+  border-radius: 12px;
+  background: #f5f8f4;
+}
+.handoff-channel-editor b {
+  display: block;
+  margin: 5px 0;
+  color: #264b37;
+  font-size: 13px;
+}
+.handoff-channel-editor p {
+  margin: 0;
+  color: #5d7062;
+  font-size: 11px !important;
+  line-height: 1.5;
+}
+.handoff-channel-editor > div:last-child,
+.variant-choice-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  align-content: flex-start;
+}
+.handoff-channel-editor button,
+.variant-choice-row button {
+  padding: 8px 10px;
+  border: 1px solid #c9d7cb;
+  border-radius: 7px;
+  background: #fff;
+  color: #40634a;
+  font-size: 11px;
+}
+.handoff-channel-editor button[aria-pressed="true"],
+.variant-choice-row button[aria-pressed="true"] {
+  border-color: #567b61;
+  background: #e7f1e8;
+  color: #1e4f32;
+  font-weight: 700;
+}
+.variant-controls {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 8px 14px;
+}
+.variant-choice-row {
+  margin: 0;
+}
+@media (max-width: 760px) {
+  .handoff-channel-editor {
+    grid-template-columns: 1fr;
+  }
+  .variant-controls {
+    grid-template-columns: 1fr;
+  }
 }
 
 .use-case-discussion {

@@ -15,11 +15,13 @@ export default function ProcessActions({
   id,
   index,
   onChange,
+  onCampaignChange,
 }: {
   session: AgentState;
   id: string;
   index: number;
   onChange: (p: ProcessState) => void;
+  onCampaignChange?: (patch: Partial<AgentState>) => void;
 }) {
   const p = processState(session, id, index);
   const [feedback, setFeedback] = useState("");
@@ -218,54 +220,71 @@ export default function ProcessActions({
       )}
       {id === "s3" && index === 0 && (
         <>
-          <p>
-            I searched the approved content bank against Northstar Health’s
-            audience, objective and channel mix. Choose the source set that
-            should ground the work; I will assemble the role-specific packages
-            from it.
-          </p>
-          <div className="content-source-options" role="radiogroup">
-            {contentSourceOptions.map((source) => (
+          {!session.campaign ? (
+            <div className="recommended-decision">
+              <span className="agent-kicker">Plan choice required</span>
+              <b>Confirm the audience, channel mix and source status first.</b>
+              <p>
+                Return to the plan choices above. The content foundation and
+                work packages stay unavailable until Morgan confirms the
+                recommended defaults or adjusts them.
+              </p>
+            </div>
+          ) : (
+            <>
+              <p>
+                I searched the approved content bank against Northstar Health’s
+                audience, objective and channel mix. Choose the source set that
+                should ground the work; I will assemble the role-specific
+                packages from it.
+              </p>
+              <div className="content-source-options" role="radiogroup">
+                {contentSourceOptions.map((source) => (
+                  <button
+                    key={source.id}
+                    aria-checked={p.choice === source.id}
+                    className={p.choice === source.id ? "selected" : ""}
+                    onClick={() =>
+                      update(
+                        { choice: source.id, status: "Not started" },
+                        `Source set selected: ${source.title}`,
+                      )
+                    }
+                    role="radio"
+                  >
+                    <span>{source.badge}</span>
+                    <b>{source.title}</b>
+                    <small>{source.assets}</small>
+                    <p>{source.rationale}</p>
+                  </button>
+                ))}
+              </div>
+              <p className="source-selection-note">
+                These are fictional content foundations for the prototype.
+                Morgan selects the narrative direction; approved source
+                material, factual claim limits and required reviews would be
+                attached in production.
+              </p>
               <button
-                key={source.id}
-                aria-checked={p.choice === source.id}
-                className={p.choice === source.id ? "selected" : ""}
+                disabled={
+                  !p.choice || session.source === "Source material missing"
+                }
                 onClick={() =>
-                  update(
-                    { choice: source.id, status: "Not started" },
-                    `Source set selected: ${source.title}`,
+                  complete(
+                    `Source set confirmed: ${contentSourceOptions.find((source) => source.id === p.choice)?.title || "selected source"}. Approved claims and source references are required in each package.`,
                   )
                 }
-                role="radio"
               >
-                <span>{source.badge}</span>
-                <b>{source.title}</b>
-                <small>{source.assets}</small>
-                <p>{source.rationale}</p>
+                Use this source set
               </button>
-            ))}
-          </div>
-          <p className="source-selection-note">
-            These are fictional content foundations for the prototype. Morgan
-            selects the narrative direction; approved source material, factual
-            claim limits and required reviews would be attached in production.
-          </p>
-          <button
-            disabled={!p.choice || session.source === "Source material missing"}
-            onClick={() =>
-              complete(
-                `Source set confirmed: ${contentSourceOptions.find((source) => source.id === p.choice)?.title || "selected source"}. Approved claims and source references are required in each package.`,
-              )
-            }
-          >
-            Use this source set
-          </button>
-          {p.status === "Blocked" && (
-            <p>
-              The content bank is unavailable for this scenario. Request an
-              approved source set from the asset owner before adaptation can
-              continue.
-            </p>
+              {p.status === "Blocked" && (
+                <p>
+                  The content bank is unavailable for this scenario. Request an
+                  approved source set from the asset owner before adaptation can
+                  continue.
+                </p>
+              )}
+            </>
           )}
         </>
       )}
@@ -467,7 +486,11 @@ export default function ProcessActions({
         </>
       )}
       {id === "s3" && index === 3 && (
-        <ChannelHandoff session={session} onChange={onChange} />
+        <ChannelHandoff
+          session={session}
+          onChange={onChange}
+          onCampaignChange={onCampaignChange}
+        />
       )}
       {id === "s5" && index === 0 && (
         <>

@@ -40,9 +40,11 @@ function activationChannels(plan: string) {
 export default function ChannelHandoff({
   session,
   onChange,
+  onCampaignChange,
 }: {
   session: AgentState;
   onChange: (p: ProcessState) => void;
+  onCampaignChange?: (patch: Partial<AgentState>) => void;
 }) {
   const [tab, setTab] = useState("Email");
   const [accountId, setAccountId] = useState("ACCT-01");
@@ -50,29 +52,6 @@ export default function ChannelHandoff({
   const variants = contentVariants(session);
   const accountVariants = variants.filter((v) => v.accountId === accountId);
   const variant = accountVariants[segmentIndex] || accountVariants[0];
-  function downloadVariants() {
-    const url = URL.createObjectURL(
-      new Blob(
-        [
-          JSON.stringify(
-            {
-              notice:
-                "Fictional candidate variants; not sent or live-generated. Recipient eligibility and review gates still apply.",
-              variants,
-            },
-            null,
-            2,
-          ),
-        ],
-        { type: "application/json" },
-      ),
-    );
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = "account-content-variants.json";
-    link.click();
-    URL.revokeObjectURL(url);
-  }
   const p = processState(session, "s3", 3);
   const channels = activationChannels(session.channel);
   const activeTab = channels.includes(tab) ? tab : channels[0];
@@ -89,7 +68,7 @@ export default function ChannelHandoff({
             ? "Complete"
             : "Staging",
         },
-        `${activeTab} bundle (${variants.length} candidate account packages across 12 accounts) accepted by the simulated connector. Routed to the configured team. Not sent.`,
+        `${activeTab} master handoff (three approved role patterns, then account-level assembly across the cohort) accepted by the simulated connector. Routed to the configured team. Not sent.`,
       ),
     );
   }
@@ -99,13 +78,51 @@ export default function ChannelHandoff({
         <span className="agent-kicker">
           Activation workspace · simulated destination
         </span>
-        <h3>One source. Twelve account packages.</h3>
+        <h3>Three approved patterns. Account-specific assembly.</h3>
         <p>
-          Review the account and audience variants, then prepare each channel
-          for release. The agent routes the work to the configured team. Nothing
-          is sent yet.
+          Approve the role-level channel pattern once. The system then adapts it
+          against account context and eligibility for the 12-account cohort. You
+          are not reviewing 36 separate packages.
         </p>
       </header>
+      <section className="handoff-channel-editor">
+        <div>
+          <span className="agent-kicker">Channel mix</span>
+          <b>Adjust channels without leaving the handoff.</b>
+          <p>
+            Changes rebuild this handoff and require the revised mix to be
+            reviewed before release.
+          </p>
+        </div>
+        <div>
+          {[
+            "Email",
+            "Event follow-up",
+            "Website",
+            "Sales enablement",
+            "Executive thought leadership",
+            "Social campaign",
+          ].map((channel) => {
+            const selected = channels.includes(channel);
+            return (
+              <button
+                key={channel}
+                aria-pressed={selected}
+                onClick={() => {
+                  const next = selected
+                    ? channels.filter((item) => item !== channel)
+                    : [...channels, channel];
+                  if (next.length)
+                    onCampaignChange?.({ channel: next.join(" + ") });
+                }}
+              >
+                {selected ? "✓ " : "+ "}
+                {channel}
+              </button>
+            );
+          })}
+        </div>
+      </section>
       <nav aria-label="Channel work orders">
         {channels.map((c) => (
           <button
@@ -123,46 +140,41 @@ export default function ChannelHandoff({
       >
         <div>
           <b>
-            {variants.length} candidate account packages · 12 accounts ·{" "}
-            {accountVariants.length} audience{" "}
-            {accountVariants.length === 1 ? "version" : "versions"} each
+            {accountVariants.length} master role patterns · 12 account-level
+            instances after approval
           </b>
           <p>
-            Shared source and layout; different audience needs, message and next
-            action. These are fictional examples, not {variants.length}{" "}
-            confirmed recipients or sends.
+            The master pattern holds the approved structure and claims. The
+            account context changes the emphasis and next action at assembly
+            time. This preview is a representative instance, not a recipient
+            list or a send.
           </p>
         </div>
         <div className="variant-controls">
-          <label>
-            Account
-            <select
-              value={accountId}
-              onChange={(e) => setAccountId(e.target.value)}
-            >
-              {exampleAccounts.map((a) => (
-                <option key={a.id} value={a.id}>
-                  {a.name}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label>
-            Audience version
-            <select
-              value={accountVariants.indexOf(variant)}
-              onChange={(e) => setSegmentIndex(Number(e.target.value))}
-            >
-              {accountVariants.map((v, i) => (
-                <option key={v.id} value={i}>
-                  {v.segment}
-                </option>
-              ))}
-            </select>
-          </label>
-          <button onClick={downloadVariants}>
-            Download all {variants.length} variants
-          </button>
+          <span className="agent-kicker">Representative account</span>
+          <div className="variant-choice-row">
+            {exampleAccounts.slice(0, 3).map((account) => (
+              <button
+                key={account.id}
+                aria-pressed={accountId === account.id}
+                onClick={() => setAccountId(account.id)}
+              >
+                {account.name}
+              </button>
+            ))}
+          </div>
+          <span className="agent-kicker">Role pattern</span>
+          <div className="variant-choice-row">
+            {accountVariants.map((item, index) => (
+              <button
+                key={item.id}
+                aria-pressed={segmentIndex === index}
+                onClick={() => setSegmentIndex(index)}
+              >
+                {item.segment}
+              </button>
+            ))}
+          </div>
         </div>
         <p>
           <b>Account context:</b> {variant.context}. <b>Illustrative inputs:</b>{" "}
@@ -184,14 +196,10 @@ export default function ChannelHandoff({
                 <b>Subject</b> {variant.subject}
               </div>
               <article>
-                <small>ENTERPRISE ADOPTION</small>
+                <small>OPENAI FOR ENTERPRISE</small>
                 <h2>{variant.headline}</h2>
                 <p>{variant.body}</p>
-                <div className="source-preview">
-                  ▤ Enterprise adoption guide
-                  <br />
-                  <small>v3 · source reference attached</small>
-                </div>
+                <p className="email-proof">{variant.proof}</p>
                 <span className="preview-cta">{variant.cta} →</span>
               </article>
               <footer>
@@ -201,43 +209,37 @@ export default function ChannelHandoff({
             </div>
           ) : activeTab === "Event follow-up" ? (
             <div className="event-preview">
-              <h2>
-                Two paths.
-                <br />
-                One event context.
-              </h2>
+              <small>OPENAI FOR ENTERPRISE · EVENT FOLLOW-UP</small>
+              <h2>{variant.headline}</h2>
               <article>
-                <b>Attended</b>
+                <b>For attendees</b>
                 <p>
-                  Prepare a follow-up referencing the session and the approved
-                  adoption guide.
+                  Thank you for joining the enterprise adoption roundtable.{" "}
+                  {variant.body}
                 </p>
-                <span>Next step → account conversation</span>
+                <span>{variant.cta} →</span>
               </article>
               <article>
-                <b>Did not attend</b>
+                <b>For registrants who missed it</b>
                 <p>
-                  Prepare the approved resource path without claiming
-                  attendance.
+                  We saved the key decision framework from the session: connect
+                  active technical use to a clear operating and governance path.
                 </p>
-                <span>Next step → review the guide</span>
+                <span>Review the session guide →</span>
               </article>
               <footer>
-                Suppress duplicate invitations and ineligible contacts.
+                One approved event pattern; attendee status changes the opening
+                and CTA at assembly.
               </footer>
             </div>
           ) : activeTab === "Website" ? (
             <div className="email-preview">
-              <div>Marketing website / proposed audience experience</div>
+              <div>OPENAI FOR ENTERPRISE / NORTHSTAR HEALTH</div>
               <article>
-                <small>FOR YOUR TEAM</small>
-                <h2>
-                  A clearer path
-                  <br />
-                  to enterprise adoption.
-                </h2>
-                <div className="source-preview">Approved guide placement</div>
-                <span className="preview-cta">Explore the guide →</span>
+                <small>FOR {variant.segment.toUpperCase()}</small>
+                <h2>{variant.headline}</h2>
+                <p>{variant.body}</p>
+                <span className="preview-cta">{variant.cta} →</span>
               </article>
               <footer>
                 Audience rule: resolved identity + eligible account context
@@ -245,24 +247,19 @@ export default function ChannelHandoff({
             </div>
           ) : activeTab === "Sales enablement" ? (
             <div className="event-preview">
-              <h2>
-                Seller-ready
-                <br />
-                account brief.
-              </h2>
+              <small>OPENAI FOR ENTERPRISE · SELLER BRIEF</small>
+              <h2>{variant.account}</h2>
               <article>
                 <b>Why this account, now</b>
                 <p>
-                  Technical engagement is present; broader buying-role
-                  participation needs attention.
+                  {variant.context}. The next buying-group conversation should
+                  focus on {variant.segment.toLowerCase()} needs.
                 </p>
               </article>
               <article>
                 <b>Suggested seller action</b>
-                <p>
-                  Review the account brief and coordinate the next conversation
-                  with the account team.
-                </p>
+                <p>{variant.body}</p>
+                <span>{variant.cta} →</span>
               </article>
               <footer>
                 Includes role context, approved guide and campaign reference.
@@ -270,13 +267,11 @@ export default function ChannelHandoff({
             </div>
           ) : activeTab === "Executive thought leadership" ? (
             <div className="event-preview">
-              <h2>Executive point of view.</h2>
+              <small>OPENAI FOR ENTERPRISE · EXECUTIVE POV</small>
+              <h2>{variant.headline}</h2>
               <article>
                 <b>Perspective</b>
-                <p>
-                  Frame enterprise adoption as a leadership decision, using
-                  approved evidence and the account’s stated priorities.
-                </p>
+                <p>{variant.body}</p>
               </article>
               <article>
                 <b>Distribution</b>
@@ -291,17 +286,11 @@ export default function ChannelHandoff({
             </div>
           ) : (
             <div className="event-preview">
-              <h2>
-                Account-relevant
-                <br />
-                social campaign.
-              </h2>
+              <small>OPENAI FOR ENTERPRISE · SOCIAL</small>
+              <h2>{variant.headline}</h2>
               <article>
-                <b>Social story</b>
-                <p>
-                  Adapt the approved enterprise adoption perspective into a
-                  role-relevant social sequence.
-                </p>
+                <b>Post copy</b>
+                <p>{variant.body}</p>
               </article>
               <article>
                 <b>Destination</b>

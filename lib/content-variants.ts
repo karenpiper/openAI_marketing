@@ -97,8 +97,9 @@ export function contentVariants(s: Pick<AgentState, "audience">) {
       context: account.context,
       segment,
       subject: `${headline}: ${account.focus}`,
-      headline: `${headline} — ${sourceSet.baseContent.headline}`,
-      body: `Base message: ${sourceSet.baseContent.message}\n\nAdapted for ${account.name} / ${segment}: the starting point is ${account.focus}. ${body}\n\nApproved proof to retain: ${sourceSet.baseContent.proof}`,
+      headline,
+      body: `${sourceSet.baseContent.message}\n\nFor ${account.name}, the practical starting point is ${account.focus}. ${body}`,
+      proof: sourceSet.baseContent.proof,
       cta,
       source: `${sourceSet.title} · fictional content baseline`,
       eligibility:
