@@ -67,10 +67,14 @@ function MorganScreen({
   children,
   workflow = false,
   onRestart,
+  onToggleArchitecture,
+  architectureOpen = false,
 }: {
   children: ReactNode;
   workflow?: boolean;
   onRestart?: () => void;
+  onToggleArchitecture?: () => void;
+  architectureOpen?: boolean;
 }) {
   function jump(selector: string, e: React.MouseEvent<HTMLButtonElement>) {
     const screen = e.currentTarget.closest(".monitor-screen");
@@ -113,6 +117,16 @@ function MorganScreen({
               {onRestart && (
                 <button className="restart-chat" onClick={onRestart}>
                   <span aria-hidden="true">↺</span> Restart prototype
+                </button>
+              )}
+              {onToggleArchitecture && (
+                <button
+                  className="architecture-sidebar-tool"
+                  aria-expanded={architectureOpen}
+                  onClick={onToggleArchitecture}
+                >
+                  <span aria-hidden="true">◇</span>
+                  {architectureOpen ? "Close architecture" : "Architecture for this step"}
                 </button>
               )}
               <button className="chat-search" onClick={(e) => jump(".agent-composer", e)}>
@@ -691,7 +705,14 @@ export default function AgentWorkspace() {
               ) : (
                 <>
                   <div className="prototype-screen-layout">
-                    <MorganScreen workflow onRestart={resetPrototype}>
+                    <MorganScreen
+                      workflow
+                      onRestart={resetPrototype}
+                      onToggleArchitecture={() =>
+                        setShowStepContext((shown) => !shown)
+                      }
+                      architectureOpen={showStepContext}
+                    >
                       <div className="agent-product">
                         <header>
                           <b>
@@ -1027,18 +1048,6 @@ export default function AgentWorkspace() {
                       </div>
                     </MorganScreen>
                     <div className="prototype-context-control">
-                      <button
-                        className="prototype-context-trigger"
-                        aria-expanded={showStepContext}
-                        onClick={() => setShowStepContext((shown) => !shown)}
-                      >
-                        {showStepContext
-                          ? "Close step context"
-                          : "Architecture for this step"}
-                        <span aria-hidden="true">
-                          {showStepContext ? "×" : "◇"}
-                        </span>
-                      </button>
                       {showStepContext && (
                         <aside className="prototype-context-popover">
                           <header>

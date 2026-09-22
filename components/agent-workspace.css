@@ -4591,6 +4591,26 @@
   color: #2f5e45;
   font-size: 13px;
 }
+.agent-app .chat-sidebar .architecture-sidebar-tool {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 1px 0 8px;
+  padding: 7px 8px;
+  border: 1px solid #76a48b;
+  border-radius: 999px;
+  background: #e8f3e9;
+  color: #1a613d;
+  font-size: 10px;
+  font-weight: 650;
+  line-height: 1.2;
+}
+.agent-app .chat-sidebar .architecture-sidebar-tool[aria-expanded="true"] {
+  border-color: #1d7047;
+  background: #1d7047;
+  color: #fff;
+}
+.agent-app .chat-sidebar .architecture-sidebar-tool span { font-size: 12px; }
 .agent-app .chat-sidebar .chat-search {
   color: #747474;
 }
