@@ -111,6 +111,7 @@ export function architectureDiagram(
     E: [490, 132],
     F: [910, 420],
     G: [725, 980],
+    H: [735, 306],
   };
   const edges = new Set<string>();
   for (const step of shown) {
@@ -164,6 +165,7 @@ export function architectureDiagram(
  ${box(337, 270, 96, 135, ["Adobe", "Marketo"], 16)}
  ${box(103, 430, 330, 60, ["Adobe CDP (w/ ABM)"])}${tag(330, 430, "D")}
  ${box(610, 270, 250, 72, ["OpenAI Frontier"], 20, "H")}${tag(842, 242, "H")}
+ ${arrow(610, 288, 433, 177, ["H", "A"])}${arrow(735, 270, 660, 162, ["H", "E"])}${arrow(610, 318, 433, 460, ["H", "D"])}${arrow(610, 330, 320, 337, ["H", "C"])}${arrow(860, 306, 907, 306, ["H", "F"])}
  <path d="M 470 40 L 470 410" stroke="#c0cdbf" stroke-dasharray="7 7"/>
  ${text(18, 523, ["OAI Infrastructure"], 17)}<rect rx="16" x="18" y="535" width="582" height="300" fill="#edf2e8" stroke="#c0cdbf"/>
  ${box(113, 555, 455, 255, ["OpenAI", "Data Lake"], 32)}
