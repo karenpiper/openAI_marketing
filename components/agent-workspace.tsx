@@ -1479,7 +1479,11 @@ export default function AgentWorkspace() {
               }
             />
             <section className="agent-requirements">
-              <h2>For Colin · the next-day readout</h2>
+              <h2>
+                <strong>Let’s talk</strong>
+                <br />
+                <strong>Questions, thoughts, ideas</strong>
+              </h2>
               <div className="agent-capture">
                 {(
                   [
