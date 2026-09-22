@@ -69,20 +69,22 @@ function planForChannels(channels: string[]) {
 function routeForArchitectureActivity(activity: string) {
   const value = activity.toLowerCase();
   if (/audience|channel|plan choice|campaign context/.test(value))
-    return ["Morgan’s plan choice", "Marketing agent", "Adobe CDP / ABM"];
+    return ["Morgan’s plan choice", "Campaign strategist", "OpenAI Frontier", "Adobe CDP / ABM"];
   if (/content|creative|source|catalog|cdp-connected/.test(value))
     return [
-      "Marketing agent",
-      "Adobe CDP / ABM",
+      "Content retrieval agent",
+      "OpenAI Frontier",
       "Adobe CSC content library",
     ];
   if (/approve|approval|review|brand|legal|privacy/.test(value))
-    return ["Marketing agent", "Adobe Workfront", "Brand + legal review"];
+    return ["Governance agent", "OpenAI Frontier", "Adobe Workfront", "Brand + legal review"];
+  if (/check|consent|exception|hold|reconcil/.test(value))
+    return ["Release validation agent", "OpenAI Frontier", "Identity / consent source", "Adobe Workfront"];
   if (/handoff|stage|release|marketo|website|social|event|sales enablement/.test(value))
-    return ["Marketing agent", "Marketo / CRM", "Activation channel"];
+    return ["Activation agent", "OpenAI Frontier", "Marketo / CRM", "Activation channel"];
   if (/result|performance|learn|measure/.test(value))
-    return ["Journey analytics", "OpenAI data lake", "Marketing agent"];
-  return ["Marketing agent", "Shared campaign state", "Workflow controls"];
+    return ["Journey analytics", "OpenAI data lake", "Learning agent", "OpenAI Frontier"];
+  return ["Workflow coordinator", "OpenAI Frontier", "Shared campaign state", "Workflow controls"];
 }
 
 function workspaceInteraction(target: EventTarget | null) {
@@ -128,26 +130,35 @@ function WorkflowArchitectureRail({
     isPlanning
       ? [
           "Morgan’s plan choices",
-          `Marketing agent · ${session.audience}`,
+          `Campaign strategist · ${session.audience}`,
+          "OpenAI Frontier",
           `CDP / ABM · ${session.channel}`,
         ]
       : id === "s3" && step === 0 && contentChoice
         ? [
-            "Marketing agent",
-            "Adobe CDP / ABM",
+            "Content retrieval agent",
+            "OpenAI Frontier",
             "Adobe CSC · approved source selected",
           ]
       : id === "s3" && step === 0
-      ? ["Marketing agent", "Adobe CDP / ABM", "Adobe CSC content library"]
+      ? ["Content retrieval agent", "OpenAI Frontier", "Adobe CDP / ABM", "Adobe CSC content library"]
       : id === "s3" && step === 1
-        ? ["Marketing agent", "CDP / identity", "Content production tools"]
+        ? ["Content adaptation agent", "OpenAI Frontier", "CDP / identity", "Content production tools"]
         : id === "s3" && step === 2
-          ? ["Marketing agent", "Adobe Workfront", "Brand + legal review"]
+          ? ["Governance agent", "OpenAI Frontier", "Adobe Workfront", "Brand + legal review"]
           : id === "s3"
-            ? ["Marketing agent", "Marketo / CRM", "Journey analytics"]
+            ? ["Activation agent", "OpenAI Frontier", "Marketo / CRM", "Journey analytics"]
             : id === "s2"
-              ? ["OpenAI data lake", "CDP / ABM", "Marketing agent"]
-              : ["Marketing agent", "Workflow controls", "Activation systems"];
+              ? step === 0
+                ? ["Identity resolution agent", "OpenAI data lake", "Adobe CDP / ABM", "OpenAI Frontier"]
+                : step === 1
+                  ? ["Buying-group intelligence agent", "OpenAI Frontier", "OpenAI data lake", "Adobe CDP / ABM"]
+                  : ["Campaign strategist", "OpenAI Frontier", "Shared campaign state"]
+              : id === "s5"
+                ? step === 0
+                  ? ["Release validation agent", "OpenAI Frontier", "Identity / consent source", "Adobe Workfront"]
+                  : ["Exception-resolution agent", "OpenAI Frontier", "Activation controls", "Data-owner request"]
+                : ["Workflow coordinator", "OpenAI Frontier", "Workflow controls", "Activation systems"];
   const transition =
     isPlanning
       ? "Audience + channel mix → campaign context"
@@ -193,8 +204,9 @@ function WorkflowArchitectureRail({
         <b>{stage.output}</b>
       </div>
       <p className="workflow-architecture-note">
-        This is the proposed connection for this moment. Open the full workflow
-        architecture in Step 4 to review every component and boundary.
+        Each named agent is a proposed specialist role coordinated through
+        OpenAI Frontier. Open the full workflow architecture in Step 4 to
+        review every component and boundary.
       </p>
     </aside>
   );
