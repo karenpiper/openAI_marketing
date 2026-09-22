@@ -94,18 +94,11 @@
   background: var(--ink);
   color: #fff;
 }
-.agent-prototype,
 .agent-kicker {
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-}
-.agent-prototype {
-  border: 1px solid var(--line);
-  padding: 8px;
-  border-radius: 5px;
-  white-space: nowrap;
 }
 .agent-intro {
   max-width: 1240px;
@@ -511,9 +504,6 @@
     flex-wrap: wrap;
     gap: 15px;
   }
-  .agent-prototype {
-    display: none;
-  }
   .agent-main {
     grid-template-columns: 190px minmax(0, 1fr);
   }
@@ -686,11 +676,6 @@
 .agent-top nav button[aria-current="page"] {
   background: #f0f0f0;
   color: #171717;
-}
-.agent-prototype {
-  color: #737373;
-  border-color: #e8e8e8;
-  font-size: 9px;
 }
 .agent-app button {
   border-color: #dedede;

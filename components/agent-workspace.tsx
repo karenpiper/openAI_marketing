@@ -604,7 +604,7 @@ export default function AgentWorkspace() {
             }}
             className="agent-brand"
           >
-            OpenAI <span>× Code and Theory</span>
+            OpenAI <span>× Code and Theory × Adobe</span>
           </a>
           <nav aria-label="Workshop navigation">
             {[
@@ -624,9 +624,6 @@ export default function AgentWorkspace() {
               </button>
             ))}
           </nav>
-          <span className="agent-prototype">
-            {demo ? "DEMO SESSION" : "WORKING PROTOTYPE"}
-          </span>
         </header>
         {error && (
           <p role="alert" className="agent-error">
