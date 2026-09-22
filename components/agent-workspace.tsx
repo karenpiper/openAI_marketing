@@ -1,5 +1,4 @@
 "use client";
-import ReviewComments from "./review-comments";
 import UseCaseScoring from "./use-case-scoring";
 import { useEffect, useState, type ReactNode } from "react";
 import {
@@ -597,7 +596,6 @@ export default function AgentWorkspace() {
     <SaveContext.Provider value={{ save, revision: s, error }}>
       <div className="agent-app">
         <header className="agent-top">
-          <ReviewComments />
           <a
             href="#"
             onClick={(e) => {

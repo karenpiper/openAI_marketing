@@ -10,7 +10,6 @@
     "test": "node --test tests/*.test.cjs"
   },
   "dependencies": {
-    "@vercel/toolbar": "^0.2.7",
     "next": "^15.5.0",
     "pdfmake": "^0.2.20",
     "react": "^19.1.0",
