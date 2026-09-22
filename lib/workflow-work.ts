@@ -272,7 +272,7 @@ export function workStages(s: AgentState, id: string): WorkStage[] {
   return [
     {
       title: "Run pre-flight release checks",
-      action: "Inspect the exception",
+      action: "Run pre-flight checks",
       summary:
         "Before launch, the agent applies the release checklist and separates routine validation from a consent conflict.",
       input:
