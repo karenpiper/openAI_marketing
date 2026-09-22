@@ -4835,6 +4835,32 @@
 .social-card h2 { max-width:15ch; margin:11px 0 20px; font-size:25px; line-height:1.05; letter-spacing:-.05em; }
 .social-card span { font-size:12px; font-weight:600; }
 .social-preview footer { display:flex; gap:18px; padding:12px 16px; border-top:1px solid #e7ece7; color:#68736b; font-size:10px; }
+.handoff-campaign-summary {
+  display: grid;
+  grid-template-columns: 1.2fr .8fr;
+  gap: 14px;
+  margin: 0 0 20px;
+}
+.handoff-campaign-summary > div {
+  padding: 16px;
+  border: 1px solid #dae3da;
+  border-radius: 11px;
+  background: #fbfcfa;
+}
+.handoff-campaign-summary > div:last-child { background: #eff6f0; }
+.handoff-campaign-summary b { display: block; margin: 6px 0; font-size: 13px; }
+.handoff-campaign-summary p { margin: 0; color: #5c6e62; font-size: 11px; line-height: 1.55; }
+.handoff-campaign-summary button { margin-top: 12px; font-size: 11px; }
+.handoff-campaign-summary small { display: block; margin-top: 8px; color: #797979; font-size: 10px; }
+.handoff-canvas { display: block; }
+.handoff-preview { padding: 26px; }
+.handoff-preview > .agent-kicker { display: block; margin-bottom: 12px; }
+.handoff-preview .website-preview,.handoff-preview .seller-preview,.handoff-preview .pov-preview,.handoff-preview .social-preview,.handoff-preview .email-preview,.handoff-preview .event-preview { max-width: 900px; margin: auto; }
+@media (max-width: 760px) {
+  .handoff-campaign-summary { grid-template-columns: 1fr; }
+  .handoff-preview { padding: 14px; }
+  .website-hero,.pov-preview article { padding: 25px; }
+}
 @media (max-width: 900px) {
   .workspace-desktop,
   .prototype-screen-layout .workspace-desktop {

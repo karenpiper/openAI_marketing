@@ -47,11 +47,12 @@ export default function ChannelHandoff({
   onCampaignChange?: (patch: Partial<AgentState>) => void;
 }) {
   const [tab, setTab] = useState("Email");
-  const [segmentIndex, setSegmentIndex] = useState(0);
   const [adjustingChannels, setAdjustingChannels] = useState(false);
   const variants = contentVariants(session);
   const accountVariants = variants.filter((v) => v.accountId === "ACCT-01");
-  const variant = accountVariants[segmentIndex] || accountVariants[0];
+  // Audience adaptation is decided in the plan above. This screen previews a
+  // representative version; it never asks Morgan to allocate content person by person.
+  const variant = accountVariants[0];
   const p = processState(session, "s3", 3);
   const channels = activationChannels(session.channel);
   const activeTab = channels.includes(tab) ? tab : channels[0];
@@ -79,10 +80,10 @@ export default function ChannelHandoff({
         <span className="agent-kicker">
           Activation workspace · simulated destination
         </span>
-        <h3>Campaign outputs for Northstar Health</h3>
+        <h3>One campaign. Multiple channel-ready outputs.</h3>
         <p>
-          Review the actual channel-ready work for this campaign. Each output
-          uses the selected audience, content theme and approved direction.
+          Inspect any output below. The system applies the approved audience,
+          content theme and direction across the campaign automatically.
         </p>
       </header>
       <button
@@ -132,8 +133,34 @@ export default function ChannelHandoff({
           </div>
         </section>
       )}
+      <section className="handoff-campaign-summary">
+        <div>
+          <span className="agent-kicker">Campaign scope</span>
+          <b>Northstar Health · {session.audience}</b>
+          <p>
+            {accountVariants.map((item) => item.segment).join(" · ")} are
+            automatically adapted from the same approved direction. Morgan
+            does not choose versions one by one.
+          </p>
+        </div>
+        <div>
+          <span className="agent-kicker">Preparation</span>
+          <b>{campaignPrepared ? "Campaign outputs prepared" : "Ready to prepare as one campaign"}</b>
+          <p>One handoff covers all {channels.length} selected outputs.</p>
+          <button
+            className="agent-primary"
+            disabled={!approved || campaignPrepared}
+            onClick={stage}
+          >
+            {campaignPrepared
+              ? "Campaign outputs prepared"
+              : `Prepare complete campaign`}
+          </button>
+          {!approved && <small>Complete the approval packet first.</small>}
+        </div>
+      </section>
       <section className="handoff-output-picker" aria-label="Campaign outputs">
-        <span className="agent-kicker">Choose an output to inspect</span>
+        <span className="agent-kicker">Preview a channel output</span>
         {channels.map((c) => (
           <button
             key={c}
@@ -149,34 +176,6 @@ export default function ChannelHandoff({
             </span>
           </button>
         ))}
-      </section>
-      <section
-        className="variant-browser"
-        aria-label="Audience versions"
-      >
-        <div>
-          <b>Northstar Health · {session.audience}</b>
-          <p>
-            This shows one audience-specific version of the selected output.
-            Switch versions to see how the same campaign adapts its message and
-            next action for a different audience.
-          </p>
-        </div>
-        <div className="variant-controls">
-          <span className="agent-kicker">Audience version</span>
-          <div className="variant-choice-row">
-            {accountVariants.map((item, index) => (
-              <button
-                key={item.id}
-                aria-pressed={segmentIndex === index}
-                onClick={() => setSegmentIndex(index)}
-              >
-                {item.segment}
-              </button>
-            ))}
-          </div>
-        </div>
-        <p><b>Why this version:</b> {variant.context}</p>
       </section>
       <div className="handoff-canvas">
         <div className="handoff-preview">
@@ -261,93 +260,11 @@ export default function ChannelHandoff({
             </div>
           )}
         </div>
-        <div className="handoff-settings">
-          <div>
-            <b>Account package</b>
-            <p>
-              {variant.account} · {variant.segment} · {variant.id}
-            </p>
-          </div>
-          <div>
-            <b>Exclusions</b>
-            <p>Consent holds and pre-applied eligibility rules.</p>
-          </div>
-          <div>
-            <b>Asset binding</b>
-            <p>
-              {variant.source}. This preview shows the approved Northstar
-              audience version for the selected channel.
-            </p>
-          </div>
-          <div>
-            <b>Destination</b>
-            <p>
-              {activeTab === "Email"
-                ? "CRM (Marketing) / proposed Marketo connector"
-                : activeTab === "Event follow-up"
-                  ? "Events + marketing CRM"
-                  : activeTab === "Website"
-                    ? "Marketing Website"
-                    : activeTab === "Sales enablement"
-                      ? "Sales CRM / account team"
-                      : activeTab === "Executive thought leadership"
-                        ? "Executive communications workflow + sales CRM"
-                        : "Social publishing / advocacy workflow"}
-            </p>
-          </div>
-          <div>
-            <b>Tracking attached</b>
-            <p>
-              Campaign: enterprise-adoption
-              <br />
-              Audience: buying-role / lifecycle segment
-              <br />
-              Channel: {activeTab}
-            </p>
-          </div>
-          <div className="handoff-gate">
-            <b>
-              {approved
-                ? "✓ Review packet approved"
-                : "Review packet not approved"}
-            </b>
-            <p>Eligibility and destination checks still gate release.</p>
-          </div>
-          <button
-            className="agent-primary"
-            disabled={!approved || campaignPrepared}
-            onClick={stage}
-          >
-            {campaignPrepared
-              ? "Campaign outputs prepared"
-              : `Prepare all ${channels.length} campaign outputs`}
-          </button>
-          {!approved && (
-            <p>
-              Return to the approval package to obtain the required reviews.
-            </p>
-          )}
-          {campaignPrepared && (
-            <div className="handoff-receipt" role="status">
-              <b>✓ Prepared · not sent</b>
-              <p>
-                Campaign handoff · {channels.join(" · ")}
-                <br />
-                Status: accepted into staging
-                <br />
-                Routing: marketing operations
-                <br />
-                Release: blocked pending final checks
-                <br />
-                Sent: no
-              </p>
-            </div>
-          )}
-        </div>
       </div>
       <div className="handoff-progress">
-        One campaign handoff covers {channels.length} selected outputs.
-        Eligibility and final destination checks still gate release.
+        {campaignPrepared
+          ? `Prepared as one campaign handoff: ${channels.join(" · ")}. Release remains gated by eligibility and final destination checks.`
+          : "The previews are for review only. Preparing the campaign will create one coordinated handoff for every selected output."}
       </div>
     </section>
   );
