@@ -148,6 +148,7 @@ export default function AgentWorkspace() {
   const [saved, setSaved] = useState("");
   const [page, setPage] = useState("intro");
   const [showStepContext, setShowStepContext] = useState(false);
+  const [showRecapResults, setShowRecapResults] = useState(false);
   const chapter = Math.max(0, Math.min(2, s.day.moment - 1));
   function setChapter(index: number) {
     setS((prev) => ({ ...prev, day: { ...prev.day, moment: index + 1 } }));
@@ -172,6 +173,7 @@ export default function AgentWorkspace() {
     setConversation({});
     setDraft("");
     setShowStepContext(false);
+    setShowRecapResults(false);
   }
   function updateInMonitor(update: () => void, showWork = false) {
     const before = document
@@ -531,7 +533,7 @@ export default function AgentWorkspace() {
                     campaign: {
                       objective:
                         prev.campaign?.objective ||
-                        "Grow enterprise adoption across the buying group",
+                        "Help Northstar Health move from technical evaluation to an expansion decision",
                       instruction,
                     },
                     day: { ...prev.day, moment: 2 },
@@ -579,46 +581,92 @@ export default function AgentWorkspace() {
                   </MorganScreen>
                 </>
               ) : s.day.moment === 4 ? (
-                <>
-                  <MorganScreen>
-                    <div className="day-evening">
-                      <span className="agent-kicker">
-                        17:30 · Back in the same workspace
-                      </span>
-                      <h1>Here’s what moved today.</h1>
-                      <p>
-                        Here is the adoption campaign we worked on today, and
-                        the decisions you made along the way.
-                      </p>
-                      {s.day.history.length ? (
-                        s.day.history.map((h) => (
-                          <article key={h.id} className="day-history">
-                            <span>{h.time}</span>
-                            <p>{h.text}</p>
-                          </article>
-                        ))
-                      ) : (
-                        <p>
-                          No decisions have been made yet. Return to the morning
-                          briefing to run through the day.
-                        </p>
-                      )}
-                      <div className="day-brief">
-                        <h2>Ready for the next handoff.</h2>
-                        <p>
-                          {s.day.history.some((h) => h.id === "s3")
-                            ? "Your approved plan is queued for required reviews. Release remains gated on approvals and audience eligibility."
-                            : "The campaign plan still needs your review before I can prepare the next handoff."}
-                        </p>
-                        <p>
-                          {s.day.history.some((h) => h.id === "s5")
-                            ? "The consent exception is held for the data owner. I’ll bring it back when the records agree."
-                            : "The consent conflict remains open. I need your direction before moving that contact forward."}
-                        </p>
+                <div className="prototype-screen-layout">
+                  <MorganScreen workflow>
+                    {showRecapResults ? (
+                      <div className="day-results">
+                        <button
+                          className="day-results-back"
+                          onClick={() => setShowRecapResults(false)}
+                        >
+                          ← Back to today’s recap
+                        </button>
+                        <PerformanceLoop
+                          session={s}
+                          onSave={(learning) =>
+                            setS((prev) => ({ ...prev, learning }))
+                          }
+                          onApply={(instruction) => {
+                            setS((prev) => ({
+                              ...prev,
+                              campaign: {
+                                objective:
+                                  prev.campaign?.objective ||
+                                  "Help Northstar Health move from technical evaluation to an expansion decision",
+                                instruction,
+                              },
+                              day: { ...prev.day, moment: 2 },
+                            }));
+                            setShowRecapResults(false);
+                          }}
+                        />
                       </div>
-                    </div>
+                    ) : (
+                      <div className="day-evening">
+                        <span className="agent-kicker">
+                          17:30 · Back in the same workspace
+                        </span>
+                        <h1>Here’s what moved today.</h1>
+                        <p>
+                          Here is the adoption campaign we worked on today, and
+                          the decisions you made along the way.
+                        </p>
+                        {s.day.history.length ? (
+                          s.day.history.map((h) => (
+                            <article key={h.id} className="day-history">
+                              <span>{h.time}</span>
+                              <p>{h.text}</p>
+                            </article>
+                          ))
+                        ) : (
+                          <p>
+                            No decisions have been made yet. Return to the
+                            morning briefing to run through the day.
+                          </p>
+                        )}
+                        <div className="day-brief">
+                          <h2>Ready for the next handoff.</h2>
+                          <p>
+                            {s.day.history.some((h) => h.id === "s3")
+                              ? "Your approved plan is queued for required reviews. Release remains gated on approvals and audience eligibility."
+                              : "The campaign plan still needs your review before I can prepare the next handoff."}
+                          </p>
+                          <p>
+                            {s.day.history.some((h) => h.id === "s5")
+                              ? "The consent exception is held for the data owner. I’ll bring it back when the records agree."
+                              : "The consent conflict remains open. I need your direction before moving that contact forward."}
+                          </p>
+                        </div>
+                      </div>
+                    )}
                   </MorganScreen>
-                </>
+                  <div className="prototype-context-control prototype-recap-controls">
+                    <button
+                      className="prototype-recap-results"
+                      onClick={() => setShowRecapResults((shown) => !shown)}
+                    >
+                      {showRecapResults
+                        ? "Back to today’s recap"
+                        : "Campaign results & learnings"}
+                    </button>
+                    <button
+                      className="prototype-restart"
+                      onClick={resetPrototype}
+                    >
+                      ↺ Restart prototype
+                    </button>
+                  </div>
+                </div>
               ) : (
                 <>
                   <div className="prototype-screen-layout">
@@ -1138,51 +1186,6 @@ export default function AgentWorkspace() {
               Download concise readout
             </button>
           </main>
-        )}
-        {page !== "workspace" && (
-          <footer className="agent-footer">
-            <a href="/original">Original workshop</a>
-            <span role="status">
-              {ready
-                ? error
-                  ? "Save needs attention"
-                  : saved
-                : "Loading saved session…"}{" "}
-              · {demo ? "Demo" : "Workshop"} session
-            </span>
-            <div>
-              <button onClick={() => download(true)}>Export backup</button>
-              <label className="agent-import">
-                Restore backup
-                <input
-                  type="file"
-                  accept="application/json"
-                  onChange={async (e) => {
-                    const file = e.target.files?.[0];
-                    if (!file) return;
-                    try {
-                      if (file.size > 2000000) throw Error();
-                      const next = restoreAgentState(
-                        JSON.parse(await file.text()),
-                      );
-                      if (
-                        confirm("Replace this adapted session with the backup?")
-                      ) {
-                        setS(next);
-                        setError("");
-                      }
-                    } catch {
-                      setSaved("Could not restore that backup.");
-                    }
-                    e.target.value = "";
-                  }}
-                />
-              </label>
-              <a href={demo ? "?" : "?demo=1"}>
-                {demo ? "Leave demo" : "Explore in demo mode"}
-              </a>
-            </div>
-          </footer>
         )}
       </div>
     </SaveContext.Provider>
