@@ -479,13 +479,42 @@ export function workflowArtifact(s: AgentState, id: string, index: number) {
               detail: `Prepare a role-specific adoption plan: technical office hours for the technical lead, an operating-value brief for the business sponsor, and an approved governance brief for procurement.\nWhy now: multiple technical and governance signals are present, but the account cannot progress as a buying group without a sponsor path.\nMorgan can change this direction before any content or handoff work begins.`,
             },
           ]
-        : stage.rows.map(([name, status, detail]) => ({
-            name,
-            status,
-            detail: deliveredDetail(s, id, index, name, detail),
-          })));
+        : id === "s2" && index === 1
+          ? [
+              {
+                name: "Account progression",
+                status: "Technical evaluation is active",
+                detail: `Northstar has 18 weekly active users, up 28% in 30 days, and the technical team completed two workspace projects.\nThree contacts attended the enterprise roundtable.\nRead: this is an active evaluation signal, not evidence that an expansion decision has been made.`,
+              },
+              {
+                name: "Technical evaluator path",
+                status: "Active · ready for a practical next step",
+                detail: `Evidence: technical lead attended the roundtable and returned to the evaluation guide.\nDecision need: confirm how the team can move from trial activity to a scoped adoption path.\nRecommended work: technical office hours and an evaluation-plan brief grounded in approved material.`,
+              },
+              {
+                name: "Business sponsor path",
+                status: "Missing · highest progression gap",
+                detail: `Evidence: no recent sponsor activity or documented operating-value conversation.\nDecision need: assess whether broader adoption solves a meaningful operating problem.\nRecommended work: an operating-value brief and a clear invitation to discuss the expansion decision with the account team.`,
+              },
+              {
+                name: "Procurement and governance path",
+                status: "Researching · needs approved context",
+                detail: `Evidence: two returns to the security and governance guide.\nDecision need: understand security, governance and purchasing readiness before joining a coordinated plan.\nRecommended work: the approved governance brief, not a new claim or unreviewed security assertion.`,
+              },
+              {
+                name: "Recommended coordinated move",
+                status: "Lead with sponsor value · retain all three paths",
+                detail: `Use the business-sponsor gap as the lead priority while keeping the technical evaluator and procurement paths coordinated around the same expansion objective.\nWhy: the technical and governance signals already exist; sponsor participation is the missing condition for a buying-group decision.\nMorgan can change the leading emphasis without collapsing the plan into one audience or one message.`,
+              },
+            ]
+          : stage.rows.map(([name, status, detail]) => ({
+              name,
+              status,
+              detail: deliveredDetail(s, id, index, name, detail),
+            })));
   const sources = workflowSources(s, id, index);
-  const text = `# ${title}\n\nILLUSTRATIVE PROTOTYPE OUTPUT — Northstar Health is fictional; no live systems queried or actions executed.\n\nCampaign: Northstar Health expansion / 12-account cohort\nObjective: ${s.campaign?.objective || "Help Northstar Health move from technical evaluation to an expansion decision"}\nMorgan’s instruction: ${s.campaign?.instruction || "None added"}\nAudience: ${s.audience}\nChannels: ${s.channel}\n\n${stage.summary}\n\n${sections.map((r) => `## ${r.name}\nStatus: ${r.status}\n${r.detail}`).join("\n\n")}\n\n## Illustrative sources used\n${sources.map((source) => `- ${source.name}: ${source.purpose} | System: ${source.system} | Connection: ${source.connection}`).join("\n")}\n\n## Handoff\n${stage.output}\n\n## Required control\n${stage.control}\n\n## Workflow decisions and review history\n${processDigest(s) || "No decisions recorded yet."}`;
+  const history = processDigest(s);
+  const text = `# ${title}\n\nILLUSTRATIVE PROTOTYPE OUTPUT — Northstar Health is fictional; no live systems queried or actions executed.\n\nCampaign: Northstar Health expansion / 12-account cohort\nObjective: ${s.campaign?.objective || "Help Northstar Health move from technical evaluation to an expansion decision"}\nMorgan’s instruction: ${s.campaign?.instruction || "None added"}\nAudience: ${s.audience}\nChannels: ${s.channel}\n\n${stage.summary}\n\n${sections.map((r) => `## ${r.name}\nStatus: ${r.status}\n${r.detail}`).join("\n\n")}\n\n## Illustrative sources used\n${sources.map((source) => `- ${source.name}: ${source.purpose} | System: ${source.system} | Connection: ${source.connection}`).join("\n")}\n\n## Handoff\n${stage.output}\n\n## Required control\n${stage.control}${history ? `\n\n## Workflow decisions and review history\n${history}` : ""}`;
   const variantText =
     id === "s3" && index >= 1 && !blocked
       ? "\n\n## Candidate email variants reviewed and handed off\n" +

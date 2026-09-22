@@ -138,22 +138,23 @@ export default function ProcessActions({
             </p>
           </div>
           <p className="decision-prompt">
-            Confirm the recommendation or choose a different next move. This
-            choice becomes the campaign’s working direction.
+            Confirm the recommended role-specific plan or choose a different
+            leading emphasis. Every option keeps the technical, sponsor and
+            procurement paths in the same coordinated campaign.
           </p>
           <div className="decision-options" role="radiogroup">
             {[
               [
-                "Bring business sponsors into evaluation",
-                "Recommended · connect adoption to the sponsor’s operating priorities.",
+                "Coordinate three buying-role paths, led by sponsor value",
+                "Recommended · use the sponsor gap as the lead priority while retaining technical and procurement work.",
               ],
               [
-                "Resolve procurement and governance questions",
-                "Use if procurement has become the immediate blocker.",
+                "Coordinate three buying-role paths, led by governance",
+                "Use if procurement is the immediate blocker; technical and sponsor work stays coordinated.",
               ],
               [
-                "Help technical evaluators move into a pilot",
-                "Use if the technical team needs more proof before expanding the group.",
+                "Coordinate three buying-role paths, led by technical proof",
+                "Use if the technical team needs more proof before expansion; sponsor and procurement paths remain in scope.",
               ],
             ].map(([choice, detail]) => (
               <button
