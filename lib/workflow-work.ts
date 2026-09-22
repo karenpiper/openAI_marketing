@@ -446,11 +446,39 @@ export function workflowArtifact(s: AgentState, id: string, index: number) {
             detail: `Selected source set: ${sourceSet.assets}.\nWhy selected: ${sourceSet.rationale}\nPreserve approved claims and attach source references to each work package.\nNext: prepare audience packages, route required reviews and assemble staged channel handoffs.\nRelease only after required brand / legal checks and audience eligibility are resolved.`,
           },
         ]
-      : stage.rows.map(([name, status, detail]) => ({
-          name,
-          status,
-          detail: deliveredDetail(s, id, index, name, detail),
-        })));
+      : id === "s2" && index === 0
+        ? [
+            {
+              name: "Decision context",
+              status: "Northstar Health · expansion cohort",
+              detail: `Decision to support: whether to move Northstar from technical evaluation toward an expansion conversation.\nCohort: Northstar plus 11 comparable expansion accounts; 10 accounts have reliable person-to-account matching.\nGuardrail: keep the two unmatched accounts out of activation and account-level conclusions until identity is resolved.`,
+            },
+            {
+              name: "Product adoption signal",
+              status: "Growing technical usage",
+              detail: `18 weekly active users, up 28% over the past 30 days.\nTwo workspace projects were completed by the technical team this month.\nInterpretation: the technical evaluation appears active; product usage alone does not establish a business decision or expansion intent.`,
+            },
+            {
+              name: "Cross-channel activity",
+              status: "Corroborating journey evidence",
+              detail: `Three contacts attended the enterprise roundtable.\nThe technical lead attended and returned to the evaluation guide; procurement returned twice to the security and governance guide.\nInterpretation: the account is researching both implementation and governance, but business-sponsor engagement is still absent.`,
+            },
+            {
+              name: "Buying-group coverage",
+              status: "One active role · two decision gaps",
+              detail: `Technical lead: active in product and event activity.\nBusiness sponsor: no recent activity; value case has not reached the person who can frame an expansion decision.\nProcurement: researching governance; needs approved security and purchasing context before a coordinated next step.`,
+            },
+            {
+              name: "Recommended next step",
+              status: "Bring the sponsor into the conversation",
+              detail: `Prepare a role-specific adoption plan: technical office hours for the technical lead, an operating-value brief for the business sponsor, and an approved governance brief for procurement.\nWhy now: multiple technical and governance signals are present, but the account cannot progress as a buying group without a sponsor path.\nMorgan can change this direction before any content or handoff work begins.`,
+            },
+          ]
+        : stage.rows.map(([name, status, detail]) => ({
+            name,
+            status,
+            detail: deliveredDetail(s, id, index, name, detail),
+          })));
   const sources = workflowSources(s, id, index);
   const text = `# ${title}\n\nILLUSTRATIVE PROTOTYPE OUTPUT — Northstar Health is fictional; no live systems queried or actions executed.\n\nCampaign: Northstar Health expansion / 12-account cohort\nObjective: ${s.campaign?.objective || "Help Northstar Health move from technical evaluation to an expansion decision"}\nMorgan’s instruction: ${s.campaign?.instruction || "None added"}\nAudience: ${s.audience}\nChannels: ${s.channel}\n\n${stage.summary}\n\n${sections.map((r) => `## ${r.name}\nStatus: ${r.status}\n${r.detail}`).join("\n\n")}\n\n## Illustrative sources used\n${sources.map((source) => `- ${source.name}: ${source.purpose} | System: ${source.system} | Connection: ${source.connection}`).join("\n")}\n\n## Handoff\n${stage.output}\n\n## Required control\n${stage.control}\n\n## Workflow decisions and review history\n${processDigest(s) || "No decisions recorded yet."}`;
   const variantText =

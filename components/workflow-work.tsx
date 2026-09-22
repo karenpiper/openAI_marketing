@@ -315,16 +315,17 @@ export function WorkflowWork({
                     />
                   )}
                 <div className="assembly-sources">
-                  <b>Source references</b>
+                  <b>Evidence used in this output</b>
+                  <span>
+                    These references ground the decision or work product. Open
+                    “Architecture for this step” to see the systems, connections
+                    and controls that make it possible.
+                  </span>
                   <ul>
                     {output.sources.map((source) => (
                       <li key={source.name}>
                         <strong>{source.name}</strong>
                         <small>{source.purpose}</small>
-                        <span className="source-system">{source.system}</span>
-                        <small className="source-connection">
-                          ↳ {source.connection}
-                        </small>
                       </li>
                     ))}
                   </ul>

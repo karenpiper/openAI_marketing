@@ -25,7 +25,6 @@ import MorningInbox from "./morning-inbox";
 import AgentBriefing, { MeetMorgan } from "./agent-briefing";
 import ArchitectureOutput from "./architecture-output";
 import BackendIllustration from "./backend-illustration";
-import { Architecture } from "./workshop-mapping";
 import { useCaseCandidates } from "../lib/use-case-candidates";
 import { SaveContext } from "./save-footer";
 import "./agent-workspace.css";
@@ -1033,20 +1032,7 @@ export default function AgentWorkspace() {
             </section>
             <ArchitectureOutput
               session={arch}
-              compact
-              setSession={(action) =>
-                setS((prev) => ({
-                  ...prev,
-                  architecture:
-                    typeof action === "function"
-                      ? action(architectureSession(prev))
-                      : action,
-                }))
-              }
-            />
-            <Architecture
-              agentWorkshop
-              session={arch}
+              explorer
               setSession={(action) =>
                 setS((prev) => ({
                   ...prev,
