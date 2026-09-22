@@ -1513,6 +1513,7 @@
   border: 1px solid #ccd7e1;
   border-left: 4px solid #7893ab;
   padding: 25px;
+  margin-bottom: 32px;
 }
 .agent-requirements > .agent-kicker,
 .agent-requirements > div > .agent-kicker {
@@ -1525,6 +1526,25 @@
   line-height: 0.98;
   letter-spacing: -0.055em;
   margin: 0;
+}
+.agent-app button {
+  border-radius: 11px;
+  font-weight: 600;
+  box-shadow: 0 1px 2px rgba(24, 58, 49, 0.06);
+  transition: transform 150ms ease, box-shadow 150ms ease, background 150ms ease,
+    border-color 150ms ease;
+}
+.agent-app button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 5px 14px rgba(24, 58, 49, 0.12);
+}
+.agent-app button:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 0 1px 2px rgba(24, 58, 49, 0.08);
+}
+.agent-app .agent-primary {
+  border-radius: 11px;
+  box-shadow: 0 5px 14px rgba(24, 24, 24, 0.16);
 }
 .agent-requirements .agent-boundary {
   border-color: #9baebd;
