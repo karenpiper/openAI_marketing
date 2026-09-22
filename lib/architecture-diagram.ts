@@ -178,8 +178,7 @@ export function architectureDiagram(
  ${box(113, 555, 455, 255, ["OpenAI", "Data Lake"], 32)}
  <rect rx="10" x="30" y="585" width="60" height="205" fill="#ffffff" stroke="#365343" stroke-width="1.5"/>
  <text transform="translate(65,770) rotate(-90)" font-family="Roboto" font-size="20" fill="#203d33">ChatGPT Usage</text>
- <rect rx="10" x="910" y="40" width="60" height="795" fill="${focused && active.has("F") ? "#fff0c2" : "#fffdf7"}" stroke="#365343" stroke-width="${focused && active.has("F") ? 4 : 2}" opacity="${focused && !active.has("F") ? 0.28 : 1}"/>
- <text transform="translate(947,675) rotate(-90)" font-family="Roboto" font-size="22" fill="#203d33">Adobe Customer Journey Analytics</text>${tag(885, 845, "F")}
+ <g class="architecture-component" data-architecture-component="F" tabindex="0" role="button" opacity="${focused && !active.has("F") ? 0.28 : 1}"><rect rx="10" x="910" y="40" width="60" height="795" fill="${focused && active.has("F") ? "#fff0c2" : "#fffdf7"}" stroke="#365343" stroke-width="${focused && active.has("F") ? 4 : 2}"/><text transform="translate(947,675) rotate(-90)" font-family="Roboto" font-size="22" fill="#203d33">Adobe Customer Journey Analytics</text></g>${tag(885, 845, "F")}
  ${arrow(830, 68, 907, 68, ["E", "F"])}${arrow(830, 133, 907, 133, ["E", "F"])}${arrow(830, 198, 907, 198, ["E", "F"])}${arrow(905, 705, 571, 705, ["F", "D"])}
  ${text(615, 684, ["Adobe data to OpenAI Data Lake"], 16)}${arrow(90, 705, 110, 705)}${arrow(335, 552, 335, 493, ["D"])}
  ${arrow(197, 812, 197, 891, ["D", "G"])}${arrow(487, 812, 487, 891, ["D", "G"])}

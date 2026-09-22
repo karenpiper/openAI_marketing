@@ -5,6 +5,7 @@ import { useEffect, useState, type Dispatch, type SetStateAction } from "react";
 import { activeCases, type Session } from "../lib/workshop";
 import { architectureOutput } from "../lib/architecture-output";
 import { Badge } from "./workshop-fields";
+import { useCaseCandidates } from "../lib/use-case-candidates";
 
 const componentProfiles: Record<string, { title: string; role: string; capabilities: string[] }> = {
   H: {
@@ -40,7 +41,12 @@ export default function ArchitectureOutput({
   const [explorerComponent, setExplorerComponent] = useState("");
   const [playing, setPlaying] = useState(false);
   const model = architectureOutput(s);
-  const cases = activeCases(s);
+  const cases = explorer
+    ? useCaseCandidates.map((candidate) => ({
+        id: candidate.id,
+        label: candidate.title,
+      }))
+    : activeCases(s);
   const caseId = cases.some((u) => u.id === s.readoutFlow.caseId)
     ? s.readoutFlow.caseId
     : cases[0]?.id;
@@ -129,7 +135,7 @@ export default function ArchitectureOutput({
           </header>
           <div className="architecture-usecase-tabs" role="tablist" aria-label="Workflow architecture views">
             <button role="tab" aria-selected={!explorerCase} onClick={() => chooseExplorerCase("")}>All workflow architecture</button>
-            {cases.slice(0, 3).map((u) => (
+            {cases.map((u) => (
               <button key={u.id} role="tab" aria-selected={explorerCase === u.id} onClick={() => chooseExplorerCase(u.id)}>{u.label}</button>
             ))}
           </div>
