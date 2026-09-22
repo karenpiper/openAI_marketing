@@ -990,7 +990,7 @@
   flex-wrap: wrap;
   gap: 7px;
 }
-.channel-options label {
+.channel-options button {
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -1003,12 +1003,9 @@
   font-size: 11px;
   font-weight: 600;
 }
-.channel-options input {
-  width: 13px;
-  height: 13px;
-  padding: 0;
-  accent-color: #237244;
-}
+.channel-options button span { display: inline-grid; place-items: center; width: 13px; height: 13px; border: 1px solid #aec5b4; border-radius: 3px; color: #487257; font-size: 10px; }
+.channel-options button.selected { border-color: #397852; background: #eaf5eb; color: #22563a; }
+.channel-options button.selected span { border-color: #397852; background: #397852; color: #fff; }
 .source-choice {
   grid-column: 1 / -1;
   max-width: 330px;
@@ -3148,6 +3145,13 @@
 .source-availability button.selected { border-color:#3d8058; background:#eaf5eb; }
 .source-availability button b { font-size:11px; }
 .source-availability button span { color:#6c7e72; font-size:10px; line-height:1.35; }
+.new-content-request { display:grid; gap:11px; padding:16px; border:1px solid #d8dfd9; border-radius:11px; background:#fbfcfb; }
+.new-content-request h4 { margin:0; color:#294e38; font-size:16px; }
+.new-content-request p { margin:0; color:#5f7065; font-size:12px; line-height:1.5; }
+.new-content-request > div { display:grid; gap:4px; padding:11px; border-radius:8px; background:#f2f7f2; }
+.new-content-request > div b { color:#315b42; font-size:11px; }
+.new-content-request > div span { color:#627568; font-size:11px; line-height:1.4; }
+.new-content-request button { justify-self:start; }
 .source-references {
   display: flex;
   flex-wrap: wrap;

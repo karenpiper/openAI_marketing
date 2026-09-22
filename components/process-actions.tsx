@@ -247,6 +247,44 @@ export default function ProcessActions({
             </div>
           ) : (
             <>
+              {session.source === "Source material missing" ? (
+                <div className="new-content-request">
+                  <span className="agent-kicker">New content path</span>
+                  <h4>Prepare a new-content request</h4>
+                  <p>
+                    Morgan chose to create new content for this need. The agent
+                    keeps the audience, channel mix and campaign objective, but
+                    does not search or reuse the approved-content library.
+                  </p>
+                  <div>
+                    <b>Passes to the content team</b>
+                    <span>
+                      Northstar audience brief, channel requirements, required
+                      claims review and the decision this content must support.
+                    </span>
+                  </div>
+                  <button
+                    onClick={() => {
+                      update(
+                        { status: "Blocked" },
+                        "New-content request prepared; approved source and required claim review are needed before adaptation can continue.",
+                      );
+                      onArchitectureActivity?.(
+                        "The campaign strategist is sending the audience brief through OpenAI Frontier to the content-production workflow; no approved-library retrieval is used.",
+                      );
+                    }}
+                  >
+                    Prepare new-content request
+                  </button>
+                  {p.status === "Blocked" && (
+                    <p role="status">
+                      The request is ready for the content team. This workflow
+                      stays held until a reviewed source is returned.
+                    </p>
+                  )}
+                </div>
+              ) : (
+                <>
               <div className="content-lookup">
                 <span className="agent-kicker">CDP content discovery</span>
                 <h4>Recommended approved creative for this audience</h4>
@@ -391,6 +429,8 @@ export default function ProcessActions({
                   approved source set from the asset owner before adaptation can
                   continue.
                 </p>
+              )}
+                </>
               )}
             </>
           )}

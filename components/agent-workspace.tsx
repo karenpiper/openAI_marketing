@@ -1153,28 +1153,22 @@ export default function AgentWorkspace() {
                                           s.channel,
                                         ).includes(channel);
                                         return (
-                                          <label key={channel}>
-                                            <input
-                                              type="checkbox"
-                                              checked={checked}
-                                              onChange={() => {
-                                                const selected =
-                                                  channelsForPlan(s.channel);
-                                                const next = checked
-                                                  ? selected.filter(
-                                                      (item) =>
-                                                        item !== channel,
-                                                    )
-                                                  : [...selected, channel];
-                                                if (next.length)
-                                                  condition({
-                                                    channel:
-                                                      planForChannels(next),
-                                                  });
-                                              }}
-                                            />
+                                          <button
+                                            key={channel}
+                                            type="button"
+                                            aria-pressed={checked}
+                                            className={checked ? "selected" : ""}
+                                            onClick={() => {
+                                              const selected = channelsForPlan(s.channel);
+                                              const next = checked
+                                                ? selected.filter((item) => item !== channel)
+                                                : [...selected, channel];
+                                              if (next.length) condition({ channel: planForChannels(next) });
+                                            }}
+                                          >
+                                            <span aria-hidden="true">{checked ? "✓" : "+"}</span>
                                             {channel}
-                                          </label>
+                                          </button>
                                         );
                                       })}
                                     </div>
@@ -1197,8 +1191,8 @@ export default function AgentWorkspace() {
                                           aria-pressed={s.source === value}
                                           onClick={() => condition({ source: value })}
                                         >
-                                          <b>{value === "Approved source available" ? "Approved library connected" : "Content library unavailable"}</b>
-                                          <span>{value === "Approved source available" ? "Search for an approved creative foundation in the next step." : "Keep the workflow open, but request an approved source before adaptation."}</span>
+                                          <b>{value === "Approved source available" ? "Use approved creative" : "Create new content"}</b>
+                                          <span>{value === "Approved source available" ? "Search for an approved creative foundation in the next step." : "Skip library retrieval and prepare a new-content request from the campaign brief."}</span>
                                         </button>
                                       ))}
                                     </div>
