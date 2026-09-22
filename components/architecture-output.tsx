@@ -127,14 +127,6 @@ export default function ArchitectureOutput({
               <button key={u.id} role="tab" aria-selected={explorerCase === u.id} onClick={() => chooseExplorerCase(u.id)}>{u.label}</button>
             ))}
           </div>
-          {explorerCase && (
-            <div className="diagram-step-selector" role="tablist" aria-label="Workflow steps">
-              <button role="tab" aria-selected={explorerStep === -1} onClick={() => { setExplorerStep(-1); setPlaying(false); }}>Whole flow</button>
-              {(workflows[explorerCase] || []).map((item, index) => (
-                <button key={item.title} role="tab" aria-selected={explorerStep === index} onClick={() => { setExplorerStep(index); setPlaying(false); }}>{index + 1}. {item.title}</button>
-              ))}
-            </div>
-          )}
           <div className="architecture-story-layout architecture-explorer-layout">
             <div>
               <div
