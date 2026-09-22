@@ -4046,11 +4046,12 @@
   font-size: 16px;
 }
 .prototype-context-popover {
-  position: absolute;
-  right: 0;
-  top: 48px;
+  position: fixed;
+  right: 32px;
+  top: 10dvh;
   width: min(390px, calc(100vw - 76px));
-  max-height: calc(100vh - 100px);
+  height: 80dvh;
+  max-height: 80dvh;
   overflow: auto;
   padding: 14px;
   border: 1px solid #b8cbd8;
@@ -4092,6 +4093,36 @@
 .prototype-context-popover .backend-launch:hover {
   background: #fff0b6 !important;
 }
+@media (min-width: 851px) {
+  .agent-main.prototype-main {
+    height: calc(100dvh - 74px);
+    overflow: hidden;
+  }
+  .prototype-main .agent-stage {
+    height: 100%;
+    box-sizing: border-box;
+    padding: 12px 22px 18px;
+  }
+  .prototype-screen-layout,
+  .prototype-screen-layout .monitor-wrap {
+    height: 100%;
+  }
+  .prototype-screen-layout .monitor-wrap {
+    display: flex;
+    flex-direction: column;
+  }
+  .prototype-screen-layout .monitor-bezel {
+    height: auto;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+  .prototype-screen-layout .monitor-screen {
+    flex: 1;
+    height: auto;
+    min-height: 0;
+  }
+}
 .prototype-human-context {
   display: flex;
   align-items: center;
@@ -4126,9 +4157,9 @@
     right: 16px;
   }
   .prototype-context-popover {
-    position: fixed;
-    top: 70px;
+    top: 10dvh;
     right: 16px;
+    width: calc(100vw - 32px);
   }
   .prototype-screen-layout .monitor-screen {
     height: min(760px, 76vh);
