@@ -330,18 +330,7 @@ export function WorkflowWork({
                     ))}
                   </ul>
                 </div>
-                <div className="process-receipt">
-                  <b>Decisions for this version</b>
-                  <p>
-                    {processState(session, id, opened!).events.join(" → ") ||
-                      "No decisions recorded yet."}
-                  </p>
-                </div>
                 <footer>
-                  <p>
-                    No live content was generated or delivered. This is a
-                    prepared example of the work product.
-                  </p>
                   <button onClick={download}>Download example artifact</button>
                 </footer>
               </article>
