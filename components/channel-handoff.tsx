@@ -9,6 +9,20 @@ import {
 } from "../lib/process-state";
 
 function activationChannels(plan: string) {
+  const explicit = plan.split(" + ");
+  if (explicit.every((channel) => channel !== "")) {
+    const custom = explicit.filter((channel) =>
+      [
+        "Email",
+        "Event follow-up",
+        "Website",
+        "Sales enablement",
+        "Executive thought leadership",
+        "Social campaign",
+      ].includes(channel),
+    );
+    if (custom.length === explicit.length) return custom;
+  }
   if (plan.includes("Integrated"))
     return [
       "Sales enablement",

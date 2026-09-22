@@ -19,7 +19,7 @@ export function workStages(s: AgentState, id: string): WorkStage[] {
         title: "Bring the signals together",
         action: "Inspect the buying-group gap",
         summary:
-          "The agent groups recent activity by account before proposing a next action.",
+          "The agent groups Northstar Health’s activity by person and role before proposing a next action for the 12-account expansion cohort.",
         input:
           "Product usage, website activity, event engagement and account keys.",
         output: "A traceable account-level signal summary.",
@@ -32,18 +32,18 @@ export function workStages(s: AgentState, id: string): WorkStage[] {
         rows: [
           [
             "Product engagement",
-            "12 target accounts",
-            "Growing usage in the illustrative cohort",
+            "18 weekly active users · +28% in 30 days",
+            "Northstar’s technical team completed two workspace projects",
           ],
           [
-            "Website + events",
-            "Recent evaluation interest",
-            "Corroborates intent across touchpoints",
+            "Roundtable + website",
+            "3 attendees · 2 governance-guide returns",
+            "Priya Shah attended; procurement returned to the guide",
           ],
           [
-            "Identity match",
-            "Account and role context",
-            "Required before any audience is activated",
+            "Account and role match",
+            "Priya Shah · Mateo Ruiz · procurement team",
+            "10 of 12 cohort accounts are matched; two remain excluded",
           ],
         ],
       },
@@ -51,7 +51,7 @@ export function workStages(s: AgentState, id: string): WorkStage[] {
         title: "Explain the opportunity",
         action: "Prepare an action brief",
         summary:
-          "Technical interest is present, but business sponsors and procurement need a different reason to engage.",
+          "Priya is active, while Mateo and procurement need a different reason to engage before the expansion stalls.",
         input: "Joined activity, buying roles and engagement history.",
         output: "Buying-group gap and recommendation rationale.",
         connection: "Identity / CDP + CRM role context → OpenAI reasoning.",
@@ -60,16 +60,20 @@ export function workStages(s: AgentState, id: string): WorkStage[] {
         control:
           "Confidence and provenance accompany the recommendation; Morgan chooses the objective.",
         rows: [
-          ["Technical evaluators", "Active", "Offer an evaluation path"],
           [
-            "Business sponsors",
-            "Underrepresented",
-            "Show adoption value and operating outcomes",
+            "Priya Shah · AI Platforms",
+            "2 projects + roundtable attendee",
+            "Offer the evaluation plan and technical office hours",
           ],
           [
-            "Procurement",
-            "Little visible activity",
-            "Prepare approved governance material",
+            "Mateo Ruiz · VP Operations",
+            "No recent activity",
+            "Show operating value, adoption path and sponsor decision",
+          ],
+          [
+            "Northstar procurement team",
+            "2 governance-guide returns",
+            "Prepare the approved security and governance brief",
           ],
         ],
       },
@@ -89,18 +93,18 @@ export function workStages(s: AgentState, id: string): WorkStage[] {
         rows: [
           [
             "Objective",
-            "Enterprise adoption",
-            "Bring the wider buying group into evaluation",
+            "Northstar Health expansion",
+            "Bring Mateo and procurement into Priya’s active evaluation",
           ],
           [
             "Scope",
-            "12 target accounts",
-            "Eligibility checked again before activation",
+            "Northstar + 11 matched expansion accounts",
+            "Keep unmatched accounts out of activation until resolved",
           ],
           [
             "Handoff",
-            "Content plan",
-            "Same brief, audience and evidence references",
+            "Role-specific content plan",
+            "Carries named roles, source v3.2 and evidence references",
           ],
         ],
       },
@@ -112,6 +116,7 @@ export function workStages(s: AgentState, id: string): WorkStage[] {
         : s.audience === "Lifecycle stages"
           ? ["Exploring", "Evaluating", "Ready for sales"]
           : ["Eligible audience"];
+    const channel = s.channel.toLowerCase();
     return [
       {
         title: "Check the source material",
@@ -214,7 +219,7 @@ export function workStages(s: AgentState, id: string): WorkStage[] {
         input:
           "Approved direction, review packet, eligibility rules and channel configuration.",
         output: "Staged channel work orders and a measurement plan.",
-        connection: `OpenAI orchestration → ${s.channel.includes("event") ? "Marketo / marketing CRM + event platform" : s.channel.includes("thought leadership") ? "sales CRM + executive communications workflow" : s.channel.includes("Social") ? "social publishing workflow + marketing website" : s.channel.includes("Integrated") ? "marketing CRM + sales CRM + social publishing + event platform" : "Marketo / marketing CRM + website activation"} → journey analytics.`,
+        connection: `OpenAI orchestration → ${channel.includes("event") ? "Marketo / marketing CRM + event platform" : channel.includes("thought leadership") ? "sales CRM + executive communications workflow" : channel.includes("social") ? "social publishing workflow + marketing website" : channel.includes("integrated") ? "marketing CRM + sales CRM + social publishing + event platform" : "Marketo / marketing CRM + website activation"} → journey analytics.`,
         enables:
           "Coordinates channels and returns response signals to the same campaign context.",
         control:
@@ -226,27 +231,27 @@ export function workStages(s: AgentState, id: string): WorkStage[] {
             "Eligible recipients + approved asset references",
           ],
           [
-            s.channel.includes("event")
+            channel.includes("event")
               ? "Event follow-up"
-              : s.channel.includes("thought leadership")
+              : channel.includes("thought leadership")
                 ? "Executive thought leadership"
-                : s.channel.includes("Social")
+                : channel.includes("social")
                   ? "Social campaign"
-                  : s.channel.includes("Integrated")
+                  : channel.includes("integrated")
                     ? "Sales + social activation"
-                    : s.channel.includes("sales")
+                    : channel.includes("sales")
                       ? "Sales handoff"
                       : "Website experience",
             "Staged work order",
-            s.channel.includes("event")
+            channel.includes("event")
               ? "Separate attendee and non-attendee routes"
-              : s.channel.includes("thought leadership")
+              : channel.includes("thought leadership")
                 ? "Executive POV + seller talking points + approved distribution plan"
-                : s.channel.includes("Social")
+                : channel.includes("social")
                   ? "Social variants + website destination + campaign identifiers"
-                  : s.channel.includes("Integrated")
+                  : channel.includes("integrated")
                     ? "Coordinated seller, social, event and web activation"
-                    : s.channel.includes("sales")
+                    : channel.includes("sales")
                       ? "Account brief + role context + next action"
                       : "Audience rule + approved experience reference",
           ],
@@ -408,14 +413,14 @@ export function workflowArtifact(s: AgentState, id: string, index: number) {
           {
             name: "Campaign direction",
             status: "Proposed content plan",
-            detail: `Objective: ${s.campaign?.objective || "Grow enterprise adoption across the buying group"}.\nScope: 12 illustrative target accounts.\nAudience direction: ${processState(s, "s2", 1).choice || "To confirm"}.\nDirection from Morgan: ${s.campaign?.instruction || "Use one approved source to bring the wider buying group into evaluation."}`,
+            detail: `Objective: ${s.campaign?.objective || "Help Northstar Health move from technical evaluation to an expansion decision"}.\nScope: Northstar Health plus 11 matched expansion accounts; two unmatched accounts remain excluded.\nAudience direction: ${processState(s, "s2", 1).choice || "Priya Shah (technical), Mateo Ruiz (business sponsor), Northstar procurement"}.\nDirection from Morgan: ${s.campaign?.instruction || "Use Enterprise Adoption Guide v3.2 to give each role a distinct next step without creating unsupported claims."}`,
           },
           {
             name: "Audience and deliverables",
             status: s.audience,
             detail:
               s.audience === "Buying roles"
-                ? "Technical evaluators: evaluation-guide brief with a practical next step.\nBusiness sponsors: adoption-value brief tied to operating outcomes.\nProcurement: governance-readiness brief grounded in approved material."
+                ? "Technical evaluators — Priya Shah / AI Platforms: evaluation-plan brief with office-hours CTA.\nBusiness sponsors — Mateo Ruiz / VP Operations: operating-value brief tied to expansion decision.\nProcurement — Northstar procurement: governance-readiness brief grounded in approved material."
                 : s.audience === "Lifecycle stages"
                   ? "Exploring: introductory adoption brief.\nEvaluating: practical evaluation brief.\nReady for sales: account handoff and governance brief."
                   : "One eligible audience: a unified adoption brief and next-action recommendation.",
@@ -423,9 +428,9 @@ export function workflowArtifact(s: AgentState, id: string, index: number) {
           {
             name: "Channel plan",
             status: s.channel,
-            detail: s.channel.includes("event")
+            detail: s.channel.toLowerCase().includes("event")
               ? "Email: role-specific message briefs.\nEvents: invitation and follow-up requirements, separated for attendees and non-attendees."
-              : s.channel.includes("sales")
+              : s.channel.toLowerCase().includes("sales")
                 ? "Email: role-specific message briefs.\nSales: account and buying-role handoff with the same objective."
                 : "Email: role-specific message briefs.\nWebsite: aligned experience brief and eligibility rules.",
           },
@@ -433,7 +438,7 @@ export function workflowArtifact(s: AgentState, id: string, index: number) {
             name: "Source and release gates",
             status: "Approved source available · release not authorized",
             detail:
-              "Source: Enterprise adoption guide v3 (illustrative).\nPreserve approved claims and attach source references to each work package.\nNext: prepare audience packages, route required reviews and assemble staged channel handoffs.\nRelease only after required brand / legal checks and audience eligibility are resolved.",
+              "Source: Enterprise Adoption Guide v3.2 (fictional approved source).\nPreserve approved claims and attach source references to each work package.\nNext: prepare audience packages, route required reviews and assemble staged channel handoffs.\nRelease only after required brand / legal checks and audience eligibility are resolved.",
           },
         ]
       : stage.rows.map(([name, status, detail]) => ({
@@ -442,7 +447,7 @@ export function workflowArtifact(s: AgentState, id: string, index: number) {
           detail: deliveredDetail(s, id, index, name, detail),
         })));
   const sources = workflowSources(s, id, index);
-  const text = `# ${title}\n\nILLUSTRATIVE PROTOTYPE OUTPUT — no live systems queried or actions executed.\n\nCampaign: Enterprise adoption / 12 target accounts\nObjective: ${s.campaign?.objective || "Grow enterprise adoption across the buying group"}\nMorgan’s instruction: ${s.campaign?.instruction || "None added"}\nAudience: ${s.audience}\nChannels: ${s.channel}\n\n${stage.summary}\n\n${sections.map((r) => `## ${r.name}\nStatus: ${r.status}\n${r.detail}`).join("\n\n")}\n\n## Illustrative sources used\n${sources.map((source) => `- ${source.name}: ${source.purpose} | System: ${source.system} | Connection: ${source.connection}`).join("\n")}\n\n## Handoff\n${stage.output}\n\n## Required control\n${stage.control}\n\n## Workflow decisions and review history\n${processDigest(s) || "No decisions recorded yet."}`;
+  const text = `# ${title}\n\nILLUSTRATIVE PROTOTYPE OUTPUT — no live systems queried or actions executed.\n\nCampaign: Northstar Health expansion / 12-account health-tech cohort\nObjective: ${s.campaign?.objective || "Help Northstar Health move from technical evaluation to an expansion decision"}\nMorgan’s instruction: ${s.campaign?.instruction || "None added"}\nAudience: ${s.audience}\nChannels: ${s.channel}\n\n${stage.summary}\n\n${sections.map((r) => `## ${r.name}\nStatus: ${r.status}\n${r.detail}`).join("\n\n")}\n\n## Illustrative sources used\n${sources.map((source) => `- ${source.name}: ${source.purpose} | System: ${source.system} | Connection: ${source.connection}`).join("\n")}\n\n## Handoff\n${stage.output}\n\n## Required control\n${stage.control}\n\n## Workflow decisions and review history\n${processDigest(s) || "No decisions recorded yet."}`;
   const variantText =
     id === "s3" && index >= 1 && !blocked
       ? "\n\n## Candidate email variants reviewed and handed off\n" +
@@ -713,9 +718,9 @@ function deliveredDetail(
       : business
         ? "Discuss an adoption plan with the account team"
         : "Request a governance discussion";
-    const channel = s.channel.includes("event")
+    const channel = s.channel.toLowerCase().includes("event")
       ? "Prepare an invitation for non-attendees and a follow-up for attendees; suppress duplicate invitations"
-      : s.channel.includes("sales")
+      : s.channel.toLowerCase().includes("sales")
         ? "Prepare an email brief and a sales handoff using the same account context"
         : "Prepare an email brief and a matching website experience brief";
     return `Audience need: ${need}.\nMessage emphasis: ${emphasis}.\nProposed next action: ${cta}.\nProduction order: ${channel}.\nSource: Enterprise adoption guide v3 (illustrative approved asset). Preserve source claims; do not add unsupported ROI or security assertions.\nAcceptance criteria: Source references attached, audience eligibility checked, channel versions consistent, brand and required legal reviews complete.`;

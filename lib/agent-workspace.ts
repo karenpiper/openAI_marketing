@@ -22,6 +22,14 @@ export const activationPlans = [
   "Social campaign + website",
   "Integrated account activation",
 ] as const;
+const channelNames = [
+  "Email",
+  "Event follow-up",
+  "Website",
+  "Sales enablement",
+  "Executive thought leadership",
+  "Social campaign",
+] as const;
 export const chapters = [
   {
     id: "s2",
@@ -30,9 +38,9 @@ export const chapters = [
     short: "An opportunity worth acting on",
     prompt: "Where should we focus today?",
     story:
-      "Morgan opens the opportunity from her morning briefing. Technical users are engaged at 12 target accounts, but the broader buying group has not joined the conversation. She needs to decide whether to act.",
+      "Morgan opens the Northstar Health expansion opportunity from her morning briefing. Its technical team has completed two workspace projects and attended last week’s enterprise adoption roundtable, but the VP of Operations and procurement lead have not joined the conversation. Northstar is one of 12 similar health-tech accounts in the current cohort.",
     response:
-      "Usage is growing across 12 target accounts. Recent website and event activity reinforces technical interest, but business sponsors are underrepresented. I recommend a coordinated adoption campaign, with a different next step for each buying role.",
+      "Northstar has 18 weekly active technical users, 3 roundtable attendees and two return visits to the governance guide. Priya Shah, Director of AI Platforms, is engaged; Mateo Ruiz, VP of Operations, has not yet interacted. I recommend a coordinated adoption plan: an evaluation path for Priya, an operating-value story for Mateo, and a governance brief for procurement.",
     inputs: [
       [
         "Product signals",
@@ -61,9 +69,9 @@ export const chapters = [
     short: "One brief. Three buying roles.",
     prompt: "Turn this opportunity into an audience-specific plan.",
     story:
-      "The same account opportunity now has a brief. Morgan comes back to a proposed plan that carries the audience and objective forward, without asking her to start again.",
+      "Northstar’s opportunity now has a brief. Morgan returns to a proposed plan that carries the account context, named buying roles and objective forward, without asking her to start again.",
     response:
-      "For the 12-account opportunity, I have prepared a technical evaluation path, a business-value path and a procurement-readiness path. They share one approved adoption guide. Review the plan below; I will coordinate asset preparation, approvals and channel handoffs.",
+      "For Northstar and the 11-account expansion cohort, I have prepared three role-specific paths. Priya receives a practical evaluation plan; Mateo receives the operating-value story; procurement receives the approved governance brief. All three use the Enterprise Adoption Guide v3.2. Review the plan below; I will coordinate asset preparation, approvals and channel handoffs.",
     inputs: [
       [
         "Audience context",
@@ -311,8 +319,16 @@ export function restoreAgentState(raw: unknown): AgentState {
     !["Buying roles", "Lifecycle stages", "One audience"].includes(
       r.audience,
     ) ||
-    !activationPlans.includes(
-      restoredChannel as (typeof activationPlans)[number],
+    !(
+      activationPlans.includes(
+        restoredChannel as (typeof activationPlans)[number],
+      ) ||
+      (restoredChannel.length > 0 &&
+        restoredChannel
+          .split(" + ")
+          .every((channel) =>
+            channelNames.includes(channel as (typeof channelNames)[number]),
+          ))
     ) ||
     !["Approved source available", "Source material missing"].includes(r.source)
   )
@@ -435,13 +451,13 @@ export function planRows(
     {
       label: "Activation",
       value: s.channel,
-      detail: s.channel.includes("event")
+      detail: s.channel.toLowerCase().includes("event")
         ? "Separate invitations, attendee follow-up and non-attendee follow-up."
-        : s.channel.includes("thought leadership")
+        : s.channel.toLowerCase().includes("thought leadership")
           ? "Prepare executive perspective, seller enablement and an approved distribution plan."
-          : s.channel.includes("Social")
+          : s.channel.toLowerCase().includes("social")
             ? "Prepare social campaign variations and the matching website destination."
-            : s.channel.includes("sales")
+            : s.channel.toLowerCase().includes("sales")
               ? "Prepare a coordinated handoff with account context for sales."
               : "Prepare channel-specific requirements and eligibility checks.",
     },

@@ -43,9 +43,10 @@ export default function PerformanceLoop({
       </span>
       <h1>What happened—and what should we change?</h1>
       <p>
-        This example assumes a reviewed campaign was released after eligibility
-        checks. It is a fixed email + event-follow-up scenario, not results from
-        a live deployment or from your current edits.
+        This fictional readout follows the Northstar Health expansion cohort
+        after a reviewed email and roundtable-follow-up program. It is fixed
+        reference data, not results from a live deployment or from your current
+        edits.
       </p>
       <div className="performance-metrics">
         <article>
@@ -68,10 +69,10 @@ export default function PerformanceLoop({
       <div className="learning-agent">
         <b>✳ My read</b>
         <p>
-          Technical evaluators engaged. Business sponsors received the campaign
-          but rarely took the next step. I’d test the sponsor message before
-          adding volume—and resolve the two unmatched accounts before claiming
-          account-level impact.
+          Priya Shah’s technical audience engaged, but Mateo Ruiz’s
+          business-sponsor segment generated only one qualified next step. I’d
+          test the sponsor message before adding volume—and resolve the two
+          unmatched cohort accounts before claiming account-level impact.
         </p>
       </div>
       <nav>
@@ -98,9 +99,9 @@ export default function PerformanceLoop({
             <b>Next action</b>
           </div>
           {[
-            ["Technical evaluators", 79, 25, 6],
-            ["Business sponsors", 59, 6, 1],
-            ["Procurement", 40, 5, 1],
+            ["Priya + technical evaluators", 79, 25, 6],
+            ["Mateo + business sponsors", 59, 6, 1],
+            ["Procurement / governance", 40, 5, 1],
           ].map(([role, delivered, engaged, next]) => (
             <div className="perf-row" key={role}>
               <span>{role}</span>

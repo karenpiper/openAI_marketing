@@ -1,17 +1,33 @@
 import type { AgentState } from "./agent-workspace";
 
 // Fictional account context for the prototype, never customer data.
-export const exampleAccounts = Array.from({ length: 12 }, (_, i) => ({
+const accountNames = [
+  "Northstar Health",
+  "Cedar & Finch",
+  "Meridian Logistics",
+  "Solstice Energy",
+  "Harborline Bank",
+  "Aperture Retail Group",
+  "Beacon Manufacturing",
+  "Cobalt Insurance",
+  "Fieldstone Media",
+  "LumenWorks",
+  "Redwood Mobility",
+  "Vantage Partners",
+];
+export const exampleAccounts = accountNames.map((name, i) => ({
   id: `ACCT-${String(i + 1).padStart(2, "0")}`,
-  name: `Example account ${String(i + 1).padStart(2, "0")}`,
+  name,
   context: [
-    "A technical team is evaluating an initial pilot",
-    "An existing team is exploring adoption across more departments",
-    "An account team is preparing a governance conversation",
+    "A technical team completed two workspace projects in the last 30 days",
+    "An existing team is evaluating an expansion into a second business unit",
+    "The account team is preparing a security and governance review",
   ][i % 3],
-  focus: ["a focused pilot", "cross-team adoption", "governance readiness"][
-    i % 3
-  ],
+  focus: [
+    "a bounded evaluation plan",
+    "cross-team adoption",
+    "governance readiness",
+  ][i % 3],
 }));
 export function contentVariants(s: Pick<AgentState, "audience">) {
   const segments =

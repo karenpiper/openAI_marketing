@@ -29,6 +29,41 @@ import { Architecture } from "./workshop-mapping";
 import { useCaseCandidates } from "../lib/use-case-candidates";
 import { SaveContext } from "./save-footer";
 import "./agent-workspace.css";
+
+const channelOptions = [
+  "Email",
+  "Event follow-up",
+  "Website",
+  "Sales enablement",
+  "Executive thought leadership",
+  "Social campaign",
+] as const;
+
+const planChannels: Record<string, string[]> = {
+  "Email + event follow-up": ["Email", "Event follow-up"],
+  "Email + website": ["Email", "Website"],
+  "Sales enablement + executive thought leadership": [
+    "Sales enablement",
+    "Executive thought leadership",
+  ],
+  "Social campaign + website": ["Social campaign", "Website"],
+  "Integrated account activation": [
+    "Sales enablement",
+    "Executive thought leadership",
+    "Social campaign",
+    "Event follow-up",
+    "Website",
+  ],
+};
+
+function channelsForPlan(plan: string) {
+  return planChannels[plan] || plan.split(" + ").filter(Boolean);
+}
+
+function planForChannels(channels: string[]) {
+  return channels.join(" + ");
+}
+
 function MorganScreen({
   children,
   workflow = false,
@@ -121,7 +156,9 @@ export default function AgentWorkspace() {
     const fresh = createAgentState();
     setS((prev) => ({
       ...prev,
-      day: fresh.day,
+      // Restart inside the same full-screen workspace rather than returning
+      // to the separate arrival layout.
+      day: { ...fresh.day, moment: 1 },
       audience: fresh.audience,
       channel: fresh.channel,
       source: fresh.source,
@@ -165,6 +202,7 @@ export default function AgentWorkspace() {
   }
   const [demo, setDemo] = useState(false);
   const [draft, setDraft] = useState("");
+  const [adjustingRecommendation, setAdjustingRecommendation] = useState(false);
   const [conversation, setConversation] = useState<
     Record<string, { prompt: string; reply: string }[]>
   >({});
@@ -615,59 +653,154 @@ export default function AgentWorkspace() {
                             </div>
                           </div>
                           {chapter === 1 ? (
-                            <>
-                              <div className="agent-conditions">
-                                {[
-                                  [
-                                    "Audience",
-                                    s.audience,
-                                    [
-                                      "Buying roles",
-                                      "Lifecycle stages",
-                                      "One audience",
-                                    ],
-                                    "audience",
-                                  ],
-                                  [
-                                    "Channel",
-                                    s.channel,
-                                    [
-                                      "Email + event follow-up",
-                                      "Email + website",
-                                      "Sales enablement + executive thought leadership",
-                                      "Social campaign + website",
-                                      "Integrated account activation",
-                                    ],
-                                    "channel",
-                                  ],
-                                  [
-                                    "Source",
-                                    s.source,
-                                    [
-                                      "Approved source available",
-                                      "Source material missing",
-                                    ],
-                                    "source",
-                                  ],
-                                ].map(([label, value, options, field]) => (
-                                  <label key={label as string}>
-                                    {label as string}
+                            <section className="agent-recommendation">
+                              <div className="recommendation-header">
+                                <div>
+                                  <span className="agent-kicker">
+                                    Recommended next step
+                                  </span>
+                                  <h3>
+                                    Start with Priya, Mateo and the Northstar
+                                    procurement team.
+                                  </h3>
+                                  <p>
+                                    Priya Shah has completed two workspace
+                                    projects; Mateo Ruiz has not yet engaged;
+                                    the procurement team returned to the
+                                    governance guide after last week’s
+                                    roundtable. Send a role-specific follow-up
+                                    from Enterprise Adoption Guide v3.2, then
+                                    apply the same pattern to the other 11
+                                    accounts in the cohort.
+                                  </p>
+                                </div>
+                                <span className="recommendation-badge">
+                                  Recommended
+                                </span>
+                              </div>
+                              <div className="recommendation-actions">
+                                <button
+                                  className="agent-primary"
+                                  onClick={() => {
+                                    condition({
+                                      audience: "Buying roles",
+                                      channel: "Email + event follow-up",
+                                    });
+                                    setAdjustingRecommendation(false);
+                                  }}
+                                >
+                                  Use recommendation
+                                </button>
+                                <button
+                                  aria-expanded={adjustingRecommendation}
+                                  onClick={() =>
+                                    setAdjustingRecommendation((open) => !open)
+                                  }
+                                >
+                                  {adjustingRecommendation
+                                    ? "Hide adjustments"
+                                    : "Adjust recommendation"}
+                                </button>
+                              </div>
+                              {adjustingRecommendation && (
+                                <div className="recommendation-adjustments">
+                                  <section>
+                                    <span className="adjustment-label">
+                                      Audience focus
+                                    </span>
+                                    <p>
+                                      The recommendation starts with buying
+                                      roles. Choose another focus only if it
+                                      better fits this opportunity.
+                                    </p>
+                                    <div className="audience-options">
+                                      {[
+                                        [
+                                          "Buying roles",
+                                          "Reach technical evaluators, business sponsors and procurement differently.",
+                                        ],
+                                        [
+                                          "Lifecycle stages",
+                                          "Prioritize where each contact is in the adoption journey.",
+                                        ],
+                                        [
+                                          "One audience",
+                                          "Use one eligible group when segmentation would not change the work.",
+                                        ],
+                                      ].map(([value, detail]) => (
+                                        <button
+                                          key={value}
+                                          className={
+                                            s.audience === value
+                                              ? "selected"
+                                              : ""
+                                          }
+                                          onClick={() =>
+                                            condition({ audience: value })
+                                          }
+                                        >
+                                          <b>{value}</b>
+                                          <span>{detail}</span>
+                                        </button>
+                                      ))}
+                                    </div>
+                                  </section>
+                                  <section>
+                                    <span className="adjustment-label">
+                                      Channel mix
+                                    </span>
+                                    <p>
+                                      Start with the recommended mix, then add
+                                      or remove the channels that this account
+                                      opportunity needs.
+                                    </p>
+                                    <div className="channel-options">
+                                      {channelOptions.map((channel) => {
+                                        const checked = channelsForPlan(
+                                          s.channel,
+                                        ).includes(channel);
+                                        return (
+                                          <label key={channel}>
+                                            <input
+                                              type="checkbox"
+                                              checked={checked}
+                                              onChange={() => {
+                                                const selected =
+                                                  channelsForPlan(s.channel);
+                                                const next = checked
+                                                  ? selected.filter(
+                                                      (item) =>
+                                                        item !== channel,
+                                                    )
+                                                  : [...selected, channel];
+                                                if (next.length)
+                                                  condition({
+                                                    channel:
+                                                      planForChannels(next),
+                                                  });
+                                              }}
+                                            />
+                                            {channel}
+                                          </label>
+                                        );
+                                      })}
+                                    </div>
+                                  </section>
+                                  <label className="source-choice">
+                                    Source status
                                     <select
-                                      value={value as string}
+                                      value={s.source}
                                       onChange={(e) =>
-                                        condition({
-                                          [field as string]: e.target.value,
-                                        })
+                                        condition({ source: e.target.value })
                                       }
                                     >
-                                      {(options as string[]).map((o) => (
-                                        <option key={o}>{o}</option>
-                                      ))}
+                                      <option>Approved source available</option>
+                                      <option>Source material missing</option>
                                     </select>
                                   </label>
-                                ))}
-                              </div>
-                            </>
+                                </div>
+                              )}
+                            </section>
                           ) : null}
                           <CampaignEditor
                             session={s}
