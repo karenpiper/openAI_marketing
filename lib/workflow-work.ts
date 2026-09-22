@@ -296,9 +296,14 @@ export function workStages(s: AgentState, id: string): WorkStage[] {
           "Match audience, assets and channel requirements",
         ],
         [
+          "Upstream identity exclusions",
+          "Carried forward",
+          "Two unmatched records remain suppressed from activation",
+        ],
+        [
           "Consent consistency",
-          "Exception found",
-          "One contact has conflicting records",
+          "Separate exception found",
+          "One otherwise matched contact has conflicting permission records",
         ],
       ],
     },
@@ -306,14 +311,14 @@ export function workStages(s: AgentState, id: string): WorkStage[] {
       title: "Resolve only the exception",
       action: "Apply the proposed hold",
       summary:
-        "Hold the affected contact and ask the data owner to reconcile the records. Do not stop unrelated eligible work.",
+        "Hold one otherwise matched contact for a consent conflict and ask the data owner to reconcile the records. The two earlier unmatched records remain excluded automatically; do not stop unrelated eligible work.",
       input:
-        "Conflicting consent records, identity match and escalation policy.",
+        "Conflicting consent records for one matched contact, plus escalation policy.",
       output: "Proposed contact hold and an assigned reconciliation request.",
       connection:
         "Identity / consent source + activation suppression tool + request system.",
       enables:
-        "Contains risk at the affected contact rather than blocking the entire campaign.",
+        "Contains a separate consent risk at the affected contact rather than reopening the earlier identity decision or blocking the entire campaign.",
       control:
         "Morgan authorizes this proposed resolution. The agent cannot infer consent from engagement.",
       rows: [
@@ -772,6 +777,6 @@ function deliveredDetail(
   if (id === "s3" && index === 3)
     return `${fallback}\nCampaign reference: Enterprise adoption / 12 target accounts.\nAudience selection: ${s.audience}.\nChannel plan: ${s.channel}.\nRelease status: STAGED — not sent.\nRequired before release: approved content version, resolved consent, completed brand / legal review and channel configuration check.\nMeasurement handoff: campaign ID, audience role, channel and response event.`;
   if (id === "s5" && index === 1)
-    return `${fallback}\nCase: CONSENT-001 (fictional).\nAction: Hold the affected contact; do not infer permission from engagement.\nAssigned role: data / consent owner, individual to be confirmed.\nResolution evidence: authoritative consent record and suppression status.\nRe-entry condition: eligibility rechecked before any activation.`;
+    return `${fallback}\nCase: CONSENT-001 (fictional).\nAction: Hold the otherwise matched contact; do not infer permission from engagement.\nThis is separate from the two upstream identity exclusions, which remain suppressed without further action.\nAssigned role: data / consent owner, individual to be confirmed.\nResolution evidence: authoritative consent record and suppression status.\nRe-entry condition: eligibility rechecked before any activation.`;
   return fallback;
 }

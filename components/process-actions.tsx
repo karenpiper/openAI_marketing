@@ -83,8 +83,8 @@ export default function ProcessActions({
         <>
           <p>
             Inspect the evidence before letting the agent use it. The prototype
-            includes one unresolved identity record; decide whether it can enter
-            the working audience.
+            includes two unresolved identity records; decide whether they can
+            enter the working audience.
           </p>
           <div className="process-evidence">
             <span>
@@ -95,12 +95,12 @@ export default function ProcessActions({
               <b>Matched in this scenario</b>
             </span>
             <span>
-              One unmatched contact → account identity{" "}
+              Two unmatched records → account identity{" "}
               <b>Unresolved · exclude from activation</b>
             </span>
           </div>
-          {select("How should the agent handle the unmatched contact?", [
-            "Exclude it and retain the resolved account evidence",
+          {select("How should the agent handle the unmatched records?", [
+            "Exclude them and retain the resolved account evidence",
             "Hold the entire audience for identity review",
           ])}
           <button
@@ -108,7 +108,7 @@ export default function ProcessActions({
             onClick={() =>
               p.choice.startsWith("Exclude")
                 ? complete(
-                    "Unmatched contact excluded; resolved evidence accepted for planning",
+                    "Unmatched records excluded; resolved evidence accepted for planning",
                   )
                 : update(
                     { status: "Blocked" },
@@ -510,8 +510,11 @@ export default function ProcessActions({
                   Audience / asset setup <b>Pass</b>
                 </span>
                 <span>
+                  Earlier identity exclusions <b>2 records carried forward</b>
+                </span>
+                <span>
                   Consent consistency{" "}
-                  <b>One conflicting record · needs a decision</b>
+                  <b>One separate conflict · needs a decision</b>
                 </span>
               </div>
               <button
@@ -530,8 +533,10 @@ export default function ProcessActions({
       {id === "s5" && index === 1 && (
         <>
           <p>
-            CONSENT-001: engagement is present, but permission records conflict.
-            Decide the scope of the hold and the scope of the pause.
+            CONSENT-001 is separate from the two identity records already
+            excluded upstream. This contact is matched to the account and has
+            engagement, but permission records conflict. Decide the scope of
+            this new hold and the scope of the pause.
           </p>
           {select("Containment decision", [
             "Hold the affected contact only",
