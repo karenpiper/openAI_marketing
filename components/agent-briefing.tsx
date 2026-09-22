@@ -12,12 +12,12 @@ export const workshopAgenda = [
   },
   {
     title: "Target workflow (prototype)",
-    minutes: 20,
+    minutes: 15,
     body: "Use Morgan’s day to examine one tangible target workflow, the moments where judgment matters and the proposed near-term experience.",
   },
   {
     title: "Target workflow architecture and operating boundaries",
-    minutes: 25,
+    minutes: 30,
     body: "Work through how OpenAI intelligence and orchestration connect with Adobe capabilities and Code and Theory’s implementation approach across identity, buying groups, journeys, content operations, activation, governance and measurement.",
   },
   {

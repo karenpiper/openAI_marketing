@@ -1428,43 +1428,6 @@ export default function AgentWorkspace() {
                 <p>The room has not selected a priority set yet.</p>
               )}
             </section>
-            <div className="agent-readout-cards">
-              {chapters.map((ch, i) => {
-                const finding = s.findings[ch.id];
-                return (
-                  <article key={ch.id}>
-                    <span className="agent-kicker">{finding.priority}</span>
-                    <h2>{ch.title}</h2>
-                    <p>
-                      <b>Business outcome</b>
-                      <br />
-                      {finding.businessOutcome || "Not captured yet"}
-                    </p>
-                    <p>
-                      <b>Prove</b>
-                      <br />
-                      {finding.proof}
-                    </p>
-                    <p>
-                      <b>Decision / dependency</b>
-                      <br />
-                      {finding.decision || "Not captured yet"}
-                    </p>
-                    <p>
-                      <b>Owner</b> {finding.owner || "Unassigned"}
-                    </p>
-                    <button
-                      onClick={() => {
-                        setChapter(i);
-                        setPage("priorities");
-                      }}
-                    >
-                      Review room findings →
-                    </button>
-                  </article>
-                );
-              })}
-            </div>
             <ArchitectureOutput
               session={arch}
               compact
