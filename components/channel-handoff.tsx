@@ -323,15 +323,32 @@ export default function ChannelHandoff({
             </div>
           ) : activeTab === "Website" ? (
             <div className="website-preview">
-              <nav><b>OpenAI</b><span>Enterprise</span><span>Resources</span><button>Talk to sales</button></nav>
-              <div className="website-hero">
-                <img src={creativeImage} alt="" />
-                <small>FOR NORTHSTAR HEALTH · {variant.segment.toUpperCase()}</small>
-                <h2>{variant.headline}</h2>
-                <p>{variant.body}</p>
-                <button>{variant.cta} →</button>
-              </div>
-              <div className="website-proof-grid"><span>Practical adoption path</span><span>Decision-ready guidance</span><span>Governed expansion</span></div>
+              <nav className="website-nav">
+                <b>OpenAI</b>
+                <div className="website-nav-links"><span>Why OpenAI</span><span>Solutions</span><span>Resources</span></div>
+                <button>Contact sales</button>
+              </nav>
+              <main className="website-landing">
+                <section className="website-copy">
+                  <small>OPENAI FOR BUSINESS</small>
+                  <h2>{variant.headline}</h2>
+                  <p>{variant.body}</p>
+                  <button>{variant.cta} <span>↗</span></button>
+                </section>
+                <section className="website-image">
+                  <img src={creativeImage} alt="Illustrative enterprise team collaborating" />
+                  <div className="website-image-caption">
+                    <span>PERSONALIZED FOR</span>
+                    <b>{variant.recipient}</b>
+                    <small>{variant.segment} · Northstar Health</small>
+                  </div>
+                </section>
+              </main>
+              <section className="website-proof-grid">
+                <div><b>One shared foundation</b><span>Approved material is carried forward.</span></div>
+                <div><b>Relevant by design</b><span>Each role receives the right emphasis.</span></div>
+                <div><b>Ready to act</b><span>A clear next step for {variant.recipient.split(" ")[0]}.</span></div>
+              </section>
             </div>
           ) : activeTab === "Sales enablement" ? (
             <div className="seller-preview">
