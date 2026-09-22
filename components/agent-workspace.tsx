@@ -20,7 +20,6 @@ import { WorkflowWork, WorkflowRequirements } from "./workflow-work";
 import { CampaignEditor } from "./campaign-editor";
 import { processKey } from "../lib/process-state";
 import { currentWorkStep, workSignature } from "../lib/workflow-work";
-import MorganStory from "./morgan-story";
 import PerformanceLoop from "./performance-loop";
 import MorningInbox from "./morning-inbox";
 import AgentBriefing, { MeetMorgan } from "./agent-briefing";
@@ -519,7 +518,6 @@ export default function AgentWorkspace() {
             <section className="agent-stage" id="morgan-day">
               {s.day.moment === 0 ? (
                 <>
-                  <MorganStory moment={0} />
                   <MorganScreen onReset={resetPrototype}>
                     <div className="day-arrival">
                       <span className="agent-kicker">
@@ -551,7 +549,6 @@ export default function AgentWorkspace() {
                 </>
               ) : s.day.moment === 4 ? (
                 <>
-                  <MorganStory moment={4} />
                   <MorganScreen onReset={resetPrototype}>
                     <div className="day-evening">
                       <span className="agent-kicker">
@@ -590,40 +587,6 @@ export default function AgentWorkspace() {
                       </div>
                     </div>
                   </MorganScreen>
-                  <section className="performance-transition">
-                    <span className="agent-kicker">
-                      Close the loop · a few days later
-                    </span>
-                    <h2>What did the campaign teach us?</h2>
-                    <p>
-                      Jump to fictional results from a reviewed, released
-                      reference campaign. Inspect audience and channel outcomes,
-                      identify uncertainty and use the learning in the next
-                      plan.
-                    </p>
-                    <button
-                      className="agent-primary"
-                      onClick={() => {
-                        setPage("performance");
-                        window.scrollTo({ top: 0 });
-                      }}
-                    >
-                      Explore results and decide what changes →
-                    </button>
-                  </section>
-                  <section className="agent-requirements">
-                    <span className="agent-kicker">
-                      Facilitator discussion · outside Morgan’s screen
-                    </span>
-                    <h2>What would enable this day?</h2>
-                    <p>
-                      Now examine the inputs, connectors, controls and ownership
-                      needed to make the proposed experience real.
-                    </p>
-                    <button onClick={() => setPage("architecture")}>
-                      Next · Full architecture →
-                    </button>
-                  </section>
                 </>
               ) : (
                 <>
@@ -863,20 +826,6 @@ export default function AgentWorkspace() {
                       )}
                     </div>
                   </div>
-                  <div className="agent-next">
-                    <button
-                      onClick={() => {
-                        if (chapter < 2) {
-                          setChapter(chapter + 1);
-                        } else setPage("architecture");
-                      }}
-                    >
-                      {chapter < 2
-                        ? "Continue through the representative flow"
-                        : "View the full architecture"}{" "}
-                      →
-                    </button>
-                  </div>
                 </>
               )}
             </section>
@@ -1058,49 +1007,51 @@ export default function AgentWorkspace() {
             </button>
           </main>
         )}
-        <footer className="agent-footer">
-          <a href="/original">Original workshop</a>
-          <span role="status">
-            {ready
-              ? error
-                ? "Save needs attention"
-                : saved
-              : "Loading saved session…"}{" "}
-            · {demo ? "Demo" : "Workshop"} session
-          </span>
-          <div>
-            <button onClick={() => download(true)}>Export backup</button>
-            <label className="agent-import">
-              Restore backup
-              <input
-                type="file"
-                accept="application/json"
-                onChange={async (e) => {
-                  const file = e.target.files?.[0];
-                  if (!file) return;
-                  try {
-                    if (file.size > 2000000) throw Error();
-                    const next = restoreAgentState(
-                      JSON.parse(await file.text()),
-                    );
-                    if (
-                      confirm("Replace this adapted session with the backup?")
-                    ) {
-                      setS(next);
-                      setError("");
+        {page !== "workspace" && (
+          <footer className="agent-footer">
+            <a href="/original">Original workshop</a>
+            <span role="status">
+              {ready
+                ? error
+                  ? "Save needs attention"
+                  : saved
+                : "Loading saved session…"}{" "}
+              · {demo ? "Demo" : "Workshop"} session
+            </span>
+            <div>
+              <button onClick={() => download(true)}>Export backup</button>
+              <label className="agent-import">
+                Restore backup
+                <input
+                  type="file"
+                  accept="application/json"
+                  onChange={async (e) => {
+                    const file = e.target.files?.[0];
+                    if (!file) return;
+                    try {
+                      if (file.size > 2000000) throw Error();
+                      const next = restoreAgentState(
+                        JSON.parse(await file.text()),
+                      );
+                      if (
+                        confirm("Replace this adapted session with the backup?")
+                      ) {
+                        setS(next);
+                        setError("");
+                      }
+                    } catch {
+                      setSaved("Could not restore that backup.");
                     }
-                  } catch {
-                    setSaved("Could not restore that backup.");
-                  }
-                  e.target.value = "";
-                }}
-              />
-            </label>
-            <a href={demo ? "?" : "?demo=1"}>
-              {demo ? "Leave demo" : "Explore in demo mode"}
-            </a>
-          </div>
-        </footer>
+                    e.target.value = "";
+                  }}
+                />
+              </label>
+              <a href={demo ? "?" : "?demo=1"}>
+                {demo ? "Leave demo" : "Explore in demo mode"}
+              </a>
+            </div>
+          </footer>
+        )}
       </div>
     </SaveContext.Provider>
   );
