@@ -48,7 +48,7 @@ export function WorkflowWork({
   const [edited, setEdited] = useState(false);
   const [opened, setOpened] = useState<number | null>(null);
   const panel = useRef<HTMLDivElement>(null);
-  const blocked = id === "s3" && session.source === "Source material missing";
+  const blocked = false;
   const actions = workflowActivity(session, id, index);
   useEffect(() => {
     setRun({ key: runKey, phase: 0 });
@@ -127,9 +127,7 @@ export function WorkflowWork({
                   "Checking the context…",
                   "Preparing the output…",
                 ][phase]
-              : blocked
-                ? "Source gap found"
-                : "Work package ready"}
+              : "Work package ready"}
           </b>
           <small>
             {phase < 3
@@ -156,9 +154,7 @@ export function WorkflowWork({
           <div className="execution-reply">
             <b>Marketing agent</b>
             <p>
-              {blocked
-                ? "I couldn’t find an approved source for this plan. I’ve prepared a source request with the required review gate. Adaptation stays on hold."
-                : `I’ve prepared the ${workflowArtifact(session, id, index).title.toLowerCase()}. ${stage.summary}`}
+              {`I’ve prepared the ${workflowArtifact(session, id, index).title.toLowerCase()}. ${stage.summary}`}
             </p>
           </div>
           <div className="execution-assets">

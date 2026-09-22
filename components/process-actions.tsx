@@ -265,21 +265,21 @@ export default function ProcessActions({
                   </div>
                   <button
                     onClick={() => {
-                      update(
-                        { status: "Blocked" },
-                        "New-content request prepared; approved source and required claim review are needed before adaptation can continue.",
+                      complete(
+                        "New content foundation drafted from the campaign brief; brand and legal review are required before release.",
                       );
                       onArchitectureActivity?.(
                         "The campaign strategist is sending the audience brief through OpenAI Frontier to the content-production workflow; no approved-library retrieval is used.",
                       );
                     }}
                   >
-                    Prepare new-content request
+                    Create content foundation
                   </button>
-                  {p.status === "Blocked" && (
+                  {p.status === "Complete" && (
                     <p role="status">
-                      The request is ready for the content team. This workflow
-                      stays held until a reviewed source is returned.
+                      The new foundation is ready to be adapted for the selected
+                      audiences. Brand and legal review remains required before
+                      release.
                     </p>
                   )}
                 </div>

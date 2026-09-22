@@ -137,7 +137,7 @@ test("work packages carry audience and channel context and invalidate when condi
   assert.equal(work.currentWorkStep(s, "s3"), 0);
   assert.equal(work.workStages(s, "s3")[1].rows.length, 1);
   s.source = "Source material missing";
-  assert.match(work.workStages(s, "s3")[0].summary, /on hold/);
+  assert.match(work.workStages(s, "s3")[0].summary, /Morgan chose new content/);
   for (const id of ["s2", "s3", "s5"])
     for (const step of work.workStages(s, id))
       for (const key of ["input", "output", "connection", "enables", "control"])
@@ -155,9 +155,9 @@ test("artifacts are concrete, scenario-aware examples with honest provenance", (
   s.audience = "One audience";
   assert.equal(w.workflowArtifact(s, "s3", 1).sections.length, 1);
   s.source = "Source material missing";
-  const blocked = w.workflowArtifact(s, "s3", 0);
-  assert.equal(blocked.title, "Source material request");
-  assert.equal(blocked.blocked, true);
+  const newContent = w.workflowArtifact(s, "s3", 0);
+  assert.equal(newContent.title, "New content foundation");
+  assert.equal(newContent.blocked, false);
 });
 
 test("Morgan edits survive saving and are included in exported artifacts", () => {

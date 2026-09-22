@@ -119,32 +119,43 @@ export function workStages(s: AgentState, id: string): WorkStage[] {
           : ["Eligible audience"];
     const channel = s.channel.toLowerCase();
     const sourceSet = selectedContentSource(s);
+    const newContent = s.source === "Source material missing";
     return [
       {
-        title: "Check the source material",
-        action: "Prepare audience briefs",
+        title: newContent ? "Create a content foundation" : "Check the source material",
+        action: newContent ? "Draft the new foundation" : "Prepare audience briefs",
         summary:
-          s.source === "Source material missing"
-            ? "No approved source is available. The agent has prepared a source request; audience adaptation is on hold."
+          newContent
+            ? "Morgan chose new content. The content adaptation agent is drafting a purpose-built foundation from the campaign brief, with review required before release."
             : `The agent has prepared ${sourceSet.title.toLowerCase()} as the fictional message theme for this account and buying group.`,
         input:
-          "Account brief, audience needs, fictional practice theme, rights and brand rules.",
+          newContent
+            ? "Campaign brief, audience needs, channel requirements and brand / legal guardrails."
+            : "Account brief, audience needs, fictional practice theme, rights and brand rules.",
         output:
-          "Message-theme brief with claim boundaries and missing-material flags.",
+          newContent
+            ? "New content foundation with required brand and legal review gates."
+            : "Message-theme brief with claim boundaries and missing-material flags.",
         connection:
-          "OpenAI agent → approved asset repository / Adobe content capabilities.",
+          newContent
+            ? "Content adaptation agent → OpenAI Frontier → content production workflow + Adobe Workfront review."
+            : "Content retrieval agent → OpenAI Frontier → approved asset repository / Adobe content capabilities.",
         enables:
-          "Grounds every variant in traceable material instead of inventing claims.",
+          newContent
+            ? "Creates a campaign-specific foundation while preserving an explicit review path."
+            : "Grounds every variant in traceable material instead of inventing claims.",
         control:
-          "No approved source means no adaptation; version and usage permissions travel with the work.",
+          newContent
+            ? "New claims cannot be released until brand and legal review make this a governed source."
+            : "Version and usage permissions travel with the approved source.",
         rows: [
           [
             "Recommended source set",
-            s.source === "Source material missing"
-              ? "Missing · blocked"
+            newContent
+              ? "New foundation requested"
               : sourceSet.badge,
-            s.source === "Source material missing"
-              ? "No approved material is available for this request"
+            newContent
+              ? sourceSet.assets
               : sourceSet.assets,
           ],
           ["Why this matches", "Ranked for this brief", sourceSet.rationale],
@@ -155,10 +166,12 @@ export function workStages(s: AgentState, id: string): WorkStage[] {
           ],
           [
             "Content controls",
-            s.source === "Source material missing"
-              ? "Required before proceeding"
+            newContent
+              ? "Review required before release"
               : "Approved claims only",
-            "Morgan can choose a different source set; source rights and claim limits remain attached to every package",
+            newContent
+              ? "The new foundation is traceable to Morgan’s brief and requires brand and legal review before activation"
+              : "Morgan can choose a different source set; source rights and claim limits remain attached to every package",
           ],
         ],
       },
@@ -447,12 +460,14 @@ export function workflowArtifact(s: AgentState, id: string, index: number) {
       "Decision and audit record",
     ],
   };
-  const blocked = id === "s3" && s.source === "Source material missing";
+  const blocked = false;
+  const newContent = id === "s3" && s.source === "Source material missing";
   const sourceSet = selectedContentSource(s);
   const variants = id === "s3" ? contentVariants(s) : [];
   const northstarVariants = variants.filter((variant) => variant.accountId === "ACCT-01");
   const planChannels = selectedChannels(s.channel);
-  const title = blocked ? "Source material request" : names[id][index];
+  const title =
+    newContent && index === 0 ? "New content foundation" : names[id][index];
   const sections =
     s.artifactEdits?.[artifactKey(s, id, index)] ??
     (id === "s3" && index === 0 && !blocked
@@ -492,8 +507,12 @@ export function workflowArtifact(s: AgentState, id: string, index: number) {
           },
           {
             name: "Source and release gates",
-            status: "Approved source available · release not authorized",
-            detail: `Selected source set: ${sourceSet.assets}.\nWhy selected: ${sourceSet.rationale}\nPreserve approved claims and attach source references to each work package.\nNext: prepare audience packages, route required reviews and assemble staged channel handoffs.\nRelease only after required brand / legal checks and audience eligibility are resolved.`,
+            status: newContent
+              ? "New content foundation · release not authorized"
+              : "Approved source available · release not authorized",
+            detail: newContent
+              ? `New foundation: ${sourceSet.assets}.\nWhy created: ${sourceSet.rationale}\nThe foundation is traceable to Morgan’s campaign brief and may not be released until brand and legal review are complete.\nNext: prepare audience packages, route required reviews and assemble staged channel handoffs.`
+              : `Selected source set: ${sourceSet.assets}.\nWhy selected: ${sourceSet.rationale}\nPreserve approved claims and attach source references to each work package.\nNext: prepare audience packages, route required reviews and assemble staged channel handoffs.\nRelease only after required brand / legal checks and audience eligibility are resolved.`,
           },
         ]
       : id === "s2" && index === 0
@@ -767,10 +786,10 @@ export function workflowActivity(
       [
         "Searching the approved asset repository through a proposed Adobe CSC / content connector for material matching the campaign objective and audience needs.",
         s.source === "Source material missing"
-          ? "Finding no approved source in this scenario; marking adaptation as blocked instead of supplying unsupported claims."
+          ? "Using Morgan’s campaign brief, audience context and channel requirements to draft a new fictional content foundation instead of retrieving existing approved material."
           : "Reading the adoption guide’s version, permitted claims and usage rights from the asset metadata before reusing it.",
         s.source === "Source material missing"
-          ? "Preparing a source request identifying the missing approved material and the review needed before adaptation can resume."
+          ? "Preparing the new foundation with its claim boundaries, then routing it to brand and legal review before it can be released."
           : "Preparing a source manifest that links the adoption guide, allowed claims and reuse restrictions to the campaign brief.",
       ],
       [

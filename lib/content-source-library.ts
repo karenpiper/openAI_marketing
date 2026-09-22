@@ -54,7 +54,25 @@ export const contentSourceOptions = [
   },
 ] as const;
 
+export const newContentSource = {
+  id: "new-content-foundation",
+  title: "New Northstar content foundation",
+  badge: "New content path",
+  assets: "New fictional foundation drafted from the campaign brief; review required before release",
+  rationale:
+    "Use when Morgan chooses to create a purpose-built foundation instead of retrieving an existing approved asset.",
+  baseContent: {
+    headline: "Turn active AI use into an enterprise decision with a clear next step.",
+    message:
+      "Northstar’s technical adoption creates an opening to convene the business sponsor and procurement team around one bounded expansion decision, with the evidence and governance questions they need to move forward.",
+    proof:
+      "A fictional draft framework: state the observed adoption signal, the operating decision it can inform and the governance questions that require review. Do not make performance or ROI claims until Northstar validates them.",
+    cta: "Build Northstar’s expansion decision brief.",
+  },
+} as const;
+
 export function selectedContentSource(s: AgentState) {
+  if (s.source === "Source material missing") return newContentSource;
   return (
     contentSourceOptions.find(
       (source) => source.id === processState(s, "s3", 0).choice,
