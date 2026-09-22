@@ -54,11 +54,11 @@ export default function AgentBriefing({ onEnter }: { onEnter: () => void }) {
           </article>
           <article>
             <span>THE OPPORTUNITY</span>
-            <h3>Content at scale.</h3>
+            <h3>Agent-led, human-augmented marketing.</h3>
             <p>
-              Use audience and journey context to coordinate relevant messaging
-              across buying roles and channels. Events are one part of that
-              journey.
+              Convert the richest enterprise pipeline in history with agents
+              that assemble relevant work across buying roles and channels—and
+              people who direct the consequential decisions.
             </p>
           </article>
           <article>
@@ -80,42 +80,38 @@ export default function AgentBriefing({ onEnter }: { onEnter: () => void }) {
       </section>
       <section id="opening-outcomes-first">
         <span className="agent-kicker">02 / Start with the outcomes</span>
-        <h2>
-          Before naming use cases,
-          <br />
-          agree what better looks like.
-        </h2>
+        <h2>Before naming use cases, agree what moves.</h2>
         <div className="opening-cards outcome-cards">
           <article>
             <span>01</span>
-            <h3>Speed to market</h3>
+            <h3>AAR growth</h3>
             <p>
-              Move from a real signal and an approved source to a useful market
-              action faster.
+              The primary measure: AAR created and realized from enterprise
+              pipeline, including expansion opportunities.
             </p>
           </article>
           <article>
             <span>02</span>
-            <h3>Do more with less</h3>
+            <h3>Release-ready cadence</h3>
             <p>
-              Increase the volume and relevance of work without adding a
-              separate manual process for every audience.
+              Time from a daily product release to an approved, enterprise-ready
+              market action across the relevant buying group.
             </p>
           </article>
           <article>
             <span>03</span>
-            <h3>Efficiency with care</h3>
+            <h3>Pipeline velocity</h3>
             <p>
-              Keep people focused on consequential decisions while routine work
-              follows the right controls.
+              Days for qualified enterprise deals to move from engaged buying
+              group through the next decision and toward close.
             </p>
           </article>
           <article>
             <span>04</span>
-            <h3>Revenue realization</h3>
+            <h3>Pipeline value</h3>
             <p>
-              Help more enterprise buying groups move from interest to a
-              meaningful next conversation.
+              The size of qualified enterprise opportunities progressing through
+              the pipeline, including expansion potential.
             </p>
           </article>
         </div>
