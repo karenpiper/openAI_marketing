@@ -32,11 +32,9 @@ import "./agent-workspace.css";
 function MorganScreen({
   children,
   workflow = false,
-  onReset,
 }: {
   children: ReactNode;
   workflow?: boolean;
-  onReset?: () => void;
 }) {
   function jump(selector: string, e: React.MouseEvent<HTMLButtonElement>) {
     const screen = e.currentTarget.closest(".monitor-screen");
@@ -65,11 +63,6 @@ function MorganScreen({
             <span aria-hidden="true">● ● ●</span>
             <span>ChatGPT Work · Enterprise marketing</span>
             <span>Morgan</span>
-            {onReset && (
-              <button className="monitor-reset" onClick={onReset}>
-                ↺ Restart prototype
-              </button>
-            )}
           </div>
           <div className="workspace-desktop">
             <aside className="chat-sidebar">
@@ -518,7 +511,7 @@ export default function AgentWorkspace() {
             <section className="agent-stage" id="morgan-day">
               {s.day.moment === 0 ? (
                 <>
-                  <MorganScreen onReset={resetPrototype}>
+                  <MorganScreen>
                     <div className="day-arrival">
                       <span className="agent-kicker">
                         08:45 · Morgan arrives
@@ -549,7 +542,7 @@ export default function AgentWorkspace() {
                 </>
               ) : s.day.moment === 4 ? (
                 <>
-                  <MorganScreen onReset={resetPrototype}>
+                  <MorganScreen>
                     <div className="day-evening">
                       <span className="agent-kicker">
                         17:30 · Back in the same workspace
@@ -591,7 +584,7 @@ export default function AgentWorkspace() {
               ) : (
                 <>
                   <div className="prototype-screen-layout">
-                    <MorganScreen workflow onReset={resetPrototype}>
+                    <MorganScreen workflow>
                       <div className="agent-product">
                         <header>
                           <b>
@@ -806,6 +799,12 @@ export default function AgentWorkspace() {
                         <span aria-hidden="true">
                           {showStepContext ? "×" : "◇"}
                         </span>
+                      </button>
+                      <button
+                        className="prototype-restart"
+                        onClick={resetPrototype}
+                      >
+                        ↺ Restart prototype
                       </button>
                       {showStepContext && (
                         <aside className="prototype-context-popover">

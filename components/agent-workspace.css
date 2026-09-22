@@ -4303,6 +4303,25 @@
 .prototype-context-trigger span {
   font-size: 16px;
 }
+.prototype-restart {
+  display: block;
+  width: 100%;
+  margin-top: 8px;
+  padding: 9px 13px;
+  border: 1px solid #d7ded8;
+  border-radius: 9px;
+  background: #f9faf8;
+  color: #4d6256;
+  font-size: 12px;
+  font-weight: 650;
+  text-align: left;
+  box-shadow: 0 5px 16px #27352b14;
+}
+.prototype-restart:hover {
+  border-color: #8ba18f;
+  background: #ffffff;
+  color: #244f37;
+}
 .prototype-context-popover {
   position: fixed;
   right: 32px;
