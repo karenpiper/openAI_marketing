@@ -171,8 +171,8 @@ export function architectureDiagram(
  ${box(220, 270, 100, 135, ["Adobe", "CSC"], 17)}${tag(279, 278, "C")}
  ${box(337, 270, 96, 135, ["Adobe", "Marketo"], 16)}
  ${box(103, 430, 330, 60, ["Adobe CDP (w/ ABM)"])}${tag(330, 430, "D")}
- ${box(610, 270, 250, 72, ["OpenAI Frontier", "Orchestration layer", "Adobe CX Coworker"], 18, "H")}${tag(842, 242, "H")}
- ${arrow(610, 288, 433, 177, ["H", "A"], [[470, 288], [470, 177]])}${arrow(735, 270, 830, 132, ["H", "E"], [[860, 270], [860, 132]])}${arrow(610, 318, 433, 460, ["H", "D"], [[470, 318], [470, 460]])}${arrow(610, 330, 320, 405, ["H", "C"], [[470, 330], [470, 420], [320, 420]])}${arrow(860, 306, 907, 306, ["H", "F"])}
+ ${box(590, 265, 290, 100, ["Orchestration layer", "OpenAI Frontier", "Adobe CX Coworker"], 16, "H")}${tag(862, 237, "H")}
+ ${arrow(590, 288, 433, 177, ["H", "A"], [[470, 288], [470, 177]])}${arrow(735, 265, 830, 132, ["H", "E"], [[880, 265], [880, 132]])}${arrow(590, 325, 433, 460, ["H", "D"], [[470, 325], [470, 460]])}${arrow(590, 345, 320, 405, ["H", "C"], [[470, 345], [470, 420], [320, 420]])}${arrow(880, 315, 907, 315, ["H", "F"])}
  <path d="M 470 40 L 470 410" stroke="#c0cdbf" stroke-dasharray="7 7"/>
  ${text(18, 523, ["OAI Infrastructure"], 17)}<rect rx="16" x="18" y="535" width="582" height="300" fill="#edf2e8" stroke="#c0cdbf"/>
  ${box(113, 555, 455, 255, ["OpenAI", "Data Lake"], 32)}

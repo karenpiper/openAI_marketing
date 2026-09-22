@@ -9,7 +9,7 @@ import { useCaseCandidates } from "../lib/use-case-candidates";
 
 const componentProfiles: Record<string, { title: string; role: string; capabilities: string[] }> = {
   H: {
-    title: "OpenAI Frontier orchestration layer · Adobe CX Coworker",
+    title: "Orchestration layer · OpenAI Frontier · Adobe CX Coworker",
     role: "The shared decision and coordination layer used by specialist agents: it preserves working context, selects the right capability, retrieves connected evidence and keeps people in control before an external action.",
     capabilities: ["Shared campaign and account memory", "Model and specialist-agent routing", "Retrieval before action", "Guardrails, permissions and review gates"],
   },
