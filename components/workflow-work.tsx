@@ -324,7 +324,7 @@ export function WorkflowWork({
                   <b>Evidence used in this output</b>
                   <span>
                     These references ground the decision or work product. Open
-                    “Architecture for this step” to see the systems, connections
+                    “Workflow architecture for this step” to see the systems, connections
                     and controls that make it possible.
                   </span>
                   <ul>
@@ -432,7 +432,7 @@ export function WorkflowRequirements({
       </div>
       <p>
         This is the relevant data movement for this moment, not the full
-        architecture. The proposed connections still need validation.
+        workflow architecture. The proposed connections still need validation.
       </p>
     </section>
   );

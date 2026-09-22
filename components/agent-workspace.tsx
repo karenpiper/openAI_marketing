@@ -16,15 +16,18 @@ import {
   guidedReply,
   advanceDay,
 } from "../lib/agent-workspace";
-import { WorkflowWork, WorkflowRequirements } from "./workflow-work";
+import { WorkflowWork } from "./workflow-work";
 import { CampaignEditor } from "./campaign-editor";
 import { processKey } from "../lib/process-state";
-import { currentWorkStep, workSignature } from "../lib/workflow-work";
+import {
+  currentWorkStep,
+  workSignature,
+  workStages,
+} from "../lib/workflow-work";
 import PerformanceLoop from "./performance-loop";
 import MorningInbox from "./morning-inbox";
 import AgentBriefing, { MeetMorgan } from "./agent-briefing";
 import ArchitectureOutput from "./architecture-output";
-import BackendIllustration from "./backend-illustration";
 import { useCaseCandidates } from "../lib/use-case-candidates";
 import { SaveContext } from "./save-footer";
 import "./agent-workspace.css";
@@ -61,6 +64,68 @@ function channelsForPlan(plan: string) {
 
 function planForChannels(channels: string[]) {
   return channels.join(" + ");
+}
+
+function WorkflowArchitectureRail({
+  session,
+  id,
+  onClose,
+}: {
+  session: ReturnType<typeof createAgentState>;
+  id: string;
+  onClose: () => void;
+}) {
+  const step = currentWorkStep(session, id);
+  const stage = workStages(session, id)[step];
+  const route =
+    id === "s3" && step === 0
+      ? ["Marketing agent", "Adobe CDP / ABM", "Adobe CSC content library"]
+      : id === "s3" && step === 1
+        ? ["Marketing agent", "CDP / identity", "Content production tools"]
+        : id === "s3" && step === 2
+          ? ["Marketing agent", "Adobe Workfront", "Brand + legal review"]
+          : id === "s3"
+            ? ["Marketing agent", "Marketo / CRM", "Journey analytics"]
+            : id === "s2"
+              ? ["OpenAI data lake", "CDP / ABM", "Marketing agent"]
+              : ["Marketing agent", "Workflow controls", "Activation systems"];
+  const transition =
+    id === "s3" && step === 0
+      ? "Plan choices → recommended creative"
+      : stage.action;
+
+  return (
+    <aside className="prototype-context-popover workflow-architecture-rail">
+      <header>
+        <span className="agent-kicker">Live workflow architecture</span>
+        <button aria-label="Close workflow architecture" onClick={onClose}>
+          ×
+        </button>
+      </header>
+      <p className="workflow-architecture-now">Now moving through</p>
+      <h3>{transition}</h3>
+      <p className="workflow-architecture-summary">{stage.summary}</p>
+      <div
+        className="workflow-architecture-route"
+        aria-label="Systems active in this transition"
+      >
+        {route.map((component, index) => (
+          <div key={component}>
+            <span>{component}</span>
+            {index < route.length - 1 && <i aria-hidden="true">↓</i>}
+          </div>
+        ))}
+      </div>
+      <div className="workflow-architecture-pass">
+        <span>Passes forward</span>
+        <b>{stage.output}</b>
+      </div>
+      <p className="workflow-architecture-note">
+        This is the proposed connection for this moment. Open the full workflow
+        architecture in Step 4 to review every component and boundary.
+      </p>
+    </aside>
+  );
 }
 
 function MorganScreen({
@@ -130,7 +195,9 @@ function MorganScreen({
                   onClick={onToggleArchitecture}
                 >
                   <span aria-hidden="true">◇</span>
-                  {architectureOpen ? "Close architecture" : "Architecture for this step"}
+                  {architectureOpen
+                    ? "Close workflow architecture"
+                    : "Workflow architecture for this step"}
                 </button>
               )}
               {onCampaignResults && (
@@ -432,7 +499,7 @@ export default function AgentWorkspace() {
               ["meet", "1 · Morgan’s Tuesday"],
               ["priorities", "2 · Priorities"],
               ["workspace", "3 · Prototype flow"],
-              ["architecture", "4 · Architecture"],
+              ["architecture", "4 · Workflow architecture"],
               ["readout", "5 · Readout"],
             ].map(([id, label]) => (
               <button
@@ -489,7 +556,7 @@ export default function AgentWorkspace() {
         ) : page === "capabilities" ? (
           <main className="agent-wide">
             <span className="agent-kicker">
-              Agenda 2 · Current-state architecture and capability reuse · 25
+              Agenda 2 · Current-state workflow architecture and capability reuse · 25
               minutes
             </span>
             <h1>What can we build on?</h1>
@@ -564,7 +631,7 @@ export default function AgentWorkspace() {
                 window.scrollTo({ top: 0 });
               }}
             >
-              Next · Target architecture →
+              Next · Workflow architecture →
             </button>
           </main>
         ) : page === "performance" ? (
@@ -1078,21 +1145,11 @@ export default function AgentWorkspace() {
                     </MorganScreen>
                     <div className="prototype-context-control">
                       {showStepContext && (
-                        <aside className="prototype-context-popover">
-                          <header>
-                            <span className="agent-kicker">
-                              Proposed architecture context
-                            </span>
-                            <button
-                              aria-label="Close architecture context"
-                              onClick={() => setShowStepContext(false)}
-                            >
-                              ×
-                            </button>
-                          </header>
-                          <WorkflowRequirements session={s} id={c.id} />
-                          <BackendIllustration session={s} id={c.id} />
-                        </aside>
+                        <WorkflowArchitectureRail
+                          session={s}
+                          id={c.id}
+                          onClose={() => setShowStepContext(false)}
+                        />
                       )}
                     </div>
                   </div>
@@ -1103,12 +1160,12 @@ export default function AgentWorkspace() {
         ) : page === "architecture" ? (
           <main className="agent-wide">
             <span className="agent-kicker">
-              Step 4 · Capabilities, architecture and operating boundaries · 25
+              Step 4 · Capabilities, workflow architecture and operating boundaries · 25
               minutes
             </span>
             <h1>How would we make it work?</h1>
             <p className="agent-lede">
-              Now bring the relevant capabilities into the full architecture.
+              Now bring the relevant capabilities into the full workflow architecture.
               The diagram is our starting proposal; use the room’s feedback to
               adapt the flows, ownership and open decisions.
             </p>

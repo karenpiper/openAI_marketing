@@ -35,6 +35,8 @@ export default function ProcessActions({
   const [sourceLookup, setSourceLookup] = useState<
     "idle" | "searching" | "results"
   >("idle");
+  const [contentSearch, setContentSearch] = useState("");
+  const [submittedSearch, setSubmittedSearch] = useState("");
   const update = (patch: Partial<ProcessState>, event?: string) =>
     onChange(processUpdate(p, patch, event));
   const complete = (event: string) => update({ status: "Complete" }, event);
@@ -244,34 +246,66 @@ export default function ProcessActions({
           ) : (
             <>
               <div className="content-lookup">
-                <span className="agent-kicker">Content discovery</span>
-                <h4>Find approved creative for this audience</h4>
+                <span className="agent-kicker">CDP content discovery</span>
+                <h4>Recommended approved creative for this audience</h4>
                 <p>
                   The agent uses the CDP’s account and buying-group context to
-                  query the approved content library. The CDP informs the
-                  search; approved material and claim permissions remain in the
-                  content system.
+                  recommend content foundations. The CDP supplies the context;
+                  the approved library supplies the material, version and claim
+                  permissions.
                 </p>
                 <div className="content-lookup-query">
-                  <span>CDP context</span>
+                  <span>CDP recommendation context</span>
                   <b>Northstar Health · {session.audience} · active technical evaluation</b>
                   <small>Signals: product usage, event engagement, sponsor gap</small>
                 </div>
+                <div className="content-lookup-actions">
                 {sourceLookup === "idle" && (
                   <button
                     className="agent-primary"
                     onClick={() => {
+                      setSubmittedSearch("");
                       setSourceLookup("searching");
                       window.setTimeout(() => setSourceLookup("results"), 800);
                     }}
                   >
-                    Search approved library
+                    View recommended content
                   </button>
                 )}
+                  <label className="content-search-input">
+                    <span>Or search the CDP content catalog</span>
+                    <div>
+                      <input
+                        value={contentSearch}
+                        onChange={(event) => setContentSearch(event.target.value)}
+                        onKeyDown={(event) => {
+                          if (event.key === "Enter") {
+                            event.preventDefault();
+                            setSubmittedSearch(contentSearch.trim());
+                            setSourceLookup("searching");
+                            window.setTimeout(() => setSourceLookup("results"), 800);
+                          }
+                        }}
+                        placeholder="Search by theme, audience or asset type"
+                      />
+                      <button
+                        type="button"
+                        disabled={!contentSearch.trim()}
+                        onClick={() => {
+                          setSubmittedSearch(contentSearch.trim());
+                          setSourceLookup("searching");
+                          window.setTimeout(() => setSourceLookup("results"), 800);
+                        }}
+                      >
+                        Search
+                      </button>
+                    </div>
+                  </label>
+                </div>
                 {sourceLookup === "searching" && (
                   <p role="status" className="content-lookup-status">
-                    <span aria-hidden="true">✳</span> Checking the content
-                    library for approved, reusable foundations…
+                    <span aria-hidden="true">✳</span> Searching CDP-connected
+                    approved content for reusable foundations…
                   </p>
                 )}
               </div>
@@ -280,10 +314,18 @@ export default function ProcessActions({
                   <div className="content-library-results">
                     <div className="content-library-heading">
                       <div>
-                        <span className="agent-kicker">Approved library results</span>
-                        <b>3 foundations match this audience brief</b>
+                        <span className="agent-kicker">
+                          {submittedSearch
+                            ? "CDP content catalog results"
+                            : "CDP recommendations"}
+                        </span>
+                        <b>
+                          {submittedSearch
+                            ? `Results for “${submittedSearch}”`
+                            : "3 foundations match this audience brief"}
+                        </b>
                       </div>
-                      <span>Asset system · fictional practice library</span>
+                      <span>Approved asset system · fictional practice library</span>
                     </div>
                     <div className="content-source-options" role="radiogroup">
                       {contentSourceOptions.map((source) => (

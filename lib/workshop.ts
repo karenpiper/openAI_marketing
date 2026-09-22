@@ -25,7 +25,7 @@ export const stages = [
   },
   { title: "Current state", subtitle: "What can we build on?", minutes: 30 },
   {
-    title: "Architecture",
+    title: "Workflow architecture",
     subtitle: "How should the work connect?",
     minutes: 45,
   },

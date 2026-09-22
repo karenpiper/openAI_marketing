@@ -120,7 +120,7 @@ export default function WorkshopReadout({
       </section>
       <section className="closing-section closing-architecture">
         <div>
-          <span className="eyebrow">02 · Working architecture</span>
+          <span className="eyebrow">02 · Working workflow architecture</span>
           <ArchitectureOutput
             session={session}
             compact
@@ -133,7 +133,7 @@ export default function WorkshopReadout({
           <p className="preserve-lines">{summary.ownership}</p>
           <p className="muted">
             Baseline proposal with session annotations. Detailed changes and
-            unresolved boundaries are in the architecture PDF.
+            unresolved boundaries are in the workflow architecture PDF.
           </p>
         </aside>
       </section>

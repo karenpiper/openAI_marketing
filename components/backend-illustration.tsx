@@ -119,7 +119,7 @@ export default function BackendIllustration({
           <header>
             <div>
               <span className="agent-kicker">
-                Facilitator illustration · based on our proposed architecture
+                Facilitator illustration · based on our proposed workflow architecture
               </span>
               <h2 id="backend-title">{stage.title}</h2>
             </div>
@@ -135,7 +135,7 @@ export default function BackendIllustration({
             <div
               className="backend-map"
               role="img"
-              aria-label={`Architecture diagram highlighting ${frames[frame].refs.map((r) => names[r]).join(", ")}`}
+              aria-label={`Workflow architecture diagram highlighting ${frames[frame].refs.map((r) => names[r]).join(", ")}`}
               dangerouslySetInnerHTML={{
                 __html: architectureDiagram(
                   session.architecture,
@@ -161,7 +161,7 @@ export default function BackendIllustration({
                 <p>{stage.control}</p>
               </aside>
               <p className="backend-note">
-                Solid lines reproduce connections in the architecture proposal.
+                Solid lines reproduce connections in the workflow architecture proposal.
                 The request / response above is a proposed orchestration path to
                 validate. Marketo, where mentioned, is a candidate
                 implementation of the diagram’s CRM (Marketing) box; its

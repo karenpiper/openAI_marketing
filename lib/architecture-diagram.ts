@@ -37,8 +37,10 @@ export function architectureDiagram(
       ? "A"
       : x === 103 && y === 270
         ? "B"
-        : x === 293
-          ? "C"
+    : x === 220
+      ? "C"
+      : x === 337 && y === 270
+        ? "E"
           : y === 430 || y === 555
             ? "D"
             : x === 490
@@ -153,8 +155,9 @@ export function architectureDiagram(
  ${box(103, 65, 330, 65, ["Codex Interfaces", "+ ChatGPT work"])}${box(103, 145, 330, 65, ["Agent Interface(s)"])}${tag(345, 40, "A")}
  ${text(490, 27, ["B2B Marketing Touchpoints"], 23)}
  ${box(490, 40, 340, 55, ["Events"])}${box(490, 105, 340, 55, ["CRM (Marketing)"])}${box(490, 170, 340, 55, ["Marketing Website"])}${tag(850, 10, "E")}
- ${box(103, 270, 155, 135, ["Adobe", "Workfront"])}${tag(103, 240, "B")}
- ${box(293, 270, 140, 135, ["Adobe CSC", "(Assets, etc)"], 17)}${tag(293, 240, "C")}
+ ${box(103, 270, 100, 135, ["Adobe", "Workfront"], 16)}${tag(103, 240, "B")}
+ ${box(220, 270, 100, 135, ["Adobe", "CSC"], 17)}${tag(220, 240, "C")}
+ ${box(337, 270, 96, 135, ["Adobe", "Marketo"], 16)}
  ${box(103, 430, 330, 60, ["Adobe CDP (w/ ABM)"])}${tag(330, 430, "D")}
  <path d="M 470 40 L 470 410" stroke="#c0cdbf" stroke-dasharray="7 7"/>
  ${text(18, 523, ["OAI Infrastructure"], 17)}<rect rx="16" x="18" y="535" width="582" height="300" fill="#edf2e8" stroke="#c0cdbf"/>

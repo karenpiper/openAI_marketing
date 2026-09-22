@@ -68,8 +68,8 @@ export function middayReadout(s: Session) {
       (u, i) =>
         `${i + 1}. ${u.label}\nWhat to prove: ${s.assessments[u.id].proofText}`,
     ),
-    "## 2. Proposed architecture",
-    "See the annotated architecture PDF for the working diagram and session changes.",
+    "## 2. Proposed workflow architecture",
+    "See the annotated workflow architecture PDF for the working diagram and session changes.",
     `Ownership boundaries:\n${summary.ownership}`,
     "## 3. Decisions, dependencies and sequence",
     `Proposed sequence:\n${summary.sequence}`,
@@ -113,8 +113,8 @@ export function closingItems(s: Session) {
       id: `review-${r.useCase}-${r.step}`,
       title:
         r.choice === "Change"
-          ? "Requested architecture change"
-          : "Architecture question",
+          ? "Requested workflow architecture change"
+          : "Workflow architecture question",
       detail: r.change || r.next || "Room clarification needed.",
       owner: r.owner,
       due: "",
@@ -139,7 +139,7 @@ export function closingItems(s: Session) {
   ))
     items.push({
       id: `addition-${a.id}`,
-      title: "Proposed architecture addition",
+      title: "Proposed workflow architecture addition",
       detail: a.note,
       owner: a.owner,
       due: "",

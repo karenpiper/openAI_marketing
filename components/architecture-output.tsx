@@ -74,7 +74,7 @@ export default function ArchitectureOutput({
       });
     } catch {
       setError(
-        "The architecture PDF could not be generated. Your workshop answers are saved; please try again.",
+        "The workflow architecture PDF could not be generated. Your workshop answers are saved; please try again.",
       );
     } finally {
       setBusy(false);
@@ -85,11 +85,11 @@ export default function ArchitectureOutput({
       <div className="card-heading">
         <div>
           <span className="eyebrow">Generated from this conversation</span>
-          <h2>Proposed architecture</h2>
+          <h2>Proposed workflow architecture</h2>
         </div>
         {download && (
           <button disabled={busy} onClick={exportPdf}>
-            {busy ? "Preparing PDF…" : "Download annotated architecture PDF"}
+            {busy ? "Preparing PDF…" : "Download annotated workflow architecture PDF"}
           </button>
         )}
       </div>
@@ -97,7 +97,7 @@ export default function ArchitectureOutput({
       {!compact && (
         <p className="muted">
           Proposed workflow order · room changes and open questions remain
-          visible. The PDF recreates our original architecture diagram with
+          visible. The PDF recreates our original workflow architecture diagram with
           session annotations.
         </p>
       )}
@@ -105,7 +105,7 @@ export default function ArchitectureOutput({
         <section className="architecture-explorer" aria-live="polite">
           <header className="architecture-explorer-heading">
             <div>
-              <span className="eyebrow">Explore the proposed architecture</span>
+              <span className="eyebrow">Explore the proposed workflow architecture</span>
               <h3>{explorerCase ? cases.find((u) => u.id === explorerCase)?.label : "The complete system"}</h3>
             </div>
             {explorerCase && (
@@ -121,8 +121,8 @@ export default function ArchitectureOutput({
               </button>
             )}
           </header>
-          <div className="architecture-usecase-tabs" role="tablist" aria-label="Architecture views">
-            <button role="tab" aria-selected={!explorerCase} onClick={() => chooseExplorerCase("")}>All architecture</button>
+          <div className="architecture-usecase-tabs" role="tablist" aria-label="Workflow architecture views">
+            <button role="tab" aria-selected={!explorerCase} onClick={() => chooseExplorerCase("")}>All workflow architecture</button>
             {cases.slice(0, 3).map((u) => (
               <button key={u.id} role="tab" aria-selected={explorerCase === u.id} onClick={() => chooseExplorerCase(u.id)}>{u.label}</button>
             ))}
@@ -132,7 +132,7 @@ export default function ArchitectureOutput({
               <div
                 className="closing-diagram"
                 role="img"
-                aria-label={explorerCase ? `Architecture highlighting ${cases.find((u) => u.id === explorerCase)?.label || "the selected workflow"}${explorerStep >= 0 ? ` — ${workflows[explorerCase]?.[explorerStep]?.title}` : ""}` : "The full proposed OpenAI, Adobe and Code and Theory architecture"}
+                aria-label={explorerCase ? `Workflow architecture highlighting ${cases.find((u) => u.id === explorerCase)?.label || "the selected workflow"}${explorerStep >= 0 ? ` — ${workflows[explorerCase]?.[explorerStep]?.title}` : ""}` : "The full proposed OpenAI, Adobe and Code and Theory workflow architecture"}
                 dangerouslySetInnerHTML={{ __html: explorerCase ? architectureDiagram(s, explorerCase, explorerStep) : architectureDiagram(s) }}
               />
               <p className="diagram-legend">
@@ -189,7 +189,7 @@ export default function ArchitectureOutput({
               <div
                 className="closing-diagram"
                 role="img"
-                aria-label={`Architecture highlighting ${cases.find((u) => u.id === caseId)?.label || "the proposal"}${step >= 0 ? ` — ${flow[step]?.title}` : ""}`}
+                aria-label={`Workflow architecture highlighting ${cases.find((u) => u.id === caseId)?.label || "the proposal"}${step >= 0 ? ` — ${flow[step]?.title}` : ""}`}
                 dangerouslySetInnerHTML={{
                   __html: architectureDiagram(s, caseId, step),
                 }}

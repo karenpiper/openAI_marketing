@@ -6,12 +6,12 @@ export const workshopAgenda = [
     body: "Align on the first use cases worth solving, the Northstar, the business outcome for each, and what should be validated and proven first.",
   },
   {
-    title: "Current-state architecture and capability reuse",
+    title: "Current-state workflow architecture and capability reuse",
     minutes: 25,
-    body: "Map the OpenAI capabilities and architecture patterns already in place across Codex, product/growth infrastructure, S3/data, Marketo, and internal tooling. Pinpoint foundational capabilities still required.",
+    body: "Map the OpenAI capabilities and workflow architecture patterns already in place across Codex, product/growth infrastructure, S3/data, Marketo, and internal tooling. Pinpoint foundational capabilities still required.",
   },
   {
-    title: "Target architecture and operating boundaries",
+    title: "Target workflow architecture and operating boundaries",
     minutes: 25,
     body: "Work through how OpenAI intelligence and orchestration connect with Adobe capabilities and Code and Theory’s implementation approach across identity, buying groups, journeys, content operations, activation, governance, and measurement. Clarify system ownership, integration points, state, and controls.",
   },
@@ -164,7 +164,7 @@ export default function AgentBriefing({ onEnter }: { onEnter: () => void }) {
           </article>
           <article>
             <span>02</span>
-            <h3>A working architecture</h3>
+            <h3>A working workflow architecture</h3>
             <p>
               With clear ownership boundaries, integration points, state and
               controls.

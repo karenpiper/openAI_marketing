@@ -1124,7 +1124,7 @@ test("outcome readout lands on priorities and architecture without capture forms
       React.createElement(Readout, { session: s, setSession: () => {}, room }),
     );
     assert.match(html, /Three priority use cases/);
-    assert.match(html, /Proposed architecture/);
+    assert.match(html, /Proposed workflow architecture/);
     assert.equal((html.match(/class="outcome-priority"/g) || []).length, 3);
     assert.ok(!html.includes("<textarea"));
     assert.ok(!html.includes("Current-state findings"));
@@ -1158,7 +1158,10 @@ test("architecture download recreates source diagram and links session annotatio
   ]) {
     assert.ok(
       svg.includes(component) ||
-        svg.includes(component.replace("Adobe Workfront", "Workfront")),
+        svg.includes(component.replace("Adobe Workfront", "Workfront")) ||
+        (component === "Adobe CSC" &&
+          svg.includes(">Adobe</text>") &&
+          svg.includes(">CSC</text>")),
     );
   }
   assert.match(diagramRefs("s3", 1), /C/);
@@ -1166,7 +1169,7 @@ test("architecture download recreates source diagram and links session annotatio
   const doc = architectureDocument(s);
   assert.ok(doc.content.slice(0, 5).some((c) => c.svg));
   assert.match(JSON.stringify(doc), /SESSION ANNOTATIONS/);
-  assert.match(JSON.stringify(doc), /Use the existing approved library/);
+  assert.match(JSON.stringify(doc), /suitable approved source/);
 });
 
 test("closing readout has one diagram, three outputs and a persistent editorial summary", () => {

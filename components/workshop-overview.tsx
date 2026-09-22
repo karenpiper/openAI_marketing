@@ -134,7 +134,7 @@ export default function WorkshopOverview({
               First, follow Morgan’s day. Then understand today’s process, shape
               the next workflow and agree the first test.
             </p>
-            <strong>Our output: priorities → architecture → action.</strong>
+            <strong>Our output: priorities → workflow architecture → action.</strong>
             {onResume && hasProgress && (
               <button className="briefing-resume" onClick={onResume}>
                 Resume saved progress · {stages[s.stage].title} →
@@ -179,7 +179,7 @@ export default function WorkshopOverview({
                     [
                       "Priority use cases + outcomes",
                       "Existing tools + gaps",
-                      "Architecture shaped by the room",
+                      "Workflow architecture shaped by the room",
                       "Action plan + asks for Colin",
                     ][i]
                   }
@@ -191,7 +191,7 @@ export default function WorkshopOverview({
         <div className="briefing-note">
           <b>Explore the workflow · Content at scale</b>
           <span>
-            Optional, within the architecture block. Change audiences, channels
+            Optional, within the workflow architecture block. Change audiences, channels
             and approvals to see how the proposed workflow adapts. No content
             generation or source asset needed.
           </span>

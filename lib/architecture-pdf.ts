@@ -12,7 +12,7 @@ export function architectureDocument(s: Session): TDocumentDefinitions {
     { text: model.title, fontSize: 10, margin: [0, 0, 0, 8] },
     { svg: architectureDiagram(s), width: 495 },
     {
-      text: "Recreated from our original architecture proposal. Original components and arrows are preserved; markers A-G link to session notes on the following pages. Amber markers show captured workflow reviews (a note may reference several components).",
+      text: "Recreated from our original workflow architecture proposal. Original components and arrows are preserved; markers A-G link to session notes on the following pages. Amber markers show captured workflow reviews (a note may reference several components).",
       fontSize: 9,
       margin: [0, 8, 0, 0],
     },
@@ -24,7 +24,7 @@ export function architectureDocument(s: Session): TDocumentDefinitions {
   ];
   if (!model.cases.length)
     content.push({
-      text: "No selected or discussed workflows yet. Capture the conversation in step 3 to generate the architecture.",
+      text: "No selected or discussed workflows yet. Capture the conversation in step 3 to generate the workflow architecture.",
       margin: [0, 20, 0, 0],
     });
   for (const c of model.cases) {
@@ -161,7 +161,7 @@ export function architectureDocument(s: Session): TDocumentDefinitions {
       });
     if (c.boundaries.length || c.handoffs.length)
       content.push({
-        text: "Additional architecture captured in the workshop",
+        text: "Additional workflow architecture captured in the workshop",
         style: "stepTitle",
       });
     for (const b of c.boundaries)
@@ -191,7 +191,7 @@ export function architectureDocument(s: Session): TDocumentDefinitions {
     },
     { text: scenarioSummary(s.scenario), style: "note" },
     {
-      text: "Illustrative routing through the proposed architecture; requires room validation. No content generation or live integrations.",
+      text: "Illustrative routing through the proposed workflow architecture; requires room validation. No content generation or live integrations.",
       style: "note",
     },
   );
@@ -230,7 +230,7 @@ export function architectureDocument(s: Session): TDocumentDefinitions {
     );
   return {
     info: {
-      title: "OpenAI + Adobe architecture with session annotations",
+      title: "OpenAI + Adobe workflow architecture with session annotations",
       subject: model.title,
     },
     pageSize: "A4",

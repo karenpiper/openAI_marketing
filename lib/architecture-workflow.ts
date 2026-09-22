@@ -3,9 +3,9 @@ import { currentQuestions, findAnswer } from "./workshop-guide";
 export const pdfBoxes = {
   interface: "Codex Interfaces + ChatGPT work / Agent Interface(s)",
   data: "OpenAI Data Lake / Adobe CDP (w/ ABM)",
-  assets: "Adobe CSC (Assets, etc)",
+  assets: "Adobe CSC",
   review: "Adobe Workfront",
-  touchpoints: "Events / CRM (Marketing) / Marketing Website",
+  touchpoints: "Events / CRM (Marketing) / Marketing Website / Adobe Marketo",
   journeys: "Adobe Customer Journey Analytics → OpenAI Data Lake",
   sales: "Salesforce / CRM (Sales) / Offer Tools",
 };
