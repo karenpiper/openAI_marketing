@@ -184,7 +184,7 @@ export function WorkflowWork({
                 <header>
                   <div>
                     <span className="agent-kicker">
-                      Illustrative document · Northstar Health expansion
+                      Illustrative document · enterprise expansion cohort
                     </span>
                     <h3>{output.title}</h3>
                   </div>
@@ -225,7 +225,7 @@ export function WorkflowWork({
                 <p className="artifact-brief-note">
                   <b>Campaign objective:</b>{" "}
                   {session.campaign?.objective ||
-                    "Help Northstar Health move from technical evaluation to an expansion decision"}
+                    "Help the lead account move from technical evaluation to an expansion decision"}
                   {session.campaign?.instruction && (
                     <>
                       <br />

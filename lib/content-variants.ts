@@ -6,7 +6,7 @@ import {
 
 // Fictional account context for the prototype, never customer data.
 const accountNames = [
-  "Northstar Health",
+  "Lead expansion account",
   "Cedar & Finch",
   "Meridian Logistics",
   "Solstice Energy",

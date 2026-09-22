@@ -130,11 +130,11 @@ export default function ProcessActions({
         <>
           <div className="recommended-decision">
             <span className="agent-kicker">Agent recommendation</span>
-            <b>Bring Mateo, the business sponsor, into the evaluation.</b>
+            <b>Bring the business sponsor into the evaluation.</b>
             <p>
-              Priya’s technical team is already active. The next constraint is
-              the operating decision Mateo needs to make; procurement can enter
-              once that decision has a clear scope.
+              The technical team is already active. The next constraint is the
+              operating decision the sponsor needs to make; procurement can
+              enter once that decision has a clear scope.
             </p>
           </div>
           <p className="decision-prompt">
@@ -145,7 +145,7 @@ export default function ProcessActions({
             {[
               [
                 "Bring business sponsors into evaluation",
-                "Recommended · connect adoption to Mateo’s operating priorities.",
+                "Recommended · connect adoption to the sponsor’s operating priorities.",
               ],
               [
                 "Resolve procurement and governance questions",
@@ -153,7 +153,7 @@ export default function ProcessActions({
               ],
               [
                 "Help technical evaluators move into a pilot",
-                "Use if Priya’s team needs more proof before expanding the group.",
+                "Use if the technical team needs more proof before expanding the group.",
               ],
             ].map(([choice, detail]) => (
               <button
@@ -218,9 +218,10 @@ export default function ProcessActions({
       {id === "s3" && index === 0 && (
         <>
           <p>
-            I searched the approved content bank against Northstar’s audience,
-            objective and channel mix. Choose the source set that should ground
-            the work; I will assemble the role-specific packages from it.
+            I searched the approved content bank against this account’s
+            audience, objective and channel mix. Choose the source set that
+            should ground the work; I will assemble the role-specific packages
+            from it.
           </p>
           <div className="content-source-options" role="radiogroup">
             {contentSourceOptions.map((source) => (

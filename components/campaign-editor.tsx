@@ -18,14 +18,14 @@ export function CampaignEditor({
           <span className="agent-kicker">Shared campaign brief</span>
           <h3>
             {session.campaign?.objective ||
-              "Help Northstar Health move from technical evaluation to an expansion decision"}
+              "Help the lead account move from technical evaluation to an expansion decision"}
           </h3>
         </div>
         <button
           onClick={() => {
             setObjective(
               session.campaign?.objective ||
-                "Help Northstar Health move from technical evaluation to an expansion decision",
+                "Help the lead account move from technical evaluation to an expansion decision",
             );
             setInstruction(session.campaign?.instruction || "");
             setEditing(!editing);
