@@ -33,9 +33,11 @@ import "./agent-workspace.css";
 function MorganScreen({
   children,
   workflow = false,
+  onReset,
 }: {
   children: ReactNode;
   workflow?: boolean;
+  onReset?: () => void;
 }) {
   function jump(selector: string, e: React.MouseEvent<HTMLButtonElement>) {
     const screen = e.currentTarget.closest(".monitor-screen");
@@ -64,6 +66,11 @@ function MorganScreen({
             <span aria-hidden="true">● ● ●</span>
             <span>ChatGPT Work · Enterprise marketing</span>
             <span>Morgan</span>
+            {onReset && (
+              <button className="monitor-reset" onClick={onReset}>
+                ↺ Restart prototype
+              </button>
+            )}
           </div>
           <div className="workspace-desktop">
             <aside className="chat-sidebar">
@@ -117,6 +124,25 @@ export default function AgentWorkspace() {
   const chapter = Math.max(0, Math.min(2, s.day.moment - 1));
   function setChapter(index: number) {
     setS((prev) => ({ ...prev, day: { ...prev.day, moment: index + 1 } }));
+  }
+  function resetPrototype() {
+    const fresh = createAgentState();
+    setS((prev) => ({
+      ...prev,
+      day: fresh.day,
+      audience: fresh.audience,
+      channel: fresh.channel,
+      source: fresh.source,
+      campaign: undefined,
+      artifactEdits: {},
+      work: {},
+      process: {},
+      learning: undefined,
+      outcomes: fresh.outcomes,
+    }));
+    setConversation({});
+    setDraft("");
+    setShowStepContext(false);
   }
   function updateInMonitor(update: () => void, showWork = false) {
     const before = document
@@ -494,7 +520,7 @@ export default function AgentWorkspace() {
               {s.day.moment === 0 ? (
                 <>
                   <MorganStory moment={0} />
-                  <MorganScreen>
+                  <MorganScreen onReset={resetPrototype}>
                     <div className="day-arrival">
                       <span className="agent-kicker">
                         08:45 · Morgan arrives
@@ -526,7 +552,7 @@ export default function AgentWorkspace() {
               ) : s.day.moment === 4 ? (
                 <>
                   <MorganStory moment={4} />
-                  <MorganScreen>
+                  <MorganScreen onReset={resetPrototype}>
                     <div className="day-evening">
                       <span className="agent-kicker">
                         17:30 · Back in the same workspace
@@ -602,7 +628,7 @@ export default function AgentWorkspace() {
               ) : (
                 <>
                   <div className="prototype-screen-layout">
-                    <MorganScreen workflow>
+                    <MorganScreen workflow onReset={resetPrototype}>
                       <div className="agent-product">
                         <header>
                           <b>

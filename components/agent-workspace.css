@@ -1396,6 +1396,20 @@
   color: #bbb;
   font-size: 8px;
 }
+.monitor-reset {
+  margin-left: 4px;
+  padding: 4px 7px;
+  border: 1px solid #d4d8d4;
+  border-radius: 5px;
+  background: #fff;
+  color: #5d675f;
+  font-size: 9px;
+  white-space: nowrap;
+}
+.monitor-reset:hover {
+  border-color: #8ba18f;
+  color: #244f37;
+}
 .monitor-chin {
   height: 22px;
 }
