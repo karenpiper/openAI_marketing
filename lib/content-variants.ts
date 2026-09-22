@@ -33,74 +33,47 @@ export const exampleAccounts = accountNames.map((name, i) => ({
     "governance readiness",
   ][i % 3],
 }));
-export function contentVariants(s: Pick<AgentState, "audience">) {
+export function contentVariants(
+  s: Pick<AgentState, "audience">,
+  sourceId?: string,
+) {
   const sourceSet =
-    "process" in s
+    sourceId
+      ? contentSourceOptions.find((source) => source.id === sourceId) ||
+        contentSourceOptions[0]
+      : "process" in s
       ? selectedContentSource(s as AgentState)
       : contentSourceOptions[0];
-  const segments =
+  const recipients =
     s.audience === "Buying roles"
       ? [
-          [
-            "Technical evaluator",
-            "Define a practical evaluation",
-            "Agree a bounded use case and the criteria your team would use to assess it.",
-            "Review the evaluation guide",
-          ],
-          [
-            "Business sponsor",
-            "Connect adoption to a business priority",
-            "Choose the operating outcome your team needs to improve and a useful first proof point.",
-            "Discuss the adoption plan",
-          ],
-          [
-            "Procurement",
-            "Prepare the governance conversation",
-            "Identify the documentation and review questions your team needs before moving forward.",
-            "Review governance considerations",
-          ],
+          { name: "Maya Chen", role: "Technical evaluator", signal: "completed two workspace projects and attended the enterprise roundtable", headline: "Define a practical evaluation", detail: "Agree a bounded use case and the criteria your team would use to assess it.", cta: "Review the evaluation guide" },
+          { name: "Rafael Ortiz", role: "Business sponsor", signal: "has not yet joined the evaluation conversation", headline: "Connect adoption to a business priority", detail: "Choose the operating outcome your team needs to improve and a useful first proof point.", cta: "Discuss the adoption plan" },
+          { name: "Aisha Khan", role: "Procurement lead", signal: "returned twice to the governance and security guide", headline: "Prepare the governance conversation", detail: "Identify the documentation and review questions your team needs before moving forward.", cta: "Review governance considerations" },
         ]
       : s.audience === "Lifecycle stages"
         ? [
-            [
-              "Exploring",
-              "Find a useful starting point",
-              "Choose one workflow where a small evaluation could answer a meaningful question.",
-              "Explore the adoption guide",
-            ],
-            [
-              "Evaluating",
-              "Shape the next evaluation",
-              "Define the scope, evidence and success criteria for your evaluation.",
-              "Review the evaluation guide",
-            ],
-            [
-              "Ready for sales",
-              "Bring the next conversation into focus",
-              "Bring your evaluation questions and governance requirements to your account team.",
-              "Plan an account conversation",
-            ],
+            { name: "Leah Park", role: "Exploring", signal: "visited the adoption overview after the roundtable", headline: "Find a useful starting point", detail: "Choose one workflow where a small evaluation could answer a meaningful question.", cta: "Explore the adoption guide" },
+            { name: "Maya Chen", role: "Evaluating", signal: "completed two workspace projects in the last 30 days", headline: "Shape the next evaluation", detail: "Define the scope, evidence and success criteria for your evaluation.", cta: "Review the evaluation guide" },
+            { name: "Aisha Khan", role: "Ready for sales", signal: "is reviewing governance requirements for the next decision", headline: "Bring the next conversation into focus", detail: "Bring your evaluation questions and governance requirements to your account team.", cta: "Plan an account conversation" },
           ]
         : [
-            [
-              "Eligible audience",
-              "Plan your next adoption step",
-              "Choose one practical next step using the shared adoption guide.",
-              "Review the adoption guide",
-            ],
+            { name: "Jordan Lee", role: "Eligible audience", signal: "is part of the matched Northstar adoption cohort", headline: "Plan your next adoption step", detail: "Choose one practical next step using the shared adoption guide.", cta: "Review the adoption guide" },
           ];
   return exampleAccounts.flatMap((account) =>
-    segments.map(([segment, headline, body, cta], index) => ({
+    recipients.map((recipient, index) => ({
       id: `${account.id}-V${index + 1}`,
       account: account.name,
       accountId: account.id,
       context: account.context,
-      segment,
-      subject: `${headline}: ${account.focus}`,
-      headline,
-      body: `${sourceSet.baseContent.message}\n\nFor ${account.name}, the practical starting point is ${account.focus}. ${body}`,
+      recipient: recipient.name,
+      segment: recipient.role,
+      signal: recipient.signal,
+      subject: `${recipient.name} at ${account.name}: ${recipient.headline.toLowerCase()}`,
+      headline: recipient.headline,
+      body: `${sourceSet.baseContent.message}\n\nFor ${recipient.name}, who ${recipient.signal}, the practical starting point at ${account.name} is ${account.focus}. ${recipient.detail}`,
       proof: sourceSet.baseContent.proof,
-      cta,
+      cta: recipient.cta,
       source: `${sourceSet.title} · workshop practice foundation`,
       eligibility:
         "Candidate only: requires matched identity, segment membership and consent",

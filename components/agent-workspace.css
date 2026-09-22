@@ -4895,8 +4895,32 @@
 .asset-gallery-header button { white-space: nowrap; font-size: 11px; }
 .asset-gallery-modal .handoff-preview { padding: 34px; }
 .asset-gallery-modal .handoff-output-picker { margin-top: 0; }
+.gallery-inspector {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+  margin-bottom: 18px;
+  padding: 16px;
+  border: 1px solid #dce5dd;
+  border-radius: 12px;
+  background: #fff;
+}
+.gallery-inspector > div { min-width: 0; }
+.gallery-inspector p { margin: 5px 0 10px; color: #65736a; font-size: 11px; line-height: 1.45; }
+.gallery-choice-row { display: flex; flex-wrap: wrap; gap: 7px; }
+.agent-app .gallery-choice-row button {
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: #fff;
+  color: #385344;
+  font-size: 11px;
+}
+.agent-app .gallery-choice-row button[aria-pressed="true"] { border-color: #24704a; background: #eaf4eb; color: #174a31; font-weight: 650; }
+.gallery-choice-row small { display: block; margin-top: 3px; color: #367453; font-size: 9px; font-weight: 500; }
+.gallery-preview-note { grid-column: 1 / -1; padding-top: 10px; border-top: 1px solid #edf0ed; }
 @media (max-width: 900px) {
   .asset-gallery-modal { left: 22px; right: 22px; top: 72px; bottom: 18px; }
+  .gallery-inspector { grid-template-columns: 1fr; }
 }
 @media (max-width: 900px) {
   .workspace-desktop,

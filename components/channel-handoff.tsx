@@ -1,5 +1,9 @@
 import { useState } from "react";
 import { contentVariants } from "../lib/content-variants";
+import {
+  contentSourceOptions,
+  selectedContentSource,
+} from "../lib/content-source-library";
 import type { AgentState } from "../lib/agent-workspace";
 import {
   processReady,
@@ -47,13 +51,15 @@ export default function ChannelHandoff({
   onCampaignChange?: (patch: Partial<AgentState>) => void;
 }) {
   const [tab, setTab] = useState("Email");
+  const [segmentIndex, setSegmentIndex] = useState(0);
   const [adjustingChannels, setAdjustingChannels] = useState(false);
   const [showGallery, setShowGallery] = useState(false);
-  const variants = contentVariants(session);
+  const [previewTheme, setPreviewTheme] = useState(() =>
+    selectedContentSource(session).id,
+  );
+  const variants = contentVariants(session, previewTheme);
   const accountVariants = variants.filter((v) => v.accountId === "ACCT-01");
-  // Audience adaptation is decided in the plan above. This screen previews a
-  // representative version; it never asks Morgan to allocate content person by person.
-  const variant = accountVariants[0];
+  const variant = accountVariants[segmentIndex] || accountVariants[0];
   const p = processState(session, "s3", 3);
   const channels = activationChannels(session.channel);
   const activeTab = channels.includes(tab) ? tab : channels[0];
@@ -139,9 +145,9 @@ export default function ChannelHandoff({
           <span className="agent-kicker">Campaign scope</span>
           <b>Northstar Health · {session.audience}</b>
           <p>
-            {accountVariants.map((item) => item.segment).join(" · ")} are
-            automatically adapted from the same approved direction. Morgan
-            does not choose versions one by one.
+            {accountVariants.map((item) => item.recipient).join(" · ")} each
+            receive a 1:1 adaptation from the same approved direction. Morgan
+            does not compose these versions one by one.
           </p>
         </div>
         <div>
@@ -181,6 +187,46 @@ export default function ChannelHandoff({
             </div>
             <button onClick={() => setShowGallery(false)}>Close gallery ✕</button>
           </header>
+          <section className="gallery-inspector" aria-label="Asset preview controls">
+            <div>
+              <span className="agent-kicker">Recipient preview</span>
+              <p>Inspect the 1:1 version prepared for each buying-group member.</p>
+              <div className="gallery-choice-row">
+                {accountVariants.map((item, index) => (
+                  <button
+                    key={item.id}
+                    aria-pressed={segmentIndex === index}
+                    onClick={() => setSegmentIndex(index)}
+                  >
+                    <b>{item.recipient}</b>
+                    <small>{item.segment}</small>
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div>
+              <span className="agent-kicker">Content theme</span>
+              <p>Compare the same asset under each fictional message theme.</p>
+              <div className="gallery-choice-row">
+                {contentSourceOptions.map((theme) => (
+                  <button
+                    key={theme.id}
+                    aria-pressed={previewTheme === theme.id}
+                    onClick={() => setPreviewTheme(theme.id)}
+                  >
+                    {theme.title}
+                    {selectedContentSource(session).id === theme.id && (
+                      <small>Campaign theme</small>
+                    )}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <p className="gallery-preview-note">
+              Preview only. Each recipient version uses their role and observed
+              signal; changing a preview does not change the approved campaign.
+            </p>
+          </section>
       <section className="handoff-output-picker" aria-label="Campaign outputs">
         <span className="agent-kicker">Preview a channel output</span>
         {channels.map((c) => (
@@ -207,7 +253,7 @@ export default function ChannelHandoff({
           {activeTab === "Email" ? (
             <div className="email-preview">
               <div>
-                <b>To</b> {variant.account} · {variant.segment}
+                <b>To</b> {variant.recipient} · {variant.segment} · {variant.account}
               </div>
               <div>
                 <b>Subject</b> {variant.subject}
@@ -275,7 +321,7 @@ export default function ChannelHandoff({
             </div>
           ) : (
             <div className="social-preview">
-              <header><span className="social-avatar">O</span><div><b>OpenAI</b><small>Sponsored · for {variant.segment}</small></div><span>•••</span></header>
+              <header><span className="social-avatar">O</span><div><b>OpenAI</b><small>Sponsored · for {variant.recipient}</small></div><span>•••</span></header>
               <p>{variant.body}</p>
               <div className="social-card"><small>OPENAI FOR ENTERPRISE</small><h2>{variant.headline}</h2><span>{variant.cta} →</span></div>
               <footer><span>♡ 128</span><span>◌ 24 comments</span><span>↗ Share</span></footer>
