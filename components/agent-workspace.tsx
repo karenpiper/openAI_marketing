@@ -66,22 +66,63 @@ function planForChannels(channels: string[]) {
   return channels.join(" + ");
 }
 
+function routeForArchitectureActivity(activity: string) {
+  const value = activity.toLowerCase();
+  if (/audience|channel|plan choice|campaign context/.test(value))
+    return ["Morgan’s plan choice", "Marketing agent", "Adobe CDP / ABM"];
+  if (/content|creative|source|catalog|cdp-connected/.test(value))
+    return [
+      "Marketing agent",
+      "Adobe CDP / ABM",
+      "Adobe CSC content library",
+    ];
+  if (/approve|approval|review|brand|legal|privacy/.test(value))
+    return ["Marketing agent", "Adobe Workfront", "Brand + legal review"];
+  if (/handoff|stage|release|marketo|website|social|event|sales enablement/.test(value))
+    return ["Marketing agent", "Marketo / CRM", "Activation channel"];
+  if (/result|performance|learn|measure/.test(value))
+    return ["Journey analytics", "OpenAI data lake", "Marketing agent"];
+  return ["Marketing agent", "Shared campaign state", "Workflow controls"];
+}
+
+function workspaceInteraction(target: EventTarget | null) {
+  const element = target instanceof HTMLElement ? target : null;
+  const control = element?.closest<HTMLElement>(
+    "button, input, select, textarea",
+  );
+  if (
+    !control ||
+    control.closest(
+      ".chat-sidebar, .workflow-architecture-rail, .monitor-toolbar",
+    )
+  )
+    return "";
+  const label =
+    control.closest("label")?.textContent?.replace(/\s+/g, " ").trim() ||
+    control.textContent?.replace(/\s+/g, " ").trim() ||
+    control.getAttribute("aria-label") ||
+    "a workflow control";
+  return `Morgan selected “${label.slice(0, 120)}”.`;
+}
+
 function WorkflowArchitectureRail({
   session,
   id,
   onClose,
   activity,
+  activeRoute,
 }: {
   session: ReturnType<typeof createAgentState>;
   id: string;
   onClose: () => void;
   activity: string;
+  activeRoute: string[] | null;
 }) {
   const step = currentWorkStep(session, id);
   const stage = workStages(session, id)[step];
   const isPlanning = id === "s3" && !session.campaign;
   const contentChoice = processState(session, id, step).choice;
-  const route =
+  const defaultRoute =
     isPlanning
       ? [
           "Morgan’s plan choices",
@@ -134,7 +175,7 @@ function WorkflowArchitectureRail({
         className="workflow-architecture-route"
         aria-label="Systems active in this transition"
       >
-        {route.map((component, index) => (
+        {(activeRoute || defaultRoute).map((component, index, route) => (
           <div key={component}>
             <span>{component}</span>
             {index < route.length - 1 && <i aria-hidden="true">↓</i>}
@@ -160,6 +201,7 @@ function MorganScreen({
   onToggleArchitecture,
   architectureOpen = false,
   architectureRail,
+  onArchitectureInteraction,
   onCampaignResults,
   campaignResultsOpen = false,
 }: {
@@ -169,6 +211,7 @@ function MorganScreen({
   onToggleArchitecture?: () => void;
   architectureOpen?: boolean;
   architectureRail?: ReactNode;
+  onArchitectureInteraction?: (activity: string) => void;
   onCampaignResults?: () => void;
   campaignResultsOpen?: boolean;
 }) {
@@ -202,7 +245,17 @@ function MorganScreen({
               M
             </span>
           </div>
-          <div className="workspace-desktop">
+          <div
+            className="workspace-desktop"
+            onClickCapture={(event) => {
+              const activity = workspaceInteraction(event.target);
+              if (activity) onArchitectureInteraction?.(activity);
+            }}
+            onChangeCapture={(event) => {
+              const activity = workspaceInteraction(event.target);
+              if (activity) onArchitectureInteraction?.(activity);
+            }}
+          >
             <aside className="chat-sidebar">
               <button
                 className="new-chat"
@@ -289,6 +342,9 @@ export default function AgentWorkspace() {
   const [page, setPage] = useState("intro");
   const [showStepContext, setShowStepContext] = useState(false);
   const [architectureActivity, setArchitectureActivity] = useState("");
+  const [architectureRoute, setArchitectureRoute] = useState<string[] | null>(
+    null,
+  );
   const [showRecapResults, setShowRecapResults] = useState(false);
   const chapter = Math.max(0, Math.min(2, s.day.moment - 1));
   function setChapter(index: number) {
@@ -315,6 +371,7 @@ export default function AgentWorkspace() {
     setDraft("");
     setShowStepContext(false);
     setArchitectureActivity("");
+    setArchitectureRoute(null);
     setShowRecapResults(false);
     setPage("workspace");
     requestAnimationFrame(() =>
@@ -497,7 +554,7 @@ export default function AgentWorkspace() {
   }
   function condition(p: Partial<typeof s>) {
     setPlanStatus("Plan choices saved in this browser. Confirm the plan to continue.");
-    setArchitectureActivity(
+    recordArchitectureActivity(
       "Audience and channel choices are updating the CDP context for the next recommendation.",
     );
     setS((prev) => ({
@@ -509,6 +566,10 @@ export default function AgentWorkspace() {
           : prev.campaign,
       outcomes: { ...prev.outcomes, [c.id]: "" },
     }));
+  }
+  function recordArchitectureActivity(activity: string) {
+    setArchitectureActivity(activity);
+    setArchitectureRoute(routeForArchitectureActivity(activity));
   }
   const arch = architectureSession(s);
   return (
@@ -780,40 +841,101 @@ export default function AgentWorkspace() {
                         />
                       </div>
                     ) : (
-                      <div className="day-evening">
-                        <span className="agent-kicker">
-                          17:30 · Back in the same workspace
-                        </span>
-                        <h1>Here’s what moved today.</h1>
-                        <p>
-                          Here is the adoption campaign we worked on today, and
-                          the decisions you made along the way.
-                        </p>
-                        {s.day.history.length ? (
-                          s.day.history.map((h) => (
-                            <article key={h.id} className="day-history">
-                              <span>{h.time}</span>
-                              <p>{h.text}</p>
+                      <div className="agent-product day-recap-chat">
+                        <header>
+                          <b>
+                            Marketing agent <span aria-hidden="true">⌄</span>
+                          </b>
+                          <span>Enterprise adoption campaign</span>
+                        </header>
+                        <div className="agent-conversation">
+                          <div className="day-recap-thread">
+                            <span>17:30 · Today’s activity</span>
+                            <p>
+                              I’ve brought together the work you directed today
+                              and the first illustrative campaign signals.
+                            </p>
+                          </div>
+                          <div className="agent-reply day-recap-reply">
+                            <span className="agent-orb">✳</span>
+                            <div>
+                              <b>Marketing agent</b>
+                              <h2>Here’s what moved today.</h2>
+                              <p>
+                                Three coordinated campaign patterns are staged
+                                for 12 accounts. The first results show where
+                                the buying group is engaging and where Morgan’s
+                                next decision should focus.
+                              </p>
+                            </div>
+                          </div>
+                          <section className="day-recap-metrics" aria-label="Illustrative campaign results">
+                            <article>
+                              <b>3</b>
+                              <span>campaign patterns deployed</span>
+                              <small>sales, web and event routes</small>
                             </article>
-                          ))
-                        ) : (
-                          <p>
-                            No decisions have been made yet. Return to the
-                            morning briefing to run through the day.
-                          </p>
-                        )}
-                        <div className="day-brief">
-                          <h2>Ready for the next handoff.</h2>
-                          <p>
-                            {s.day.history.some((h) => h.id === "s3")
-                              ? "Your approved plan is queued for required reviews. Release remains gated on approvals and audience eligibility."
-                              : "The campaign plan still needs your review before I can prepare the next handoff."}
-                          </p>
-                          <p>
-                            {s.day.history.some((h) => h.id === "s5")
-                              ? "The consent exception is held for the data owner. I’ll bring it back when the records agree."
-                              : "The consent conflict remains open. I need your direction before moving that contact forward."}
-                          </p>
+                            <article>
+                              <b>36</b>
+                              <span>individual audience paths</span>
+                              <small>12 accounts · 3 buying roles</small>
+                            </article>
+                            <article>
+                              <b>38%</b>
+                              <span>decision-maker engagement</span>
+                              <small>illustrative first-week signal</small>
+                            </article>
+                            <article>
+                              <b>7</b>
+                              <span>sales-ready conversations</span>
+                              <small>based on role and response signals</small>
+                            </article>
+                          </section>
+                          <section className="day-recap-insights">
+                            <span className="agent-kicker">What the data suggests</span>
+                            <article>
+                              <b>Business sponsors are now engaging.</b>
+                              <p>
+                                The operating-value path created the strongest
+                                response among contacts who had not previously
+                                entered the evaluation.
+                              </p>
+                            </article>
+                            <article>
+                              <b>Governance remains the release constraint.</b>
+                              <p>
+                                Two contacts are held for consent and review
+                                checks; the rest of the staged work can proceed
+                                once required approvals are complete.
+                              </p>
+                            </article>
+                          </section>
+                          <section className="day-recap-history">
+                            <span className="agent-kicker">Today’s decisions</span>
+                            {s.day.history.length ? (
+                              s.day.history.map((h) => (
+                                <article key={h.id} className="day-history">
+                                  <span>{h.time}</span>
+                                  <p>{h.text}</p>
+                                </article>
+                              ))
+                            ) : (
+                              <p>No decisions have been made yet.</p>
+                            )}
+                          </section>
+                          <div className="day-brief">
+                            <h2>Ready for the next handoff.</h2>
+                            <p>
+                              {s.day.history.some((h) => h.id === "s3")
+                                ? "Your approved plan is queued for required reviews. Release remains gated on approvals and audience eligibility."
+                                : "The campaign plan still needs your review before I can prepare the next handoff."}
+                            </p>
+                            <p>
+                              Open “Campaign results & learnings” in the sidebar
+                              to inspect the signals and apply a learning to the
+                              next plan.
+                            </p>
+                          </div>
                         </div>
                       </div>
                     )}
@@ -829,6 +951,7 @@ export default function AgentWorkspace() {
                         setShowStepContext((shown) => !shown)
                       }
                       architectureOpen={showStepContext}
+                      onArchitectureInteraction={recordArchitectureActivity}
                       architectureRail={
                         showStepContext ? (
                           <WorkflowArchitectureRail
@@ -836,6 +959,7 @@ export default function AgentWorkspace() {
                             id={c.id}
                             onClose={() => setShowStepContext(false)}
                             activity={architectureActivity}
+                            activeRoute={architectureRoute}
                           />
                         ) : undefined
                       }
@@ -1047,7 +1171,7 @@ export default function AgentWorkspace() {
                                         setPlanStatus(
                                           "Plan confirmed. The fictional practice library is ready for Morgan’s selection.",
                                         );
-                                        setArchitectureActivity(
+                                        recordArchitectureActivity(
                                           "The confirmed audience and channel mix are now passing into CDP-informed content discovery.",
                                         );
                                       }}
@@ -1071,7 +1195,7 @@ export default function AgentWorkspace() {
                             }
                           />
                           <WorkflowWork
-                            onArchitectureActivity={setArchitectureActivity}
+                            onArchitectureActivity={recordArchitectureActivity}
                             onProcess={(value) =>
                               setS((prev) => ({
                                 ...prev,
