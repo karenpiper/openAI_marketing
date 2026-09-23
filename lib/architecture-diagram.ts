@@ -7,6 +7,7 @@ export const diagramReferences = {
   review: "B",
   assets: "C",
   data: "D",
+  curation: "L",
   cdp: "J",
   touchpoints: "E",
   activation: "I",
@@ -53,6 +54,8 @@ export function architectureDiagram(
             ? "J"
             : y === 555
               ? "D"
+              : y === 502
+                ? "L"
             : x === 490
               ? "E"
               : y >= 895
@@ -121,7 +124,8 @@ export function architectureDiagram(
     K: [433, 177],
     B: [180, 270],
     C: [363, 270],
-    D: [433, 460],
+    D: [568, 680],
+    L: [433, 519],
     I: [433, 337],
     J: [433, 460],
     E: [490, 132],
@@ -181,6 +185,7 @@ export function architectureDiagram(
  ${box(220, 270, 100, 135, ["Adobe", "CSC"], 17)}
  ${box(337, 270, 96, 135, ["Adobe", "Marketo /", "AJO"], 14, "I")}
  ${box(103, 430, 330, 60, ["Adobe CDP (w/ ABM)"], 19, "J")}
+ ${box(103, 502, 330, 33, ["Curatorial layer · marketer-safe data"], 14, "L")}
  ${box(590, 265, 290, 100, ["Orchestration layer", "OpenAI Frontier", "Adobe CX Coworker"], 16, "H")}
  ${arrow(590, 288, 433, 177, ["H", "A"], [[470, 288], [470, 177]])}${arrow(735, 265, 830, 132, ["H", "E"], [[880, 265], [880, 132]])}${arrow(590, 315, 433, 337, ["H", "I"], [[500, 315]])}${arrow(590, 325, 433, 460, ["H", "J"], [[470, 325], [470, 460]])}${arrow(590, 345, 320, 405, ["H", "C"], [[470, 345], [470, 420], [320, 420]])}${arrow(880, 315, 907, 315, ["H", "F"])}
  <path d="M 470 40 L 470 410" stroke="#c0cdbf" stroke-dasharray="7 7"/>
@@ -189,7 +194,7 @@ export function architectureDiagram(
  ${tint(`<g class="architecture-component" data-architecture-component="A" tabindex="0" role="button"><rect rx="10" x="30" y="585" width="60" height="205" fill="#ffffff" stroke="#365343" stroke-width="1.5"/><text transform="translate(65,770) rotate(-90)" font-family="Roboto" font-size="20" fill="#203d33">ChatGPT Usage</text></g>`, "A")}
  <g class="architecture-component" data-architecture-component="F" tabindex="0" role="button" opacity="${focused && !active.has("F") ? 0.28 : 1}"><rect rx="10" x="910" y="40" width="60" height="795" fill="${focused && active.has("F") ? "#fff0c2" : "#fffdf7"}" stroke="#365343" stroke-width="${focused && active.has("F") ? 4 : 2}"/><text transform="translate(947,675) rotate(-90)" font-family="Roboto" font-size="22" fill="#203d33">Adobe Customer Journey Analytics</text></g>
  ${arrow(830, 68, 907, 68, ["E", "F"])}${arrow(830, 133, 907, 133, ["E", "F"])}${arrow(830, 198, 907, 198, ["E", "F"])}${arrow(905, 705, 571, 705, ["F", "D"])}
- ${text(615, 684, ["Adobe data to OpenAI Data Lake"], 16)}${arrow(90, 705, 110, 705)}${arrow(335, 552, 335, 493, ["D"])}
+ ${text(615, 684, ["Adobe data to OpenAI Data Lake"], 16)}${arrow(90, 705, 110, 705)}${arrow(335, 552, 335, 535, ["D", "L"])}${arrow(335, 502, 335, 490, ["L", "J"])}
  ${arrow(197, 812, 197, 891, ["D", "G"])}${arrow(487, 812, 487, 891, ["D", "G"])}
  ${box(75, 895, 245, 150, ["Salesforce"], 30)}
  ${text(340, 881, ["OAI Infrastructure"], 17)}<rect rx="16" x="340" y="895" width="385" height="180" fill="#edf2e8" stroke="#c0cdbf"/>

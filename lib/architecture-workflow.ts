@@ -4,6 +4,7 @@ export const pdfBoxes = {
   orchestration: "Orchestration layer / OpenAI Frontier / Adobe CX Coworker",
   interface: "Codex Interfaces + ChatGPT work / Agent Interface(s)",
   data: "OpenAI Data Lake",
+  curation: "Curatorial layer · marketer-safe data",
   cdp: "Adobe CDP (w/ ABM)",
   assets: "Adobe CSC",
   review: "Adobe Workfront",
