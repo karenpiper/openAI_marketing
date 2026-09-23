@@ -1,6 +1,11 @@
 import Image from "next/image";
 export const workshopAgenda = [
   {
+    title: "Workshop opener",
+    minutes: 5,
+    body: "Align on the shared goals, objectives and deliverables for the day.",
+  },
+  {
     title: "Current-state workflow",
     minutes: 10,
     body: "Map how work moves today, including the tools, people, handoffs and constraints that shape the current experience.",
@@ -17,7 +22,7 @@ export const workshopAgenda = [
   },
   {
     title: "Target workflow architecture and operating boundaries",
-    minutes: 30,
+    minutes: 25,
     body: "Work through how OpenAI intelligence and orchestration connect with Adobe capabilities and Code and Theory’s implementation approach across identity, buying groups, journeys, content operations, activation, governance and measurement.",
   },
   {
@@ -129,7 +134,7 @@ export default function AgentBriefing({ onEnter }: { onEnter: () => void }) {
       <section id="opening-agenda">
         <span className="agent-kicker">02 / The workshop agenda</span>
         <h2>
-          Four conversations.
+          One 90-minute working session.
           <br />
           One connected answer.
         </h2>
