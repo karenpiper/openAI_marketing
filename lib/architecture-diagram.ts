@@ -173,27 +173,27 @@ export function architectureDiagram(
   return `<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="1160" viewBox="0 0 1000 1160">
  ${text(85, 27, ["OAI Infrastructure"], 17)}
  <rect rx="16" x="85" y="40" width="365" height="190" fill="#edf2e8" stroke="#c0cdbf"/>
- ${box(103, 65, 330, 65, ["Codex Interfaces", "+ ChatGPT work"])}${tag(345, 40, "A")}${box(103, 145, 330, 65, ["Agent Interface(s)"])}${tag(403, 153, "K")}
+ ${box(103, 65, 330, 65, ["Codex Interfaces", "+ ChatGPT work"])}${box(103, 145, 330, 65, ["Agent Interface(s)"])}
  ${text(490, 27, ["B2B Marketing Touchpoints"], 23)}
- ${box(490, 40, 340, 55, ["Events"])}${box(490, 105, 340, 55, ["CRM (Marketing)"])}${box(490, 170, 340, 55, ["Marketing Website"])}${tag(850, 10, "E")}
+ ${box(490, 40, 340, 55, ["Events"])}${box(490, 105, 340, 55, ["CRM (Marketing)"])}${box(490, 170, 340, 55, ["Marketing Website"])}
  ${text(103, 257, ["Adobe marketing tools"], 17)}<rect rx="16" x="85" y="265" width="365" height="155" fill="#edf2e8" stroke="#c0cdbf"/>
- ${box(103, 270, 100, 135, ["Adobe", "Workfront"], 16)}${tag(162, 278, "B")}
- ${box(220, 270, 100, 135, ["Adobe", "CSC"], 17)}${tag(279, 278, "C")}
- ${box(337, 270, 96, 135, ["Adobe", "Marketo /", "AJO"], 14, "I")}${tag(403, 278, "I")}
- ${box(103, 430, 330, 60, ["Adobe CDP (w/ ABM)"], 19, "J")}${tag(403, 430, "J")}
- ${box(590, 265, 290, 100, ["Orchestration layer", "OpenAI Frontier", "Adobe CX Coworker"], 16, "H")}${tag(862, 237, "H")}
+ ${box(103, 270, 100, 135, ["Adobe", "Workfront"], 16)}
+ ${box(220, 270, 100, 135, ["Adobe", "CSC"], 17)}
+ ${box(337, 270, 96, 135, ["Adobe", "Marketo /", "AJO"], 14, "I")}
+ ${box(103, 430, 330, 60, ["Adobe CDP (w/ ABM)"], 19, "J")}
+ ${box(590, 265, 290, 100, ["Orchestration layer", "OpenAI Frontier", "Adobe CX Coworker"], 16, "H")}
  ${arrow(590, 288, 433, 177, ["H", "A"], [[470, 288], [470, 177]])}${arrow(735, 265, 830, 132, ["H", "E"], [[880, 265], [880, 132]])}${arrow(590, 315, 433, 337, ["H", "I"], [[500, 315]])}${arrow(590, 325, 433, 460, ["H", "J"], [[470, 325], [470, 460]])}${arrow(590, 345, 320, 405, ["H", "C"], [[470, 345], [470, 420], [320, 420]])}${arrow(880, 315, 907, 315, ["H", "F"])}
  <path d="M 470 40 L 470 410" stroke="#c0cdbf" stroke-dasharray="7 7"/>
  ${text(18, 523, ["OAI Infrastructure"], 17)}<rect rx="16" x="18" y="535" width="582" height="300" fill="#edf2e8" stroke="#c0cdbf"/>
  ${box(113, 555, 455, 255, ["OpenAI", "Data Lake"], 32)}
  ${tint(`<g class="architecture-component" data-architecture-component="A" tabindex="0" role="button"><rect rx="10" x="30" y="585" width="60" height="205" fill="#ffffff" stroke="#365343" stroke-width="1.5"/><text transform="translate(65,770) rotate(-90)" font-family="Roboto" font-size="20" fill="#203d33">ChatGPT Usage</text></g>`, "A")}
- <g class="architecture-component" data-architecture-component="F" tabindex="0" role="button" opacity="${focused && !active.has("F") ? 0.28 : 1}"><rect rx="10" x="910" y="40" width="60" height="795" fill="${focused && active.has("F") ? "#fff0c2" : "#fffdf7"}" stroke="#365343" stroke-width="${focused && active.has("F") ? 4 : 2}"/><text transform="translate(947,675) rotate(-90)" font-family="Roboto" font-size="22" fill="#203d33">Adobe Customer Journey Analytics</text></g>${tag(885, 845, "F")}
+ <g class="architecture-component" data-architecture-component="F" tabindex="0" role="button" opacity="${focused && !active.has("F") ? 0.28 : 1}"><rect rx="10" x="910" y="40" width="60" height="795" fill="${focused && active.has("F") ? "#fff0c2" : "#fffdf7"}" stroke="#365343" stroke-width="${focused && active.has("F") ? 4 : 2}"/><text transform="translate(947,675) rotate(-90)" font-family="Roboto" font-size="22" fill="#203d33">Adobe Customer Journey Analytics</text></g>
  ${arrow(830, 68, 907, 68, ["E", "F"])}${arrow(830, 133, 907, 133, ["E", "F"])}${arrow(830, 198, 907, 198, ["E", "F"])}${arrow(905, 705, 571, 705, ["F", "D"])}
  ${text(615, 684, ["Adobe data to OpenAI Data Lake"], 16)}${arrow(90, 705, 110, 705)}${arrow(335, 552, 335, 493, ["D"])}
  ${arrow(197, 812, 197, 891, ["D", "G"])}${arrow(487, 812, 487, 891, ["D", "G"])}
  ${box(75, 895, 245, 150, ["Salesforce"], 30)}
  ${text(340, 881, ["OAI Infrastructure"], 17)}<rect rx="16" x="340" y="895" width="385" height="180" fill="#edf2e8" stroke="#c0cdbf"/>
- ${box(363, 921, 140, 132, ["CRM", "(Sales)"])}${box(520, 921, 170, 132, ["Offer Tools"])}${tag(735, 895, "G")}
+ ${box(363, 921, 140, 132, ["CRM", "(Sales)"])}${box(520, 921, 170, 132, ["Offer Tools"])}
  ${text(341, 1103, ["Currently built tools (demoed by Matt/Pat)"], 16)}
  ${arrow(55, 490, 55, 42)}${arrow(36, 885, 36, 1123)}
  ${focused ? proposed : ""}
