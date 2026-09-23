@@ -272,60 +272,70 @@ export default function ArchitectureOutput({
               </p>
             </div>
             <aside className="architecture-story">
-              <div className="card-heading">
-                <h3>
-                  {cases.find((u) => u.id === caseId)?.label ||
-                    "Choose a priority use case"}
-                </h3>
-                {setSession && (
-                  <button
-                    aria-pressed={step === -1}
-                    onClick={() =>
-                      setSession((p) => ({
-                        ...p,
-                        readoutFlow: { caseId: caseId || "", step: -1 },
-                      }))
-                    }
-                  >
-                    Whole flow
-                  </button>
-                )}
-              </div>
-              <p className="muted">
-                Follow the story. Select a moment to highlight where it happens.
-              </p>
-              <ol>
-                {flow.map((f, i) => {
-                  const note = model.cases.find((c) => c.id === caseId)?.nodes[
-                    i
-                  ];
-                  return (
-                    <li key={i} className={step === i ? "story-active" : ""}>
+              {!cases.length ? (
+                <>
+                  <h3>No priority use cases selected</h3>
+                  <p className="muted">
+                    Select the priority set in Step 2 to see its workflow
+                    architecture here.
+                  </p>
+                </>
+              ) : (
+                <>
+                  <div className="card-heading">
+                    <h3>{cases.find((u) => u.id === caseId)?.label}</h3>
+                    {setSession && (
                       <button
-                        disabled={!setSession}
-                        aria-pressed={step === i}
+                        aria-pressed={step === -1}
                         onClick={() =>
-                          setSession?.((p) => ({
+                          setSession((p) => ({
                             ...p,
-                            readoutFlow: { caseId: caseId || "", step: i },
+                            readoutFlow: { caseId: caseId || "", step: -1 },
                           }))
                         }
                       >
-                        {i + 1}. {f.title}
+                        Whole flow
                       </button>
-                      <p>{f.proposal}</p>
-                      <small>
-                        <b>Passes forward:</b> {f.output}
-                      </small>
-                      {note?.annotation && (
-                        <p className="story-room-note">
-                          <b>Room input:</b> {note.annotation}
-                        </p>
-                      )}
-                    </li>
-                  );
-                })}
-              </ol>
+                    )}
+                  </div>
+                  <p className="muted">
+                    Follow the story. Select a moment to highlight where it
+                    happens.
+                  </p>
+                  <ol>
+                    {flow.map((f, i) => {
+                      const note = model.cases.find((c) => c.id === caseId)?.nodes[
+                        i
+                      ];
+                      return (
+                        <li key={i} className={step === i ? "story-active" : ""}>
+                          <button
+                            disabled={!setSession}
+                            aria-pressed={step === i}
+                            onClick={() =>
+                              setSession?.((p) => ({
+                                ...p,
+                                readoutFlow: { caseId: caseId || "", step: i },
+                              }))
+                            }
+                          >
+                            {i + 1}. {f.title}
+                          </button>
+                          <p>{f.proposal}</p>
+                          <small>
+                            <b>Passes forward:</b> {f.output}
+                          </small>
+                          {note?.annotation && (
+                            <p className="story-room-note">
+                              <b>Room input:</b> {note.annotation}
+                            </p>
+                          )}
+                        </li>
+                      );
+                    })}
+                  </ol>
+                </>
+              )}
             </aside>
           </div>
         </>
