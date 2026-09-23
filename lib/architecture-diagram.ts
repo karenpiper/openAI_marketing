@@ -196,7 +196,7 @@ export function architectureDiagram(
  ${box(363, 921, 140, 132, ["CRM", "(Sales)"])}${box(520, 921, 170, 132, ["Offer Tools"])}
  ${text(341, 1103, ["Currently built tools (demoed by Matt/Pat)"], 16)}
  ${text(28, 300, ["Marketer experience"], 20).replace('x="28" y="300"', 'transform="translate(28,300) rotate(-90)"')}${arrow(55, 490, 55, 42)}
- ${text(28, 1010, ["Sales experience"], 20).replace('x="28" y="1010"', 'transform="translate(28,1010) rotate(-90)"')}${arrow(36, 885, 36, 1123)}
+ ${text(28, 1090, ["Sales experience"], 20).replace('x="28" y="1090"', 'transform="translate(28,1090) rotate(-90)"')}${arrow(36, 885, 36, 1123)}
  ${focused ? proposed : ""}
  </svg>`;
 }
