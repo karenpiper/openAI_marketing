@@ -3705,14 +3705,20 @@ body {
   gap: .55rem;
   margin: 1.2rem 0;
 }
-.architecture-starting-points div {
+.architecture-starting-points button {
   display: grid;
   gap: .2rem;
   padding: .75rem .8rem;
   border: 1px solid #c9d2c5;
   border-radius: 9px;
   background: #fffdf7;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color .16s ease, background .16s ease, box-shadow .16s ease;
 }
+.architecture-starting-points button:hover,
+.architecture-starting-points button[aria-pressed="true"] { border-color: #365343; background: #eef5ee; box-shadow: 0 2px 8px rgba(24, 56, 44, .08); }
 .architecture-starting-points b { color: #18382c; font-size: .9rem; }
 .architecture-starting-points span { color: #496450; font-size: .82rem; line-height: 1.4; }
 .architecture-explorer-note { padding-top: .8rem; border-top: 1px solid #d6dfd3; font-size: .85rem; }

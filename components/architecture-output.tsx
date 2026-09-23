@@ -14,6 +14,7 @@ const componentProfiles: Record<string, { title: string; role: string; capabilit
     capabilities: ["Shared campaign and account memory", "Model and specialist-agent routing", "Retrieval before action", "Guardrails, permissions and review gates"],
   },
   A: { title: "Codex Interfaces + ChatGPT work", role: "Morgan’s working surface for seeing evidence, steering the recommendation and reviewing work without reconstructing context.", capabilities: ["Conversation and artifact workspace", "Recommendation rationale and alternatives", "Human edits and approvals", "Persistent campaign context"] },
+  K: { title: "Agent Interface(s)", role: "The specialist-agent interface layer designed and implemented with Code and Theory. It gives the orchestration layer a purposeful surface for distinct marketing tasks.", capabilities: ["Specialist-agent interaction", "Task-specific workflow surfaces", "Human steering and feedback", "Shared operating patterns"] },
   B: { title: "Adobe Workfront", role: "The review and workflow system that assigns the right checks, records decisions and holds release until they are complete.", capabilities: ["Review routing", "Approval records", "Exceptions and rework", "Release gates"] },
   C: { title: "Adobe CSC", role: "The governed content source that supplies approved assets, versions, claims and permitted reuse conditions.", capabilities: ["Approved-content retrieval", "Source versioning", "Claims and usage metadata", "Asset references"] },
   D: { title: "OpenAI Data Lake", role: "The governed enterprise data foundation that holds connected product, account and commercial signals for the workflow.", capabilities: ["Signal ingestion and retention", "Account and product context", "Governed data access", "Signal freshness and provenance"] },
@@ -45,6 +46,7 @@ export default function ArchitectureOutput({
   const [explorerCase, setExplorerCase] = useState("");
   const [explorerStep, setExplorerStep] = useState(-1);
   const [explorerComponent, setExplorerComponent] = useState("");
+  const [ownershipHighlight, setOwnershipHighlight] = useState<string[]>([]);
   const [playing, setPlaying] = useState(false);
   const model = architectureOutput(s);
   const requestedWorkflow =
@@ -101,7 +103,14 @@ export default function ArchitectureOutput({
     setExplorerCase(id);
     setExplorerStep(-1);
     setExplorerComponent("");
+    setOwnershipHighlight([]);
     setPlaying(false);
+  }
+  function chooseOwnership(components: string[]) {
+    setExplorerComponent("");
+    setOwnershipHighlight((current) =>
+      current.join(",") === components.join(",") ? [] : components,
+    );
   }
   const selectedComponent = componentProfiles[explorerComponent];
 
@@ -177,14 +186,14 @@ export default function ArchitectureOutput({
                 aria-label={explorerCase ? `Workflow architecture highlighting ${cases.find((u) => u.id === explorerCase)?.label || "the selected workflow"}${explorerStep >= 0 ? ` — ${workflows[explorerCase]?.[explorerStep]?.title}` : ""}` : "The full proposed OpenAI, Adobe and Code and Theory workflow architecture"}
                 onClick={(event) => {
                   const component = (event.target as HTMLElement).closest<HTMLElement>("[data-architecture-component]")?.dataset.architectureComponent;
-                  if (component && componentProfiles[component]) setExplorerComponent(component);
+                  if (component && componentProfiles[component]) { setOwnershipHighlight([]); setExplorerComponent(component); }
                 }}
                 onKeyDown={(event) => {
                   if (event.key !== "Enter" && event.key !== " ") return;
                   const component = (event.target as HTMLElement).closest<HTMLElement>("[data-architecture-component]")?.dataset.architectureComponent;
-                  if (component && componentProfiles[component]) { event.preventDefault(); setExplorerComponent(component); }
+                  if (component && componentProfiles[component]) { event.preventDefault(); setOwnershipHighlight([]); setExplorerComponent(component); }
                 }}
-                dangerouslySetInnerHTML={{ __html: explorerCase && explorerStep >= 0 ? architectureDiagram(s, explorerCase, explorerStep, explorerComponent ? [explorerComponent] : undefined) : architectureDiagram(s, undefined, -1, explorerComponent ? [explorerComponent] : undefined) }}
+                dangerouslySetInnerHTML={{ __html: explorerCase && explorerStep >= 0 ? architectureDiagram(s, explorerCase, explorerStep, explorerComponent ? [explorerComponent] : ownershipHighlight.length ? ownershipHighlight : undefined) : architectureDiagram(s, undefined, -1, explorerComponent ? [explorerComponent] : ownershipHighlight.length ? ownershipHighlight : undefined) }}
               />
               <p className="diagram-legend">
                 {explorerComponent ? "This component is highlighted. Select another box to inspect it, or return to the workflow story." : explorerCase && explorerStep >= 0 ? "Gold traces the components and connections involved in this step. Select any box to inspect what it provides." : explorerCase ? "Choose a step to see only the components and connections used at that moment." : "The starting proposal: a complete system view. Select any box to inspect what it provides."}
@@ -207,8 +216,8 @@ export default function ArchitectureOutput({
                   <span className="eyebrow">Start here</span>
                   <h4>One shared foundation</h4>
                   <p>This is the proposed system as a whole: OpenAI intelligence and orchestration connect to Adobe identity, content operations, activation, governance and measurement.</p>
-                  <div className="architecture-starting-points"><div><b>OpenAI</b><span>Marketer surface, reasoning, intelligence and attribution.</span></div><div><b>Adobe</b><span>Identity, content operations, activation, governance and measurement.</span></div><div><b>Code and Theory</b><span>Interface design, orchestration implementation and operating model.</span></div></div>
-                  <p className="architecture-explorer-note">Choose a priority use case above to see only the relevant components and the story of how work moves between them.</p>
+                  <div className="architecture-starting-points"><button aria-pressed={ownershipHighlight.join(",") === "A,D,G,H"} onClick={() => chooseOwnership(["A", "D", "G", "H"])}><b>OpenAI</b><span>Marketer surface, reasoning, intelligence and attribution.</span></button><button aria-pressed={ownershipHighlight.join(",") === "B,C,I,J,F,H"} onClick={() => chooseOwnership(["B", "C", "I", "J", "F", "H"])}><b>Adobe</b><span>Identity, content operations, activation, governance and measurement.</span></button><button aria-pressed={ownershipHighlight.join(",") === "K,H"} onClick={() => chooseOwnership(["K", "H"])}><b>Code and Theory</b><span>Agent interfaces, orchestration implementation and operating model.</span></button></div>
+                  <p className="architecture-explorer-note">Select an organisation to highlight its ownership container. OpenAI Frontier / Adobe CX Coworker is shared between OpenAI and Adobe; the orchestration layer is also part of Code and Theory’s implementation scope.</p>
                 </>
               ) : explorerStep < 0 ? (
                 <>
