@@ -1378,15 +1378,6 @@ export default function AgentWorkspace() {
             <ArchitectureOutput
               session={arch}
               explorer
-              explorerCases={useCaseCandidates
-                .filter(
-                  (candidate) =>
-                    s.useCases[candidate.id].priority === "Priority",
-                )
-                .map((candidate) => ({
-                  id: candidate.id,
-                  label: candidate.title,
-                }))}
               workflow={architectureWorkflow}
               setSession={(action) =>
                 setS((prev) => ({
