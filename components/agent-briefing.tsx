@@ -97,10 +97,10 @@ export default function AgentBriefing({ onEnter }: { onEnter: () => void }) {
           </article>
           <article>
             <span>02</span>
-            <h3>Release-ready cadence</h3>
+            <h3>Pipeline value</h3>
             <p>
-              Time from a daily product release to an approved, enterprise-ready
-              market action across the relevant buying group.
+              The size of qualified enterprise opportunities progressing through
+              the pipeline, including expansion potential.
             </p>
           </article>
           <article>
@@ -113,10 +113,10 @@ export default function AgentBriefing({ onEnter }: { onEnter: () => void }) {
           </article>
           <article>
             <span>04</span>
-            <h3>Pipeline value</h3>
+            <h3>Release-ready cadence</h3>
             <p>
-              The size of qualified enterprise opportunities progressing through
-              the pipeline, including expansion potential.
+              Time from a daily product release to an approved, enterprise-ready
+              market action across the relevant buying group.
             </p>
           </article>
         </div>
