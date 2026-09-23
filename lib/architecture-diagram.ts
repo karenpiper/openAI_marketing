@@ -195,7 +195,8 @@ export function architectureDiagram(
  ${text(340, 881, ["OAI Infrastructure"], 17)}<rect rx="16" x="340" y="895" width="385" height="180" fill="#edf2e8" stroke="#c0cdbf"/>
  ${box(363, 921, 140, 132, ["CRM", "(Sales)"])}${box(520, 921, 170, 132, ["Offer Tools"])}
  ${text(341, 1103, ["Currently built tools (demoed by Matt/Pat)"], 16)}
- ${arrow(55, 490, 55, 42)}${arrow(36, 885, 36, 1123)}
+ ${text(28, 300, ["Marketer experience"], 20).replace('x="28" y="300"', 'transform="translate(28,300) rotate(-90)"')}${arrow(55, 490, 55, 42)}
+ ${text(28, 1010, ["Sales experience"], 20).replace('x="28" y="1010"', 'transform="translate(28,1010) rotate(-90)"')}${arrow(36, 885, 36, 1123)}
  ${focused ? proposed : ""}
  </svg>`;
 }
