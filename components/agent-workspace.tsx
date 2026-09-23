@@ -1415,9 +1415,6 @@ export default function AgentWorkspace() {
               of {useCaseCandidates.length} candidate areas marked as
               priorities. Unknowns remain open.
             </p>
-            <p>
-              <b>Workshop aim:</b> {s.northstar || "Not agreed yet"}
-            </p>
             <section className="readout-priority-set">
               <span className="agent-kicker">Agreed priority use-case set</span>
               {useCaseCandidates.some(
