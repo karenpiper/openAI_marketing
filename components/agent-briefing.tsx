@@ -88,49 +88,6 @@ export default function AgentBriefing({ onEnter }: { onEnter: () => void }) {
         </p>
         <a href="#opening-agenda">Our time together ↓</a>
       </section>
-      <section id="opening-outcomes-first">
-        <span className="agent-kicker">02 / Start with the outcomes</span>
-        <h2>Before naming use cases, agree what moves.</h2>
-        <div className="opening-cards outcome-cards">
-          <article>
-            <span>01</span>
-            <h3>Value realization · AAR</h3>
-            <p>
-              The primary measure: AAR created and realized from enterprise
-              pipeline, including expansion opportunities.
-            </p>
-          </article>
-          <article>
-            <span>02</span>
-            <h3>Pipeline value</h3>
-            <p>
-              The size of qualified enterprise opportunities progressing through
-              the pipeline, including expansion potential.
-            </p>
-          </article>
-          <article>
-            <span>03</span>
-            <h3>Pipeline velocity</h3>
-            <p>
-              Days for qualified enterprise deals to move from engaged buying
-              group through the next decision and toward close.
-            </p>
-          </article>
-          <article>
-            <span>04</span>
-            <h3>Release-ready cadence</h3>
-            <p>
-              Time from a daily product release to an approved, enterprise-ready
-              market action across the relevant buying group.
-            </p>
-          </article>
-        </div>
-        <p className="opening-footnote">
-          These outcomes are the lens for the use-case conversation that
-          follows. The room can amend them before Morgan’s day begins.
-        </p>
-        <a href="#opening-agenda">How we will use them ↓</a>
-      </section>
       <section id="opening-agenda">
         <span className="agent-kicker">02 / The workshop agenda</span>
         <h2>
@@ -150,10 +107,22 @@ export default function AgentBriefing({ onEnter }: { onEnter: () => void }) {
             </article>
           ))}
         </div>
+        <a href="#opening-outcomes-first">Start with the outcomes ↓</a>
+      </section>
+      <section id="opening-outcomes-first">
+        <span className="agent-kicker">03 / Start with the outcomes</span>
+        <h2>Before naming use cases, agree what moves.</h2>
+        <div className="opening-cards outcome-cards">
+          <article><span>01</span><h3>Value realization · AAR</h3><p>The primary measure: AAR created and realized from enterprise pipeline, including expansion opportunities.</p></article>
+          <article><span>02</span><h3>Pipeline value</h3><p>The size of qualified enterprise opportunities progressing through the pipeline, including expansion potential.</p></article>
+          <article><span>03</span><h3>Pipeline velocity</h3><p>Days for qualified enterprise deals to move from engaged buying group through the next decision and toward close.</p></article>
+          <article><span>04</span><h3>Release-ready cadence</h3><p>Time from a daily product release to an approved, enterprise-ready market action across the relevant buying group.</p></article>
+        </div>
+        <p className="opening-footnote">These outcomes are the lens for the use-case conversation that follows. The room can amend them before Morgan’s day begins.</p>
         <a href="#opening-outcomes">What we leave with ↓</a>
       </section>
       <section id="opening-outcomes">
-        <span className="agent-kicker">03 / Three concrete outputs</span>
+        <span className="agent-kicker">04 / Three concrete outputs</span>
         <h2>
           A Day in the Life prototype
           <br />
