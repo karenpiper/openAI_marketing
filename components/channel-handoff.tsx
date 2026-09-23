@@ -90,7 +90,7 @@ export default function ChannelHandoff({
     );
   }
   function deploymentDestination(channel: string) {
-    if (channel === "Email") return "Marketing CRM / Marketo connector";
+    if (channel === "Email") return "Marketing CRM / Adobe Marketo / AJO connector";
     if (channel === "Event follow-up") return "Event platform + marketing CRM";
     if (channel === "Website") return "Marketing website / CMS connector";
     if (channel === "Sales enablement") return "Sales CRM / account workspace";

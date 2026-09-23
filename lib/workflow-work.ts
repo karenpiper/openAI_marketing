@@ -237,7 +237,7 @@ export function workStages(s: AgentState, id: string): WorkStage[] {
         input:
           "Approved direction, review packet, eligibility rules and channel configuration.",
         output: "Staged channel work orders and a measurement plan.",
-        connection: `OpenAI orchestration → ${channel.includes("event") ? "Marketo / marketing CRM + event platform" : channel.includes("thought leadership") ? "sales CRM + executive communications workflow" : channel.includes("social") ? "social publishing workflow + marketing website" : channel.includes("integrated") ? "marketing CRM + sales CRM + social publishing + event platform" : "Marketo / marketing CRM + website activation"} → journey analytics.`,
+        connection: `OpenAI orchestration → ${channel.includes("event") ? "Adobe Marketo / AJO + marketing CRM + event platform" : channel.includes("thought leadership") ? "sales CRM + executive communications workflow" : channel.includes("social") ? "social publishing workflow + marketing website" : channel.includes("integrated") ? "marketing CRM + sales CRM + social publishing + event platform" : "Adobe Marketo / AJO + marketing CRM + website activation"} → journey analytics.`,
         enables:
           "Coordinates channels and returns response signals to the same campaign context.",
         control:
@@ -753,7 +753,7 @@ export function workflowSources(s: AgentState, id: string, index: number) {
     } else if (/channel|work orders|operational checklist/.test(name)) {
       system = "CRM (Marketing), Events and Marketing Website";
       connection =
-        "Proposed configuration / status connector; Marketo is a candidate CRM implementation";
+        "Proposed configuration / status connector; Adobe Marketo / AJO is a candidate CRM implementation";
     }
     return { ...source, system, connection };
   });

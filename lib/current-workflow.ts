@@ -64,7 +64,7 @@ export const currentWorkflowRows: Record<string, Row[]> = {
     row(
       "Audience selection",
       "Where do you identify the audience—analytics, CRM or a spreadsheet?",
-      "Marketo builds the list; we export it to a spreadsheet for review.",
+      "Adobe Marketo / AJO builds the list; we export it to a spreadsheet for review.",
     ),
     row(
       "Brief and source assets",

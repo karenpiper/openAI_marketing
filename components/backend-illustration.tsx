@@ -163,7 +163,7 @@ export default function BackendIllustration({
               <p className="backend-note">
                 Solid lines reproduce connections in the workflow architecture proposal.
                 The request / response above is a proposed orchestration path to
-                validate. Marketo, where mentioned, is a candidate
+                validate. Adobe Marketo / AJO, where mentioned, is a candidate
                 implementation of the diagram’s CRM (Marketing) box; its
                 connector is not established by the diagram.
               </p>

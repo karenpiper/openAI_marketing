@@ -205,7 +205,7 @@ export default function PerformanceLoop({
         Use this learning in the next plan →
       </button>
       <p className="learning-source">
-        <b>Proposed data loop:</b> marketing CRM / Marketo + Events → Customer
+        <b>Proposed data loop:</b> marketing CRM / Adobe Marketo / AJO + Events → Customer
         Journey Analytics → OpenAI data lake and agent. CRM progression and
         identity context are required to validate the business outcome.
       </p>

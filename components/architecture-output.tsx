@@ -17,7 +17,7 @@ const componentProfiles: Record<string, { title: string; role: string; capabilit
   B: { title: "Adobe Workfront", role: "The review and workflow system that assigns the right checks, records decisions and holds release until they are complete.", capabilities: ["Review routing", "Approval records", "Exceptions and rework", "Release gates"] },
   C: { title: "Adobe CSC", role: "The governed content source that supplies approved assets, versions, claims and permitted reuse conditions.", capabilities: ["Approved-content retrieval", "Source versioning", "Claims and usage metadata", "Asset references"] },
   D: { title: "OpenAI Data Lake + Adobe CDP / ABM", role: "The connected account, identity and signal foundation that makes a recommendation specific and defensible.", capabilities: ["Consent-safe identity joins", "Account and buying-group context", "Audience eligibility", "Signal freshness and provenance"] },
-  E: { title: "Marketing touchpoints", role: "The systems that receive approved work for delivery across events, marketing CRM and the website. Marketo is a marketing tool that supports activation; it is not itself a touchpoint.", capabilities: ["Channel-ready payloads", "Campaign and audience identifiers", "Staged activation", "Response events returned to measurement"] },
+  E: { title: "Marketing touchpoints", role: "The systems that receive approved work for delivery across events, marketing CRM and the website. Adobe Marketo / AJO is a marketing tool that supports activation; it is not itself a touchpoint.", capabilities: ["Channel-ready payloads", "Campaign and audience identifiers", "Staged activation", "Response events returned to measurement"] },
   F: { title: "Adobe Customer Journey Analytics", role: "The measurement layer that joins touchpoint response into a view of progression and returns the evidence needed for the next decision.", capabilities: ["Cross-touchpoint journey signals", "Audience progression", "Measurement inputs", "Learning loop to the agent"] },
   G: { title: "Sales experience", role: "The sales systems that contribute relationship context and receive a qualified, coordinated action when marketing and sales need to work together.", capabilities: ["CRM account context", "Relationship ownership", "Offer and next-step tools", "Confirmed progression signals"] },
 };
@@ -68,7 +68,9 @@ export default function ArchitectureOutput({
           ? [requestedWorkflow]
           : []) as { id: string; label: string }[]),
       ]
-    : activeCases(s);
+    : compact && explorerCases
+      ? explorerCases
+      : activeCases(s);
   const caseId = cases.some((u) => u.id === s.readoutFlow.caseId)
     ? s.readoutFlow.caseId
     : cases[0]?.id;

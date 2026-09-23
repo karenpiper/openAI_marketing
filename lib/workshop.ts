@@ -63,7 +63,7 @@ export const layerSeeds = [
   {
     id: "activation",
     title: "Activation & touchpoints",
-    suggestion: "Marketo / marketing CRM / website / events",
+    suggestion: "Adobe Marketo / AJO / marketing CRM / website / events",
     boundary: "To confirm",
     purpose: "Deliver messages and record engagement",
   },

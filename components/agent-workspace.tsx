@@ -81,7 +81,7 @@ function routeForArchitectureActivity(activity: string) {
   if (/check|consent|exception|hold|reconcil/.test(value))
     return ["Release validation agent [via OpenAI Frontier orchestration]", "Identity / consent source [Adobe CDP / ABM]", "Adobe Workfront"];
   if (/handoff|stage|release|marketo|website|social|event|sales enablement/.test(value))
-    return ["Activation agent [via OpenAI Frontier orchestration]", "Marketo / CRM [Adobe marketing tools]", "Activation channel [B2B Marketing Touchpoints]"];
+    return ["Activation agent [via OpenAI Frontier orchestration]", "Adobe Marketo / AJO / CRM [Adobe marketing tools]", "Activation channel [B2B Marketing Touchpoints]"];
   if (/result|performance|learn|measure/.test(value))
     return ["Journey analytics [Adobe Customer Journey Analytics]", "OpenAI data lake", "Learning agent [via OpenAI Frontier orchestration]"];
   return ["Workflow coordinator [via OpenAI Frontier orchestration]"];
@@ -145,7 +145,7 @@ function WorkflowArchitectureRail({
         : id === "s3" && step === 2
           ? ["Governance agent [via OpenAI Frontier orchestration]", "Adobe Workfront", "Brand + legal review [Adobe Workfront]"]
           : id === "s3"
-            ? ["Activation agent [via OpenAI Frontier orchestration]", "Marketo / CRM [Adobe marketing tools]", "Journey analytics [Adobe Customer Journey Analytics]"]
+            ? ["Activation agent [via OpenAI Frontier orchestration]", "Adobe Marketo / AJO / CRM [Adobe marketing tools]", "Journey analytics [Adobe Customer Journey Analytics]"]
             : id === "s2"
               ? step === 0
                 ? ["Identity resolution agent [via OpenAI Frontier orchestration]", "OpenAI data lake", "Adobe CDP / ABM"]
@@ -675,7 +675,7 @@ export default function AgentWorkspace() {
             <p className="agent-lede">
               Review the requirements exposed by Morgan’s day. Confirm what
               exists across Codex, product/growth infrastructure, S3/data,
-              Marketo and internal tooling. These are areas to discuss—not
+              Adobe Marketo / AJO and internal tooling. These are areas to discuss—not
               pre-confirmed integrations.
             </p>
             <div className="agent-readout-cards">
@@ -1443,6 +1443,15 @@ export default function AgentWorkspace() {
             <ArchitectureOutput
               session={arch}
               compact
+              explorerCases={useCaseCandidates
+                .filter(
+                  (candidate) =>
+                    s.useCases[candidate.id].priority === "Priority",
+                )
+                .map((candidate) => ({
+                  id: candidate.id,
+                  label: candidate.title,
+                }))}
               setSession={(action) =>
                 setS((prev) => ({
                   ...prev,

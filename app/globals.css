@@ -3507,13 +3507,16 @@ body {
 }
 .architecture-story-layout {
   display: grid;
-  grid-template-columns: minmax(0, 1.2fr) minmax(300px, 1fr);
+  grid-template-columns: minmax(0, 2fr) minmax(260px, 1fr);
   gap: 1.5rem;
   align-items: start;
 }
 .architecture-story-layout > div {
   position: sticky;
   top: 1rem;
+}
+.architecture-story-layout .closing-diagram svg {
+  max-height: none;
 }
 .closing-architecture .architecture-story {
   padding: 0;

@@ -169,7 +169,7 @@ export function architectureDiagram(
  ${text(103, 257, ["Adobe marketing tools"], 17)}<rect rx="16" x="85" y="265" width="365" height="155" fill="#edf2e8" stroke="#c0cdbf"/>
  ${box(103, 270, 100, 135, ["Adobe", "Workfront"], 16)}${tag(162, 278, "B")}
  ${box(220, 270, 100, 135, ["Adobe", "CSC"], 17)}${tag(279, 278, "C")}
- ${box(337, 270, 96, 135, ["Adobe", "Marketo"], 16)}
+ ${box(337, 270, 96, 135, ["Adobe", "Marketo / AJO"], 14)}
  ${box(103, 430, 330, 60, ["Adobe CDP (w/ ABM)"])}${tag(330, 430, "D")}
  ${box(590, 265, 290, 100, ["Orchestration layer", "OpenAI Frontier", "Adobe CX Coworker"], 16, "H")}${tag(862, 237, "H")}
  ${arrow(590, 288, 433, 177, ["H", "A"], [[470, 288], [470, 177]])}${arrow(735, 265, 830, 132, ["H", "E"], [[880, 265], [880, 132]])}${arrow(590, 325, 433, 460, ["H", "D"], [[470, 325], [470, 460]])}${arrow(590, 345, 320, 405, ["H", "C"], [[470, 345], [470, 420], [320, 420]])}${arrow(880, 315, 907, 315, ["H", "F"])}
