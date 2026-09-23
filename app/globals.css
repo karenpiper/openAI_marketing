@@ -3632,7 +3632,7 @@ body {
   flex-basis: 100%;
   flex-wrap: wrap;
   align-items: center;
-  gap: .55rem;
+  gap: .4rem;
 }
 .architecture-usecase-group > span {
   width: 8.6rem;
@@ -3643,13 +3643,14 @@ body {
   text-transform: uppercase;
 }
 .architecture-usecase-tabs button {
-  padding: .58rem .85rem;
+  padding: .46rem .65rem;
   border: 1px solid #c9d2c5;
   border-radius: 9px;
   background: #fffdf7;
   color: #18382c;
-  font-size: .85rem;
+  font-size: .77rem;
   font-weight: 650;
+  white-space: nowrap;
 }
 .architecture-usecase-tabs button[aria-selected="true"] {
   border-color: #18382c;
