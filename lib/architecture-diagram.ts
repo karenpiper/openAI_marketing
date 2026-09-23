@@ -38,6 +38,8 @@ export function architectureDiagram(
   );
   // Frontier is the shared orchestration layer for every proposed workflow; agents use it, rather than being it.
   if (shown.length && !focusReferences?.length) active.add("H");
+  // Before data becomes marketer context, the curation layer checks that it is safe and fit for use.
+  if (!focusReferences?.length && (active.has("D") || active.has("J"))) active.add("L");
   const focused = active.size > 0;
   const groupFor = (x: number, y: number) =>
     x === 103 && y === 65
