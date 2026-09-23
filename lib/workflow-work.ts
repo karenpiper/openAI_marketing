@@ -237,7 +237,7 @@ export function workStages(s: AgentState, id: string): WorkStage[] {
         input:
           "Approved direction, review packet, eligibility rules and channel configuration.",
         output: "Staged channel work orders and a measurement plan.",
-        connection: `OpenAI orchestration → ${channel.includes("event") ? "Adobe Marketo / AJO + marketing CRM + event platform" : channel.includes("thought leadership") ? "sales CRM + executive communications workflow" : channel.includes("social") ? "social publishing workflow + marketing website" : channel.includes("integrated") ? "marketing CRM + sales CRM + social publishing + event platform" : "Adobe Marketo / AJO + marketing CRM + website activation"} → journey analytics.`,
+        connection: `OpenAI orchestration → ${channel.includes("event") ? "Adobe Marketo / AJO + marketing CRM + event platform" : channel.includes("thought leadership") ? "sales CRM + executive communications workflow" : channel.includes("social") ? "social publishing workflow + marketing website" : channel.includes("integrated") ? "Adobe Marketo / AJO + sales CRM + social publishing + event platform" : "Adobe Marketo / AJO + marketing CRM + website activation"} → journey analytics.`,
         enables:
           "Coordinates channels and returns response signals to the same campaign context.",
         control:
@@ -751,7 +751,7 @@ export function workflowSources(s: AgentState, id: string, index: number) {
       connection =
         "Proposed workflow connector for review rules, owners and status";
     } else if (/channel|work orders|operational checklist/.test(name)) {
-      system = "CRM (Marketing), Events and Marketing Website";
+      system = "Adobe Marketo / AJO, Events and Marketing Website";
       connection =
         "Proposed configuration / status connector; Adobe Marketo / AJO is a candidate CRM implementation";
     }
@@ -803,14 +803,14 @@ export function workflowActivity(
         "Preparing a review packet linking each work package to its required checks; Morgan’s direction approval does not bypass release review.",
       ],
       [
-        `Mapping the reviewed work packages to ${s.channel.toLowerCase()} through proposed marketing CRM, website or event-platform handoffs.`,
+        `Mapping the reviewed work packages to ${s.channel.toLowerCase()} through proposed Adobe Marketo / AJO, website or event-platform handoffs.`,
         "Checking audience eligibility through the identity / consent source and attaching required review status from the workflow system; unresolved checks keep release gated.",
         "Preparing staged channel work orders with asset references, audience identifiers and measurement instructions that return response signals to journey analytics.",
       ],
     ],
     s5: [
       [
-        "Reading the staged campaign work orders and destination references through proposed marketing activation connectors.",
+        "Reading the staged campaign work orders and destination references through proposed Adobe Marketo / AJO activation connectors.",
         "Comparing links, audience settings and asset references against the operational checklist, while checking consent consistency through the identity source.",
         "Preparing a check report that separates routine validation from the conflicting-consent exception requiring human attention.",
       ],

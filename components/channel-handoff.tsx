@@ -91,7 +91,7 @@ export default function ChannelHandoff({
   }
   function deploymentDestination(channel: string) {
     if (channel === "Email") return "Marketing CRM / Adobe Marketo / AJO connector";
-    if (channel === "Event follow-up") return "Event platform + marketing CRM";
+    if (channel === "Event follow-up") return "Event platform + Adobe Marketo / AJO";
     if (channel === "Website") return "Marketing website / CMS connector";
     if (channel === "Sales enablement") return "Sales CRM / account workspace";
     if (channel === "Executive thought leadership") return "Executive communications workflow";
@@ -116,6 +116,11 @@ export default function ChannelHandoff({
         <p>
           Inspect any output below. The system applies the approved audience,
           content theme and direction across the campaign automatically.
+        </p>
+        <p>
+          <b>Proposed activation layer:</b> Adobe Marketo / AJO orchestrates
+          campaign activation and response events for the supported
+          destinations. This prototype stages the handoff; it does not publish.
         </p>
       </header>
       <button
