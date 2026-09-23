@@ -36,7 +36,7 @@ export function architectureDiagram(
       shown.flatMap((step) => step.boxes.map((k) => diagramReferences[k])),
   );
   // Frontier is the shared orchestration layer for every proposed workflow; agents use it, rather than being it.
-  if (shown.length || focusReferences?.length) active.add("H");
+  if (shown.length && !focusReferences?.length) active.add("H");
   const focused = active.size > 0;
   const groupFor = (x: number, y: number) =>
     x === 103 && y === 65
