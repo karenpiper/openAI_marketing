@@ -3796,6 +3796,24 @@ body {
 .architecture-component-capabilities { margin: 1.15rem 0; padding: 1rem; border: 1px solid #c9d9ca; border-radius: 10px; background: #fffdf7; }
 .architecture-component-capabilities .eyebrow { display: block; margin-bottom: .55rem; }
 .architecture-component-capabilities ul { display: grid; gap: .5rem; margin: 0; padding-left: 1.1rem; color: #365343; font-size: .85rem; line-height: 1.4; }
+.architecture-component-summary { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .8rem; }
+.architecture-component-summary article { padding: 1rem; border: 1px solid #c9d9ca; border-radius: 10px; background: #fffdf7; }
+.architecture-component-summary h3 { margin: 0 0 .55rem; color: #18382c; font-size: .95rem; }
+.architecture-component-summary p { margin: 0; color: #496450; font-size: .82rem; line-height: 1.45; }
+.architecture-component-summary ul, .priority-usecase-details ul { margin: .7rem 0 0; padding-left: 1rem; color: #365343; font-size: .78rem; line-height: 1.45; }
+.priority-usecase-details { margin: .9rem 0; }
+.readout-pdf-button { margin-top: 1rem; }
+@media (max-width: 900px) { .architecture-component-summary { grid-template-columns: 1fr; } }
+
+@media print {
+  .readout-pdf-button,
+  .closing-readout button,
+  .outcome-record-link { display: none !important; }
+  .closing-readout { max-width: none; }
+  .architecture-component-summary { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .architecture-component-summary article,
+  .outcome-priority { break-inside: avoid; }
+}
 .architecture-component-back { margin-top: 1rem; padding: .55rem .75rem; border: 1px solid #c9d2c5; border-radius: 8px; background: #fffdf7; color: #18382c; font-size: .82rem; }
 .architecture-step-output {
   padding-top: 1rem;

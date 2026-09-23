@@ -54,7 +54,7 @@ export function architectureDiagram(
         ? "I"
           : y === 430
             ? "J"
-            : y === 555
+            : y === 600
               ? "D"
               : y === 502
                 ? "L"

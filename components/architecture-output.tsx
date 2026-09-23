@@ -7,7 +7,7 @@ import { architectureOutput } from "../lib/architecture-output";
 import { Badge } from "./workshop-fields";
 import { useCaseCandidates } from "../lib/use-case-candidates";
 
-const componentProfiles: Record<string, { title: string; role: string; capabilities: string[] }> = {
+export const architectureComponentProfiles: Record<string, { title: string; role: string; capabilities: string[] }> = {
   H: {
     title: "Orchestration layer · OpenAI Frontier · Adobe CX Coworker",
     role: "The shared decision and coordination layer used by specialist agents: it preserves working context, selects the right capability, retrieves connected evidence and keeps people in control before an external action.",
@@ -25,6 +25,7 @@ const componentProfiles: Record<string, { title: string; role: string; capabilit
   F: { title: "Adobe Customer Journey Analytics", role: "The measurement layer that joins touchpoint response into a view of progression and returns the evidence needed for the next decision.", capabilities: ["Cross-touchpoint journey signals", "Audience progression", "Measurement inputs", "Learning loop to the agent"] },
   G: { title: "Sales experience", role: "The sales systems that contribute relationship context and receive a qualified, coordinated action when marketing and sales need to work together.", capabilities: ["CRM account context", "Relationship ownership", "Offer and next-step tools", "Confirmed progression signals"] },
 };
+const componentProfiles = architectureComponentProfiles;
 const priorityArchitectureCaseIds = ["s10", "s2", "s1", "s3", "s4"];
 export default function ArchitectureOutput({
   session: s,

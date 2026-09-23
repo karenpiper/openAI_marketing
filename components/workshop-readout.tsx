@@ -1,10 +1,14 @@
 import { useState, type Dispatch, type SetStateAction } from "react";
-import { type Session, activeCases, selectionConfirmed } from "../lib/workshop";
+import { type Session } from "../lib/workshop";
 import { closingSummary, closingItems } from "../lib/closing-summary";
 import ArchitectureOutput from "./architecture-output";
+import { architectureComponentProfiles } from "./architecture-output";
 import WorkshopRecord from "./workshop-record";
 import { Badge, Field } from "./workshop-fields";
 import SaveFooter from "./save-footer";
+import { useCaseCandidates } from "../lib/use-case-candidates";
+const clientPriorityCaseIds = ["s10", "s2", "s1", "s3", "s4"];
+const architectureComponentOrder = ["H", "A", "K", "D", "L", "J", "B", "C", "I", "E", "F", "G"];
 const labels = {
   ownership: "Ownership boundaries",
   sequence: "Proposed sequence of work",
@@ -21,7 +25,9 @@ export default function WorkshopReadout({
   room?: boolean;
 }) {
   const [view, setView] = useState<"outcomes" | "record" | "edit">("outcomes");
-  const cases = activeCases(session),
+  const cases = useCaseCandidates.filter((candidate) =>
+      clientPriorityCaseIds.includes(candidate.id),
+    ),
     summary = closingSummary(session);
   const items = closingItems(session);
   const navigate = (next: typeof view) => {
@@ -71,45 +77,70 @@ export default function WorkshopReadout({
         <span className="eyebrow">
           04 · Decisions, sequencing & Colin readout · 15 min
         </span>
-        <h1>Three outputs for the midday readout.</h1>
+        <h1>Architecture first. Five priorities to carry forward.</h1>
+        {!room && (
+          <button className="readout-pdf-button" onClick={() => window.print()}>
+            Download readout PDF
+          </button>
+        )}
       </div>
       <section className="closing-section">
         <div className="card-heading">
-          <h2>
-            01 ·{" "}
-            {cases.length === 3
-              ? "Three priority use cases"
-              : `${cases.length} priority use cases`}
-          </h2>
-          <Badge
-            value={
-              selectionConfirmed(session)
-                ? "Agreed working set"
-                : "Working set needs agreement"
-            }
-          />
+          <h2>01 · Proposed workflow architecture</h2>
         </div>
-        {cases.length !== 3 && (
-          <p>Agree three use cases in step 1 before closing.</p>
-        )}
+        <ArchitectureOutput
+          session={session}
+          compact
+          explorerCases={cases.map((useCase) => ({
+            id: useCase.id,
+            label: useCase.title,
+          }))}
+          download={!room}
+          setSession={room ? undefined : setSession}
+        />
+      </section>
+      <section className="closing-section architecture-component-reference">
+        <div className="card-heading">
+          <h2>02 · Architecture component reference</h2>
+          <Badge value="Proposed roles" />
+        </div>
+        <div className="architecture-component-summary">
+          {architectureComponentOrder.map((id) => {
+            const component = architectureComponentProfiles[id];
+            return <article key={id}>
+              <h3>{component.title}</h3>
+              <p>{component.role}</p>
+              <ul>{component.capabilities.map((capability) => <li key={capability}>{capability}</li>)}</ul>
+            </article>;
+          })}
+        </div>
+      </section>
+      <section className="closing-section">
+        <div className="card-heading">
+          <h2>03 · Five priority use cases</h2>
+          <Badge value="Agreed priority set" />
+        </div>
         <div className="outcome-priorities">
           {cases.map((u, i) => (
             <article className="outcome-priority" key={u.id}>
               <span className="eyebrow">{i + 1}</span>
-              <h3>{u.label}</h3>
+              <h3>{u.title}</h3>
+              <p>{u.short}</p>
+              <div className="priority-usecase-details">
+                <span className="eyebrow">Key uses</span>
+                <ul>{u.subUseCases.map((useCase) => <li key={useCase}>{useCase}</li>)}</ul>
+              </div>
               <dl>
                 <div>
                   <dt>What we need to prove</dt>
-                  <dd>
-                    {session.assessments[u.id].proofText || "Still to agree."}
-                  </dd>
+                  <dd>{session.assessments[u.id]?.proofText || "Still to agree."}</dd>
                 </div>
               </dl>
               <Badge
                 value={
-                  session.assessments[u.id].noRegret === "yes"
+                  session.assessments[u.id]?.noRegret === "yes"
                     ? "Can move now"
-                    : session.assessments[u.id].noRegret === "no"
+                    : session.assessments[u.id]?.noRegret === "no"
                       ? "Cannot move now"
                       : "Readiness to confirm"
                 }
@@ -118,28 +149,9 @@ export default function WorkshopReadout({
           ))}
         </div>
       </section>
-      <section className="closing-section closing-architecture">
-        <div>
-          <span className="eyebrow">02 · Working workflow architecture</span>
-          <ArchitectureOutput
-            session={session}
-            compact
-            download={!room}
-            setSession={room ? undefined : setSession}
-          />
-        </div>
-        <aside>
-          <h3>Ownership boundaries</h3>
-          <p className="preserve-lines">{summary.ownership}</p>
-          <p className="muted">
-            Baseline proposal with session annotations. Detailed changes and
-            unresolved boundaries are in the workflow architecture PDF.
-          </p>
-        </aside>
-      </section>
       <section className="closing-section">
         <div className="card-heading">
-          <h2>03 · Decisions & dependencies</h2>
+          <h2>04 · Decisions & dependencies</h2>
           {!room && setSession && (
             <button onClick={() => navigate("edit")}>
               Edit closing summary

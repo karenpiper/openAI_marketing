@@ -1123,9 +1123,9 @@ test("outcome readout lands on priorities and architecture without capture forms
     const html = renderToStaticMarkup(
       React.createElement(Readout, { session: s, setSession: () => {}, room }),
     );
-    assert.match(html, /Three priority use cases/);
+    assert.match(html, /Five priority use cases/);
     assert.match(html, /Proposed workflow architecture/);
-    assert.equal((html.match(/class="outcome-priority"/g) || []).length, 3);
+    assert.equal((html.match(/class="outcome-priority"/g) || []).length, 5);
     assert.ok(!html.includes("<textarea"));
     assert.ok(!html.includes("Current-state findings"));
     assert.ok(!html.includes("actions without owners"));
@@ -1134,8 +1134,7 @@ test("outcome readout lands on priorities and architecture without capture forms
   const empty = renderToStaticMarkup(
     React.createElement(Readout, { session: w.createSession() }),
   );
-  assert.match(empty, /0 priority use cases/);
-  assert.ok(!empty.includes("Three priority use cases"));
+  assert.match(empty, /Five priority use cases/);
 });
 
 test("architecture download recreates source diagram and links session annotations", () => {
@@ -1243,7 +1242,7 @@ test("readout highlights each priority flow and exposes decisions without the fu
   assert.match(html, /Operations lead owns review/);
   assert.match(html, /Confirm access to the queue/);
   assert.match(html, /Routine marketing operations/);
-  assert.match(html, /Route exceptions/);
+  assert.match(html, /Five priority use cases/);
   assert.match(html, /Dashed: proposed/);
   assert.ok(
     closingItems(s).some(
