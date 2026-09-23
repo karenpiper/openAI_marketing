@@ -90,7 +90,7 @@ export function architectureDiagram(
     id = groupFor(x, y),
   ) =>
     tint(
-      `<g class="architecture-component" data-architecture-component="${id}" tabindex="0" role="button"><rect x="${x}" y="${y}" width="${w}" height="${h}" rx="12" fill="#ffffff" stroke="#365343" stroke-width="1.5"/>${text(x + 16, y + Math.max(28, (h - lines.length * (size + 5)) / 2 + size), lines, size)}</g>`,
+      `<g class="architecture-component" data-architecture-component="${id}" tabindex="0" role="button"><rect x="${x}" y="${y}" width="${w}" height="${h}" rx="12" fill="#ffffff" stroke="#365343" stroke-width="1.5"/>${text(x + 16, y + Math.max(size + 8, (h - lines.length * (size + 5)) / 2 + size), lines, size)}</g>`,
       id,
     );
   const tag = (x: number, y: number, id: string) =>
