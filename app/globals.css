@@ -3627,6 +3627,21 @@ body {
   gap: .55rem;
   margin: 1rem 0 0;
 }
+.architecture-usecase-group {
+  display: flex;
+  flex-basis: 100%;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: .55rem;
+}
+.architecture-usecase-group > span {
+  width: 8.6rem;
+  color: #496450;
+  font-size: .72rem;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
 .architecture-usecase-tabs button {
   padding: .58rem .85rem;
   border: 1px solid #c9d2c5;

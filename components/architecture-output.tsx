@@ -25,6 +25,7 @@ const componentProfiles: Record<string, { title: string; role: string; capabilit
   F: { title: "Adobe Customer Journey Analytics", role: "The measurement layer that joins touchpoint response into a view of progression and returns the evidence needed for the next decision.", capabilities: ["Cross-touchpoint journey signals", "Audience progression", "Measurement inputs", "Learning loop to the agent"] },
   G: { title: "Sales experience", role: "The sales systems that contribute relationship context and receive a qualified, coordinated action when marketing and sales need to work together.", capabilities: ["CRM account context", "Relationship ownership", "Offer and next-step tools", "Confirmed progression signals"] },
 };
+const priorityArchitectureCaseIds = ["s10", "s2", "s1", "s3", "s4"];
 export default function ArchitectureOutput({
   session: s,
   download = true,
@@ -59,15 +60,17 @@ export default function ArchitectureOutput({
               ?.title || workflow,
         }
       : undefined;
+  const explorerBaseCases =
+    explorerCases ||
+    useCaseCandidates.map((candidate) => ({
+      id: candidate.id,
+      label: candidate.title,
+    }));
   const cases = explorer
     ? [
-        ...(explorerCases ||
-          useCaseCandidates.map((candidate) => ({
-            id: candidate.id,
-            label: candidate.title,
-          }))),
+        ...explorerBaseCases,
         ...((requestedWorkflow &&
-          !(explorerCases || []).some(
+          !explorerBaseCases.some(
             (candidate) => candidate.id === requestedWorkflow.id,
           )
           ? [requestedWorkflow]
@@ -81,6 +84,8 @@ export default function ArchitectureOutput({
     : cases[0]?.id;
   const step = s.readoutFlow.step;
   const flow = caseId ? workflows[caseId] : [];
+  const priorityCases = cases.filter((u) => priorityArchitectureCaseIds.includes(u.id));
+  const otherCases = cases.filter((u) => !priorityArchitectureCaseIds.includes(u.id));
 
   useEffect(() => {
     if (!playing || !explorerCase) return;
@@ -175,9 +180,14 @@ export default function ArchitectureOutput({
           </header>
           <div className="architecture-usecase-tabs" role="tablist" aria-label="Workflow architecture views">
             <button role="tab" aria-selected={!explorerCase} onClick={() => chooseExplorerCase("")}>All workflow architecture</button>
-            {cases.map((u) => (
-              <button key={u.id} role="tab" aria-selected={explorerCase === u.id} onClick={() => chooseExplorerCase(u.id)}>{u.label}</button>
-            ))}
+            <div className="architecture-usecase-group">
+              <span>Priority use cases</span>
+              {priorityCases.map((u) => <button key={u.id} role="tab" aria-selected={explorerCase === u.id} onClick={() => chooseExplorerCase(u.id)}>{u.label}</button>)}
+            </div>
+            <div className="architecture-usecase-group">
+              <span>Other use cases</span>
+              {otherCases.map((u) => <button key={u.id} role="tab" aria-selected={explorerCase === u.id} onClick={() => chooseExplorerCase(u.id)}>{u.label}</button>)}
+            </div>
           </div>
           <div className="architecture-story-layout architecture-explorer-layout">
             <div>
