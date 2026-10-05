@@ -1,0 +1,26 @@
+"use client";
+import { useState } from "react";
+import type { Asset } from "../lib/finserv-workflow";
+import { channels } from "../lib/finserv-workflow";
+import { assetFormat, designNotes } from "../lib/finserv-asset-design";
+import { mockupStyles } from "../lib/finserv-mockup-styles";
+import FinservAssetMockup from "./finserv-asset-mockup";
+import "./finserv-asset-gallery.css";
+export default function FinservAssetGallery({assets,revision,selectedId,onSelect,onEdit}:{assets:Asset[];revision:number;selectedId?:string;onSelect?:(id:string)=>void;onEdit?:(patch:Partial<Asset>)=>void}){
+ const [ownId,setOwnId]=useState(""),[mobile,setMobile]=useState(false),[editing,setEditing]=useState(false),[status,setStatus]=useState("");
+ const asset=assets.find(a=>a.id===(selectedId||ownId))||assets[0];
+ if(!asset)return null;
+ const choose=(id:string)=>{setOwnId(id);onSelect?.(id);};
+ function filter(track:Asset["track"],channel:Asset["channel"],persona?:string){const same=assets.find(a=>a.track===track&&a.channel===channel&&(!persona||a.persona===persona));const next=same||assets.find(a=>a.track===track&&a.channel===channel)||assets.find(a=>a.channel===channel)||assets[0];choose(next.id);}
+ async function download(all=false){setStatus("Preparing the visual work package…");try{const {assetDocument}=await import("../lib/finserv-asset-export");const html=assetDocument(all?assets:[asset],revision,mobile);const url=URL.createObjectURL(new Blob([html],{type:"text/html"}));const a=document.createElement("a");a.href=url;a.download=all?`finserv-visual-work-package-v${revision}.html`:`finserv-${asset.id}-v${revision}.html`;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);setStatus(all?"Visual work package downloaded. Open the HTML file to view or print the mockups.":"Mockup downloaded. Open the HTML file to view or print it.");}catch{setStatus("The visual download could not be prepared. Your edits are still saved in the workflow.");}}
+ const variations=assets.filter(a=>a.track===asset.track&&a.channel===asset.channel&&a.persona===asset.persona);
+ return <section className="fs-asset-gallery" aria-label="Visual work package"><style>{mockupStyles}</style><header className="fs-gallery-heading"><div><span className="agent-kicker">Visual work package · revision {revision}</span><h3>See the campaign as your audience will.</h3><p>OpenAI-inspired concept layouts · copy edits appear in the preview.</p></div><button onClick={()=>download(true)}>Download {assets.length>1?"visual work package":"mockup"} ↗</button></header>
+ <div className="fs-gallery-filters"><label>Audience<select value={asset.track} onChange={e=>filter(e.target.value as Asset["track"],asset.channel,asset.persona)}>{[...new Set(assets.map(a=>a.track))].map(t=><option key={t}>{t}</option>)}</select></label>{asset.track==="Top 20"&&<label>Buying role<select value={asset.persona||""} onChange={e=>filter(asset.track,asset.channel,e.target.value)}>{[...new Set(assets.filter(a=>a.track===asset.track).map(a=>a.persona||""))].map(p=><option key={p} value={p}>{p||"All buying roles"}</option>)}</select></label>}<label>Work product<select value={asset.id} onChange={e=>choose(e.target.value)}>{variations.map(a=><option value={a.id} key={a.id}>{a.id.endsWith("proof")?"Non-downloader proof":a.id.endsWith("recap")?"Event recap":a.id.endsWith("guide")?"Guide delivery":a.title}</option>)}</select></label></div>
+ <div className="fs-gallery-channels" aria-label="Asset channels">{channels.filter(c=>assets.some(a=>a.channel===c)).map(c=><button key={c} aria-pressed={asset.channel===c} onClick={()=>filter(asset.track,c,asset.persona)}>{c}</button>)}</div>
+ <div className="fs-gallery-toolbar"><span>{assetFormat(asset)}</span><div><button aria-pressed={!mobile} onClick={()=>setMobile(false)}>Desktop</button><button aria-pressed={mobile} onClick={()=>setMobile(true)}>Mobile</button>{onEdit&&<button aria-expanded={editing} onClick={()=>setEditing(v=>!v)}>{editing?"Close copy editor":"Edit copy"}</button>}<button onClick={()=>download()}>Download this asset</button></div></div>
+ {editing&&onEdit&&<div className="fs-gallery-editor"><label>Headline / subject<input value={asset.title} onChange={e=>onEdit({title:e.target.value})}/></label><label>Body copy<textarea rows={7} value={asset.body} onChange={e=>onEdit({body:e.target.value})}/></label><label>Call to action<input value={asset.cta} onChange={e=>onEdit({cta:e.target.value})}/></label><p>Copy changes reopen packet approval. Internal brief and production notes remain in the work package and are omitted from audience-facing previews.</p></div>}
+ <div className="fs-gallery-canvas"><FinservAssetMockup asset={asset} mobile={mobile}/></div><p className="fs-gallery-caption">{asset.track} · {asset.persona||"All finance roles"} · {asset.title}. Preview only; buttons and forms do not submit.</p>
+ {status&&<p role="status">{status}</p>}
+ <details className="fs-design-notes"><summary>Design reference and typography</summary><p>{designNotes.status}</p><p>{designNotes.font}</p><p><a href={designNotes.reference} target="_blank" rel="noreferrer">OpenAI design guidelines ↗</a> · <a href={designNotes.portal} target="_blank" rel="noreferrer">Full brand library ↗</a></p></details>
+ </section>;
+}

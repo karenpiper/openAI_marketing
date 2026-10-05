@@ -1,0 +1,13 @@
+const {test}=require('node:test');
+const assert=require('node:assert/strict');
+const fs=require('node:fs');
+const ts=require('typescript');
+for(const ext of ['.ts','.tsx'])require.extensions[ext]=(module,path)=>module._compile(ts.transpileModule(fs.readFileSync(path,'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX,esModuleInterop:true}}).outputText,path);
+const {createWorkflow,generateAssets}=require('../lib/finserv-workflow.ts');
+const {assetCopy,guideTitle}=require('../lib/finserv-asset-design.ts');
+const {assetDocument}=require('../lib/finserv-asset-export.ts');
+const assets=generateAssets(createWorkflow());
+test('all role and channel mockups export as self-contained inert HTML',()=>{const html=assetDocument(assets,4);assert.equal((html.match(/class="export-page"/g)||[]).length,28);for(const type of ['oa-linkedin','oa-web','oa-email','oa-event','oa-sales'])assert.ok(html.includes(type));assert.doesNotMatch(html,/<script|<form|<iframe|<input/i);assert.ok(html.includes('packet revision 4'));assert.ok(html.includes('No proprietary font file is bundled'));});
+test('customer copy omits production notes but preserves role-specific guidance',()=>{const sponsor=assets.find(a=>a.id==='top-sponsor-guide');const procurement=assets.find(a=>a.id==='top-procurement-guide');assert.doesNotMatch(assetCopy(sponsor).join(' '),/Campaign direction:/);assert.match(assetCopy(procurement).join(' '),/governance questions/);assert.notDeepEqual(assetCopy(procurement),assetCopy(sponsor));const web=assets.find(a=>a.channel==='Web');assert.doesNotMatch(assetCopy(web).join(' '),/Form fields:|Guide delivery follows/);});
+test('edits appear in selected mockup with HTML safely escaped',()=>{const html=assetDocument([{...assets[0],title:'Edited <script>alert(1)</script>',body:'Use <b>care</b> & clarity',cta:'Review >'}],8);assert.ok(html.includes('Edited &lt;script&gt;alert(1)&lt;/script&gt;'));assert.doesNotMatch(html,/<script>/i);assert.ok(html.includes('Use &lt;b&gt;care&lt;/b&gt; &amp; clarity'));assert.ok(html.includes('Review &gt;'));});
+test('mobile exports apply the mobile layout and alternate source covers',()=>{const w=createWorkflow();w.source='governance';const a=generateAssets(w).find(a=>a.channel==='Web');assert.equal(guideTitle(a),'Responsible Evaluation Guide');const html=assetDocument([a],1,true);assert.ok(html.includes('class="oa-mockup oa-mobile"'));assert.ok(html.includes('Responsible Evaluation Guide'));});
