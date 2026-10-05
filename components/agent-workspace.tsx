@@ -801,6 +801,10 @@ export default function AgentWorkspace() {
         ) : page === "workspace" ? (
           <main className="agent-main prototype-main">
             <section className="agent-stage" id="morgan-day">
+              <nav className="morgan-use-case-options" aria-label="Choose Morgan’s workflow">
+                <button aria-pressed={scenario === "northstar"} onClick={() => selectScenario("northstar")}><b>Northstar</b><span>Enterprise adoption · existing workflow</span></button>
+                <button aria-pressed={scenario === "finserv"} onClick={() => selectScenario("finserv")}><b>Finserv</b><span>Top 20 + broader market · October–December</span></button>
+              </nav>
               {scenario === "finserv" ? (
                 <div className="prototype-screen-layout"><MorganScreen scenario={scenario} onScenario={selectScenario}><FinservChat /></MorganScreen></div>
               ) : s.day.moment === 0 ? (
@@ -812,11 +816,12 @@ export default function AgentWorkspace() {
                       </span>
                       <h1>Good morning, Morgan.</h1>
                       <p className="agent-lede">
-                        Four things need your attention this morning. I
-                        recommend starting with the adoption opportunity; the
+                        Five things need your attention this morning. I
+                        can help with Northstar or the Finserv activation; the
                         other items are ready when you are.
                       </p>
                       <MorningInbox
+                        onFinserv={() => selectScenario("finserv")}
                         onStart={() => updateInMonitor(() => setChapter(0))}
                       />
                       <div className="day-agenda">

@@ -9,6 +9,14 @@ const items = [
     featured: true,
   },
   {
+    title: "Finserv activation needs a coordinated plan",
+    tag: "New campaign",
+    time: "October–November · December readout",
+    body: "Two connected journeys: tailored outreach for Top 20 buying groups and an inclusive finance campaign. Morgan needs to align the audience, content, approvals and Sales handoffs.",
+    next: "Build the Finserv campaign from brief through activation and December follow-through.",
+    featured: true,
+  },
+  {
     title: "Cedar & Finch needs a sponsor-ready point of view",
     tag: "Review needed",
     time: "Approval · today",
@@ -33,13 +41,13 @@ const items = [
     featured: false,
   },
 ];
-export default function MorningInbox({ onStart }: { onStart: () => void }) {
+export default function MorningInbox({ onStart, onFinserv }: { onStart: () => void; onFinserv: () => void }) {
   const [selected, setSelected] = useState<number | null>(null);
   return (
     <section className="morning-inbox">
       <div className="morning-inbox-heading">
         <h2>Your morning queue</h2>
-        <span>4 items · illustrative scenario</span>
+        <span>5 items · illustrative scenarios</span>
       </div>
       <div className="morning-inbox-grid">
         {items.map((item, i) => (
@@ -53,11 +61,11 @@ export default function MorningInbox({ onStart }: { onStart: () => void }) {
               aria-expanded={item.featured ? undefined : selected === i}
               onClick={() =>
                 item.featured
-                  ? onStart()
+                  ? (i === 1 ? onFinserv() : onStart())
                   : setSelected(selected === i ? null : i)
               }
             >
-              {item.featured ? "Work on this opportunity →" : "Preview item"}
+              {item.featured ? (i === 1 ? "Build the Finserv campaign →" : "Work on Northstar →") : "Preview item"}
             </button>
           </article>
         ))}
