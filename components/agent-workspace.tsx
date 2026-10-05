@@ -15,6 +15,7 @@ import {
   guidedReply,
   advanceDay,
 } from "../lib/agent-workspace";
+import FinservChat from "./finserv-chat";
 import { WorkflowWork } from "./workflow-work";
 import { CampaignEditor } from "./campaign-editor";
 import { processKey, processState } from "../lib/process-state";
@@ -211,6 +212,8 @@ function WorkflowArchitectureRail({
 }
 
 function MorganScreen({
+  scenario = "northstar",
+  onScenario,
   children,
   workflow = false,
   onRestart,
@@ -221,6 +224,8 @@ function MorganScreen({
   onCampaignResults,
   campaignResultsOpen = false,
 }: {
+  scenario?: "northstar" | "finserv";
+  onScenario?: (value: "northstar" | "finserv") => void;
   children: ReactNode;
   workflow?: boolean;
   onRestart?: () => void;
@@ -316,6 +321,8 @@ function MorganScreen({
                 <span className="project-icon" aria-hidden="true">▣</span>
                 Enterprise adoption
               </button>
+              <span className="chat-sidebar-label">Use cases</span>
+              {onScenario && <><button className={scenario === "northstar" ? "active-thread" : ""} aria-pressed={scenario === "northstar"} onClick={() => onScenario("northstar")}>Northstar · enterprise adoption</button><button className={scenario === "finserv" ? "active-thread" : ""} aria-pressed={scenario === "finserv"} onClick={() => onScenario("finserv")}>Finserv · Top 20 + broader market</button></>}
               <span className="chat-sidebar-label">Recent</span>
               <button
                 className="chat-thread active-thread"
@@ -357,6 +364,9 @@ export default function AgentWorkspace() {
   const [architectureWorkflow, setArchitectureWorkflow] = useState("");
   const [saved, setSaved] = useState("");
   const [page, setPage] = useState("intro");
+  const [scenario, setScenario] = useState<"northstar" | "finserv">("northstar");
+  function selectScenario(value: "northstar" | "finserv") { setScenario(value); setPage("workspace"); }
+
   const [showStepContext, setShowStepContext] = useState(false);
   const [architectureActivity, setArchitectureActivity] = useState("");
   const [architectureRoute, setArchitectureRoute] = useState<string[] | null>(
@@ -506,6 +516,7 @@ export default function AgentWorkspace() {
       );
     }
     const params = new URLSearchParams(location.search);
+    if (params.get("scenario") === "finserv") setScenario("finserv");
     const view = params.get("view");
     if (
       view &&
@@ -540,10 +551,12 @@ export default function AgentWorkspace() {
     if (!ready) return;
     const url = new URL(location.href);
     url.searchParams.set("view", page);
+    if (scenario === "finserv") url.searchParams.set("scenario", "finserv");
+    else url.searchParams.delete("scenario");
     if (page === "workspace") url.searchParams.set("day", String(s.day.moment));
     else url.searchParams.delete("day");
     history.replaceState(history.state, "", url);
-  }, [ready, page, s.day.moment]);
+  }, [ready, page, s.day.moment, scenario]);
   function save() {
     if (error) return { ok: false, message: error };
     try {
@@ -759,7 +772,7 @@ export default function AgentWorkspace() {
                 next decision draws on results.
               </p>
             </div>
-            <MorganScreen
+            <MorganScreen scenario={scenario} onScenario={selectScenario}
               onRestart={resetPrototype}
               onToggleArchitecture={() => setPage("architecture")}
             >
@@ -788,9 +801,11 @@ export default function AgentWorkspace() {
         ) : page === "workspace" ? (
           <main className="agent-main prototype-main">
             <section className="agent-stage" id="morgan-day">
-              {s.day.moment === 0 ? (
+              {scenario === "finserv" ? (
+                <div className="prototype-screen-layout"><MorganScreen scenario={scenario} onScenario={selectScenario}><FinservChat /></MorganScreen></div>
+              ) : s.day.moment === 0 ? (
                 <div className="prototype-screen-layout">
-                  <MorganScreen onRestart={resetPrototype}>
+                  <MorganScreen scenario={scenario} onScenario={selectScenario} onRestart={resetPrototype}>
                     <div className="day-arrival">
                       <span className="agent-kicker">
                         08:45 · Morgan arrives
@@ -821,7 +836,7 @@ export default function AgentWorkspace() {
                 </div>
               ) : s.day.moment === 4 ? (
                 <div className="prototype-screen-layout">
-                  <MorganScreen
+                  <MorganScreen scenario={scenario} onScenario={selectScenario}
                     workflow
                     onRestart={resetPrototype}
                     onToggleArchitecture={() => setPage("architecture")}
@@ -995,7 +1010,7 @@ export default function AgentWorkspace() {
               ) : (
                 <>
                   <div className="prototype-screen-layout">
-                    <MorganScreen
+                    <MorganScreen scenario={scenario} onScenario={selectScenario}
                       workflow
                       onRestart={resetPrototype}
                       onToggleArchitecture={() =>
